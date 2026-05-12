@@ -714,7 +714,11 @@ async function loadLendet() {
 }
 
 async function loadNxenesit() {
-  const { data } = await db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
+  let q = db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
+  if (currentUser.roli !== 'admin') {
+    q = q.eq('mesuese_id', currentUser.id);
+  }
+  const { data } = await q;
   allNxenesit = data || [];
   renderNxenesitList(allNxenesit);
 }
@@ -934,7 +938,8 @@ async function shtoNxenes() {
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
 
   const { data: nx, error: nxErr } = await db.from('nxenesit').insert({
-    emri, mbiemri, klasa_id: klasat.id, kodi_unik: kodiNx
+    emri, mbiemri, klasa_id: klasat.id, kodi_unik: kodiNx,
+    mesuese_id: currentUser.id
   }).select().single();
 
   if (nxErr) { errEl.textContent = 'Gabim gjatë shtimit të nxënësit.'; errEl.style.display = 'block'; return; }
@@ -1094,3 +1099,4 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 </script>
 </body>
 </html>
+
