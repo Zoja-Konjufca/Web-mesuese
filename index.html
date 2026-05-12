@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
@@ -817,9 +817,18 @@ async function shfaqDetailNxenes(id) {
 }
 
 async function loadBallina() {
-  const { count: nxCount } = await db.from('nxenesit').select('*', { count: 'exact', head: true });
-  const { count: prCount } = await db.from('prinderit').select('*', { count: 'exact', head: true });
-  const { count: noCount } = await db.from('notat').select('*', { count: 'exact', head: true });
+  let nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true });
+  let prQuery = db.from('prinderit').select('*', { count: 'exact', head: true });
+  let noQuery = db.from('notat').select('*', { count: 'exact', head: true });
+  
+  if (currentUser.roli !== 'admin') {
+    nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
+    noQuery = db.from('notat').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
+  }
+  
+  const { count: nxCount } = await nxQuery;
+  const { count: prCount } = await prQuery;
+  const { count: noCount } = await noQuery;
 
   document.getElementById('stats-grid').innerHTML = `
     <div class="stat-card"><div class="stat-num">${nxCount || 0}</div><div class="stat-label">Nxënës</div></div>
