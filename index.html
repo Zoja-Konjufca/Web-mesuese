@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<!-- saved from url=(0046)file:///Users/zojalohaj/Downloads/index_5.html -->
-<html lang="sq"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="sq">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a5c3a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Ditari i Mësueses">
-<link rel="manifest" href="file:///Users/zojalohaj/Downloads/manifest.json">
+<link rel="manifest" href="manifest.json">
 <title>Ditari i Mësueses — Platforma Shkollë-Prindër</title>
-<link href="./Ditari i Mësueses1_files/css2" rel="stylesheet">
-<script src="./Ditari i Mësueses1_files/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --green-dark: #0f3d25;
@@ -325,30 +325,30 @@
 </head>
 <body>
 
-<div id="loading-screen" style="display: none;">
+<div id="loading-screen">
   <div class="logo-big">Ditari i <span>Mësueses</span></div>
   <p>Duke ngarkuar...</p>
   <div class="spinner"></div>
 </div>
 
-<div id="login-screen" style="display: flex; min-height: 100vh; background: linear-gradient(160deg, rgb(15, 61, 37), rgb(26, 92, 58), rgb(45, 122, 82)); align-items: center; justify-content: center; padding: 20px;">
+<div id="login-screen" style="display:none; min-height:100vh; background:linear-gradient(160deg,#0f3d25,#1a5c3a,#2d7a52); align-items:center; justify-content:center; padding:20px;">
   <div class="login-card">
     <div class="login-logo">Ditari i <span>Mësueses</span></div>
     <div class="login-sub">Platforma Shkollë–Prindër</div>
 
     <div style="display:flex; gap:0; margin-bottom:24px; border:1.5px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;">
-      <button onclick="switchLoginTab(&#39;mesuese&#39;)" id="ltab-mesuese" style="flex:1;padding:10px;border:none;background:var(--green-main);color:white;font-family:&#39;DM Sans&#39;,sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Mësuese</button>
-      <button onclick="switchLoginTab(&#39;prind&#39;)" id="ltab-prind" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text-soft);font-family:&#39;DM Sans&#39;,sans-serif;font-size:14px;cursor:pointer;">Prind / Kujdestar</button>
+      <button onclick="switchLoginTab('mesuese')" id="ltab-mesuese" style="flex:1;padding:10px;border:none;background:var(--green-main);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Mësuese</button>
+      <button onclick="switchLoginTab('prind')" id="ltab-prind" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text-soft);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Prind / Kujdestar</button>
     </div>
 
     <div id="login-mesuese">
       <div class="form-group">
         <label>Email</label>
-        <input type="email" id="inp-email" placeholder="emri@shkolla.com">
+        <input type="email" id="inp-email" placeholder="emaili juaj personal">
       </div>
       <div class="form-group">
         <label>Fjalëkalimi</label>
-        <input type="password" id="inp-pass" placeholder="••••••••" onkeydown="if(event.key===&#39;Enter&#39;)loginMesuese()">
+        <input type="password" id="inp-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginMesuese()">
       </div>
       <button class="btn-primary" onclick="loginMesuese()">Hyr si Mësuese</button>
       <div class="login-err" id="login-err"></div>
@@ -357,7 +357,7 @@
     <div id="login-prind" style="display:none;">
       <div class="form-group">
         <label>Kodi i qasjes (nga mësuese)</label>
-        <input type="text" id="inp-kod" placeholder="p.sh. PR-3A-0912" style="font-size:1.1rem;letter-spacing:2px;text-transform:uppercase;" onkeydown="if(event.key===&#39;Enter&#39;)loginPrind()">
+        <input type="text" id="inp-kod" placeholder="p.sh. PR-3A-0912" style="font-size:1.1rem;letter-spacing:2px;text-transform:uppercase;" onkeydown="if(event.key==='Enter')loginPrind()">
       </div>
       <button class="btn-primary" onclick="loginPrind()">Hyr si Prind</button>
       <div class="login-err" id="login-err-prind"></div>
@@ -390,13 +390,13 @@
 
     <div class="panel" id="panel-nxenesit">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:&#39;DM Serif Display&#39;,serif;font-size:1.4rem;color:var(--green-dark);">Nxënësit</h2>
-        <button class="btn-green" onclick="openModal(&#39;modal-shto-nxenes&#39;)">+ Shto nxënës</button>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Nxënësit</h2>
+        <button class="btn-green" onclick="openModal('modal-shto-nxenes')">+ Shto nxënës</button>
       </div>
       <div class="card">
         <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <input type="text" id="search-nxenes" placeholder="Kërko nxënës..." oninput="filtroNxenesit()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:&#39;DM Sans&#39;,sans-serif;font-size:14px;outline:none;">
-          <select id="filter-klasa" onchange="filtroNxenesit()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:&#39;DM Sans&#39;,sans-serif;font-size:14px;outline:none;background:white;">
+          <input type="text" id="search-nxenes" placeholder="Kërko nxënës..." oninput="filtroNxenesit()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;">
+          <select id="filter-klasa" onchange="filtroNxenesit()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:white;">
             <option value="">Të gjitha klasat</option>
             <option>Klasa 1</option><option>Klasa 2</option><option>Klasa 3</option>
             <option>Klasa 4</option><option>Klasa 5</option>
@@ -408,7 +408,7 @@
 
     <div class="panel" id="panel-notat">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:&#39;DM Serif Display&#39;,serif;font-size:1.4rem;color:var(--green-dark);">Shëno Notë</h2>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Shëno Notë</h2>
       </div>
       <div class="card">
         <div class="form-row">
@@ -458,8 +458,8 @@
     <!-- PANEL: MËSUESET (vetëm admin) -->
     <div class="panel" id="panel-mesueset">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:&#39;DM Serif Display&#39;,serif;font-size:1.4rem;color:var(--green-dark);">Mësueset</h2>
-        <button class="btn-green" onclick="openModal(&#39;modal-shto-mesuese&#39;)">+ Shto mësuese</button>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Mësueset</h2>
+        <button class="btn-green" onclick="openModal('modal-shto-mesuese')">+ Shto mësuese</button>
       </div>
       <div id="mesueset-list"></div>
     </div>
@@ -509,7 +509,7 @@
     <div class="success-msg" id="sn-sukses"></div>
     <div class="error-msg" id="sn-error"></div>
     <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal(&#39;modal-shto-nxenes&#39;)">Anulo</button>
+      <button class="btn-outline" onclick="closeModal('modal-shto-nxenes')">Anulo</button>
       <button class="btn-green" onclick="shtoNxenes()">Krijo Profil</button>
     </div>
   </div>
@@ -520,7 +520,7 @@
   <div class="modal">
     <div class="modal-title">Shto Mësuese</div>
     <div class="form-row"><label>Emri i plotë</label><input type="text" id="sm-emri" placeholder="Fatmire Krasniqi"></div>
-    <div class="form-row"><label>Email</label><input type="email" id="sm-email" placeholder="email@shkolla.com"></div>
+    <div class="form-row"><label>Email</label><input type="email" id="sm-email" placeholder="emaili juaj personal"></div>
     <div class="form-row"><label>Fjalëkalimi fillestar</label><input type="text" id="sm-pass" placeholder="min. 8 karaktere"></div>
     <div class="form-row">
       <label>Roli</label>
@@ -547,7 +547,7 @@
     <div class="success-msg" id="sm-sukses"></div>
     <div class="error-msg" id="sm-error"></div>
     <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal(&#39;modal-shto-mesuese&#39;)">Anulo</button>
+      <button class="btn-outline" onclick="closeModal('modal-shto-mesuese')">Anulo</button>
       <button class="btn-green" onclick="shtoMesuese()">Krijo Llogari</button>
     </div>
   </div>
@@ -558,7 +558,7 @@
   <div class="modal">
     <div id="modal-nxenes-content"></div>
     <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal(&#39;modal-nxenes-detail&#39;)">Mbylle</button>
+      <button class="btn-outline" onclick="closeModal('modal-nxenes-detail')">Mbylle</button>
     </div>
   </div>
 </div>
@@ -1092,6 +1092,5 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
   el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
 });
 </script>
-
-
-</body></html>
+</body>
+</html>
