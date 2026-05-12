@@ -44,7 +44,6 @@
     font-size: 15px;
   }
 
-  /* ─── LOADING ─── */
   #loading-screen {
     position: fixed; inset: 0;
     background: var(--green-main);
@@ -69,7 +68,6 @@
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ─── LOGIN ─── */
   #login-screen {
     display: none; min-height: 100vh;
     background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-main) 60%, var(--green-mid) 100%);
@@ -110,10 +108,8 @@
   .btn-primary:hover { background: var(--green-mid); }
   .login-err { color: var(--danger); font-size: 13px; margin-top: 10px; text-align: center; min-height: 18px; }
 
-  /* ─── MAIN APP ─── */
   #app { display: none; }
 
-  /* TOP NAV */
   .topnav {
     background: var(--green-main);
     padding: 0 20px;
@@ -146,7 +142,6 @@
   }
   .btn-logout:hover { background: rgba(255,255,255,0.25); }
 
-  /* TABS */
   .tabs-bar {
     background: white; border-bottom: 1px solid var(--border);
     display: flex; padding: 0 20px; overflow-x: auto;
@@ -163,13 +158,11 @@
   .tab-btn.active { color: var(--green-main); border-bottom-color: var(--green-main); font-weight: 600; }
   .tab-btn:hover:not(.active) { color: var(--text-mid); }
 
-  /* CONTENT */
   .content { padding: 20px; max-width: 860px; margin: 0 auto; }
   .panel { display: none; animation: fadeIn 0.2s; }
   .panel.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* CARDS */
   .card {
     background: white; border-radius: var(--radius);
     border: 1px solid var(--border); padding: 20px 22px;
@@ -180,7 +173,6 @@
     letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 16px;
   }
 
-  /* NXENESIT LIST */
   .student-item {
     display: flex; align-items: center; gap: 12px;
     padding: 12px 0; border-bottom: 1px solid var(--green-ultra);
@@ -206,7 +198,6 @@
   .g1 { background: #fdf2f1; color: #c0392b; }
   .gx { background: #f5f5f5; color: #888; }
 
-  /* FORMA */
   .form-row { margin-bottom: 14px; }
   .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--text-mid); margin-bottom: 5px; letter-spacing: 0.4px; text-transform: uppercase; }
   .form-row input, .form-row select, .form-row textarea {
@@ -239,7 +230,6 @@
   }
   .btn-outline:hover { background: var(--green-pale); }
 
-  /* STATS */
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat-card {
     background: white; border-radius: var(--radius); padding: 16px 18px;
@@ -248,7 +238,6 @@
   .stat-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
   .stat-label { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
 
-  /* NOTA HISTORY */
   .nota-item {
     display: flex; align-items: flex-start; gap: 12px;
     padding: 12px 0; border-bottom: 1px solid var(--green-ultra);
@@ -259,7 +248,6 @@
   .nota-lenda p { font-size: 13px; color: var(--text-soft); margin-top: 3px; }
   .nota-date { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
 
-  /* MODAL */
   .modal-overlay {
     position: fixed; inset: 0;
     background: rgba(15,61,37,0.45);
@@ -278,7 +266,6 @@
   .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--green-dark); margin-bottom: 20px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
 
-  /* BADGE */
   .badge {
     display: inline-block; padding: 3px 10px; border-radius: 20px;
     font-size: 11px; font-weight: 600;
@@ -288,7 +275,6 @@
   .badge-aktive { background: #e8f5ee; color: #1a5c3a; }
   .badge-joaktive { background: #fdf2f1; color: #c0392b; }
 
-  /* PRIND VIEW */
   .prind-header {
     background: linear-gradient(135deg, var(--green-main), var(--green-mid));
     border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
@@ -305,7 +291,6 @@
   .subject-tile .s-name { font-size: 12px; color: var(--text-soft); margin-bottom: 6px; font-weight: 500; }
   .subject-tile .s-grade { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
 
-  /* SUCCESS MSG */
   .success-msg {
     background: var(--green-pale); border: 1px solid #a8d5b8;
     border-radius: var(--radius-sm); padding: 12px 14px;
@@ -319,12 +304,10 @@
     display: none;
   }
 
-  /* EMPTY STATE */
   .empty-state { text-align: center; padding: 40px 20px; color: var(--text-soft); }
   .empty-state svg { opacity: 0.3; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; }
 
-  /* KODI UNIK */
   .kodi-box {
     background: var(--green-pale); border: 1.5px dashed var(--green-light);
     border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 12px;
@@ -332,10 +315,8 @@
   .kodi-box .kodi-label { font-size: 11px; font-weight: 600; color: var(--text-soft); letter-spacing: 0.5px; text-transform: uppercase; }
   .kodi-box .kodi-val { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--green-dark); letter-spacing: 2px; }
 
-  /* SEPARATOR */
   .sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 
-  /* SCROLL HINT */
   @media (max-width: 600px) {
     .content { padding: 14px; }
     .login-card { padding: 28px 22px; }
@@ -344,26 +325,22 @@
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading-screen">
   <div class="logo-big">Ditari i <span>Mësueses</span></div>
   <p>Duke ngarkuar...</p>
   <div class="spinner"></div>
 </div>
 
-<!-- LOGIN -->
 <div id="login-screen" style="display:none; min-height:100vh; background:linear-gradient(160deg,#0f3d25,#1a5c3a,#2d7a52); align-items:center; justify-content:center; padding:20px;">
   <div class="login-card">
     <div class="login-logo">Ditari i <span>Mësueses</span></div>
     <div class="login-sub">Platforma Shkollë–Prindër</div>
 
-    <!-- Tabs: Mesuese / Prind -->
     <div style="display:flex; gap:0; margin-bottom:24px; border:1.5px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;">
       <button onclick="switchLoginTab('mesuese')" id="ltab-mesuese" style="flex:1;padding:10px;border:none;background:var(--green-main);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Mësuese</button>
       <button onclick="switchLoginTab('prind')" id="ltab-prind" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text-soft);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Prind / Kujdestar</button>
     </div>
 
-    <!-- LOGIN MESUESE -->
     <div id="login-mesuese">
       <div class="form-group">
         <label>Email</label>
@@ -377,7 +354,6 @@
       <div class="login-err" id="login-err"></div>
     </div>
 
-    <!-- LOGIN PRIND -->
     <div id="login-prind" style="display:none;">
       <div class="form-group">
         <label>Kodi i qasjes (nga mësuese)</label>
@@ -389,7 +365,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app">
   <nav class="topnav">
     <div class="nav-logo">Ditari i <span>Mësueses</span></div>
@@ -402,11 +377,9 @@
     </div>
   </nav>
 
-  <!-- TABS - shfaqen sipas rolit -->
   <div class="tabs-bar" id="tabs-bar"></div>
 
   <div class="content">
-    <!-- PANEL: BALLINA (Admin/Mesuese) -->
     <div class="panel" id="panel-ballina">
       <div class="stats-grid" id="stats-grid"></div>
       <div class="card">
@@ -415,7 +388,6 @@
       </div>
     </div>
 
-    <!-- PANEL: NXENESIT -->
     <div class="panel" id="panel-nxenesit">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Nxënësit</h2>
@@ -434,7 +406,6 @@
       </div>
     </div>
 
-    <!-- PANEL: NOTAT -->
     <div class="panel" id="panel-notat">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Shëno Notë</h2>
@@ -478,19 +449,10 @@
         <div class="error-msg" id="nota-error"></div>
       </div>
 
-      <!-- Historiku i notave -->
       <div class="card" id="card-historiku" style="display:none;">
         <div class="card-title">Historiku i notave — <span id="historiku-emri"></span></div>
         <div id="historiku-list"></div>
       </div>
-    </div>
-
-    <!-- PANEL: PRINDERIT -->
-    <div class="panel" id="panel-prinderit">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Prindërit</h2>
-      </div>
-      <div id="prinderit-list"></div>
     </div>
 
     <!-- PANEL: MËSUESET (vetëm admin) -->
@@ -502,7 +464,6 @@
       <div id="mesueset-list"></div>
     </div>
 
-    <!-- PANEL: PROFILI I FEMIJES (Prind) -->
     <div class="panel" id="panel-femija">
       <div class="prind-header" id="prind-header">
         <h2 id="femija-emri">—</h2>
@@ -518,16 +479,17 @@
       </div>
     </div>
 
-  </div><!-- /content -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <!-- MODAL: SHTO NXËNËS -->
 <div class="modal-overlay" id="modal-shto-nxenes">
   <div class="modal">
     <div class="modal-title">Shto Nxënës të Ri</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px;">Të dhënat e nxënësit</div>
     <div class="form-grid">
-      <div class="form-row"><label>Emri</label><input type="text" id="sn-emri" placeholder="Arta"></div>
-      <div class="form-row"><label>Mbiemri</label><input type="text" id="sn-mbiemri" placeholder="Nushi"></div>
+      <div class="form-row"><label>Emri</label><input type="text" id="sn-emri" placeholder="Emri i nxënësit"></div>
+      <div class="form-row"><label>Mbiemri</label><input type="text" id="sn-mbiemri" placeholder="Mbiemri i nxënësit"></div>
     </div>
     <div class="form-row">
       <label>Klasa</label>
@@ -571,7 +533,7 @@
       <label>Roli</label>
       <select id="sm-roli">
         <option value="admin">Admin (Mësuese Kryesore — 9 lëndë)</option>
-        <option value="anglisht">Mësuese Anglishteje</option>
+        <option value="mesuesja">Mësuese</option>
       </select>
     </div>
     <div class="form-row">
@@ -603,14 +565,12 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
-let currentUser = null; // { id, emri, roli, email }
-let currentPrind = null; // { id, emri, nxenesi_id, kodi }
+let currentUser = null;
+let currentPrind = null;
 let allNxenesit = [];
 let allLendet = [];
 
-// ─── INIT ───
 window.addEventListener('load', async () => {
-  // Kontrollo session
   const sess = localStorage.getItem('dm_session');
   if (sess) {
     try {
@@ -689,7 +649,6 @@ function logout() {
   showLogin();
 }
 
-// ─── SHOW APP ───
 async function showApp() {
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'none';
@@ -707,7 +666,6 @@ async function showApp() {
   }
 }
 
-// ─── MESUESE UI ───
 async function buildMesueseUI() {
   const isAdmin = currentUser.roli === 'admin';
   const tabs = [];
@@ -715,7 +673,6 @@ async function buildMesueseUI() {
   tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
   tabs.push({ id: 'notat', label: 'Shëno Notë' });
   if (isAdmin) {
-    tabs.push({ id: 'prinderit', label: 'Prindërit' });
     tabs.push({ id: 'mesueset', label: 'Mësueset' });
   }
 
@@ -724,7 +681,6 @@ async function buildMesueseUI() {
   await loadNxenesit();
   await loadBallina();
   if (isAdmin) { await loadMesueset(); }
-  await loadPrinderit();
   populateNotaForm();
 }
 
@@ -738,10 +694,6 @@ function buildTabs(tabs, active) {
 
 function switchTab(id, scroll=true) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent === document.querySelector(`.tab-btn[onclick*="${id}"]`)?.textContent);
-  });
-  // reset active tabs
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   const btn = document.querySelector(`.tab-btn[onclick="switchTab('${id}')"]`);
   if (btn) btn.classList.add('active');
@@ -752,7 +704,7 @@ function switchTab(id, scroll=true) {
 
 async function loadLendet() {
   let q = db.from('lendet').select('*');
-  if (currentUser.roli === 'anglisht') q = q.eq('mesuese_roli', 'anglisht');
+  // te gjitha lendet per mesuesin
   const { data } = await q.order('emri');
   allLendet = data || [];
 }
@@ -890,7 +842,6 @@ function populateNotaForm() {
     allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri} (${n.klasat ? n.klasat.emri : '—'})</option>`).join('');
   selL.innerHTML = '<option value="">— Zgjedh lëndën —</option>' +
     allLendet.map(l => `<option value="${l.id}">${l.emri}</option>`).join('');
-  // data sot
   document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
 }
 
@@ -973,11 +924,9 @@ async function shtoNxenes() {
     errEl.style.display = 'block'; return;
   }
 
-  // Gjej klasën
   const { data: klasat } = await db.from('klasat').select('id').eq('emri', klasa).single();
   if (!klasat) { errEl.textContent = 'Klasa nuk u gjet.'; errEl.style.display = 'block'; return; }
 
-  // Gjenero kodi unik për nxënësin
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
 
   const { data: nx, error: nxErr } = await db.from('nxenesit').insert({
@@ -986,7 +935,6 @@ async function shtoNxenes() {
 
   if (nxErr) { errEl.textContent = 'Gabim gjatë shtimit të nxënësit.'; errEl.style.display = 'block'; return; }
 
-  // Shto prind 1
   const kod1 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
   await db.from('prinderit').insert({
     nxenesi_id: nx.id, emri: p1emri,
@@ -995,7 +943,6 @@ async function shtoNxenes() {
     kodi_qasjes: kod1
   });
 
-  // Shto prind 2 nëse ka
   const p2emri = document.getElementById('sn-p2-emri').value.trim();
   if (p2emri) {
     const kod2 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
@@ -1010,34 +957,12 @@ async function shtoNxenes() {
   sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi i qasjes për prindin: ${kod1}`;
   sukEl.style.display = 'block';
 
-  // Pastro
   ['sn-emri','sn-mbiemri','sn-p1-emri','sn-p1-tel','sn-p1-email','sn-p2-emri','sn-p2-tel','sn-p2-email'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('sn-klasa').value = '';
 
   await loadNxenesit();
   populateNotaForm();
   await loadBallina();
-}
-
-async function loadPrinderit() {
-  const { data } = await db.from('prinderit').select('*, nxenesit(emri, mbiemri, klasat(emri))').order('emri');
-  const el = document.getElementById('prinderit-list');
-  if (!data || !data.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka prindër të regjistruar.</p></div></div>'; return; }
-  el.innerHTML = data.map(p => `
-    <div class="card" style="margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div style="font-weight:600;">${p.emri}</div>
-          <div style="font-size:13px;color:var(--text-soft);">Fëmija: ${p.nxenesit ? p.nxenesit.emri + ' ' + p.nxenesit.mbiemri : '—'} &nbsp;•&nbsp; ${p.nxenesit && p.nxenesit.klasat ? p.nxenesit.klasat.emri : ''}</div>
-          <div style="font-size:12px;color:var(--text-soft);margin-top:4px;">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
-        </div>
-      </div>
-      <div class="kodi-box">
-        <div class="kodi-label">Kodi i qasjes (dërgoje prindit)</div>
-        <div class="kodi-val">${p.kodi_qasjes}</div>
-      </div>
-    </div>
-  `).join('');
 }
 
 async function loadMesueset() {
@@ -1051,7 +976,7 @@ async function loadMesueset() {
         <div style="font-weight:500;">${m.emri}</div>
         <div style="font-size:13px;color:var(--text-soft);">${m.email}</div>
         <div style="margin-top:4px;display:flex;gap:6px;">
-          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : 'badge-anglisht'}">${m.roli === 'admin' ? 'Admin' : 'Anglisht'}</span>
+          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : 'badge-mesuesja'}">${m.roli === 'admin' ? 'Admin' : 'Mësuese'}</span>
           <span class="badge ${m.aktive ? 'badge-aktive' : 'badge-joaktive'}">${m.aktive ? 'Aktive' : 'Jo aktive'}</span>
         </div>
       </div>
@@ -1097,7 +1022,6 @@ async function shtoMesuese() {
   await loadMesueset();
 }
 
-// ─── PRIND UI ───
 async function buildPrindUI() {
   const tabs = [{ id: 'femija', label: 'Fëmija im' }];
   buildTabs(tabs, 'femija');
@@ -1112,10 +1036,8 @@ async function loadFemijaData() {
   document.getElementById('femija-emri').textContent = nx.emri + ' ' + nx.mbiemri;
   document.getElementById('femija-klasa').textContent = nx.klasat ? nx.klasat.emri : '';
 
-  // Notat sipas lëndës (nota e fundit për çdo lëndë)
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: false });
 
-  // Gropo sipas lëndës
   const byLende = {};
   if (notat) {
     notat.forEach(n => {
@@ -1128,7 +1050,6 @@ async function loadFemijaData() {
   if (!vals.length) {
     notaEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka nota.</p></div>';
   } else {
-    const gc = ['','g1','g2','g3','g4','g5'];
     notaEl.innerHTML = vals.map(n => `
       <div class="subject-tile">
         <div class="s-name">${n.lendet ? n.lendet.emri : '—'}</div>
@@ -1140,7 +1061,6 @@ async function loadFemijaData() {
     `).join('');
   }
 
-  // Komentet e fundit
   const komentEl = document.getElementById('femija-komentet');
   const meKoment = notat ? notat.filter(n => n.koment).slice(0, 5) : [];
   if (!meKoment.length) {
@@ -1160,7 +1080,6 @@ async function loadFemijaData() {
   }
 }
 
-// ─── MODALS ───
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(el => {
