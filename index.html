@@ -935,13 +935,10 @@ async function shtoNxenes() {
     errEl.style.display = 'block'; return;
   }
 
-  const { data: klasat } = await db.from('klasat').select('id').eq('emri', klasa).single();
-  if (!klasat) { errEl.textContent = 'Klasa nuk u gjet.'; errEl.style.display = 'block'; return; }
-
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
 
   const { data: nx, error: nxErr } = await db.from('nxenesit').insert({
-    emri, mbiemri, klasa_id: klasat.id, kodi_unik: kodiNx,
+    emri, mbiemri, kodi_unik: kodiNx,
     mesuese_id: currentUser.id
   }).select().single();
 
