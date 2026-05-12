@@ -391,7 +391,7 @@
     <div class="panel" id="panel-nxenesit">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Nxënësit</h2>
-        <button class="btn-green" onclick="openModal('modal-shto-nxenes')">+ Shto nxënës</button>
+        <button class="btn-green" id="btn-shto-nxenes" onclick="openModal('modal-shto-nxenes')">+ Shto nxënës</button>
       </div>
       <div class="card">
         <div style="display:flex;gap:10px;margin-bottom:16px;">
@@ -684,7 +684,10 @@ async function buildMesueseUI() {
   await loadLendet();
   await loadNxenesit();
   await loadBallina();
-  if (isAdmin) { await loadMesueset(); }
+  if (isAdmin) { 
+    await loadMesueset();
+    document.getElementById('btn-shto-nxenes').style.display = 'none';
+  }
   populateNotaForm();
 }
 
@@ -1099,4 +1102,3 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
 </script>
 </body>
 </html>
-
