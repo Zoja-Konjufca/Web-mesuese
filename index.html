@@ -694,7 +694,7 @@ async function buildMesueseUI() {
   const tabs = [];
   tabs.push({ id: 'ballina', label: 'Ballina' });
   tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
-  tabs.push({ id: 'lendet-notat', label: 'Lëndët' });
+  tabs.push({ id: 'lendet-notat', label: 'Lëndët', onclick: 'hapListenLendeve()' });
   tabs.push({ id: 'notat', label: 'Shëno Notë' });
   if (isAdmin) {
     tabs.push({ id: 'mesueset', label: 'Mësueset' });
@@ -715,9 +715,14 @@ async function buildMesueseUI() {
 function buildTabs(tabs, active) {
   const bar = document.getElementById('tabs-bar');
   bar.innerHTML = tabs.map(t =>
-    `<button class="tab-btn ${t.id===active?'active':''}" onclick="switchTab('${t.id}')">${t.label}</button>`
+    `<button class="tab-btn ${t.id===active?'active':''}" onclick="switchTab('${t.id}'); ${t.onclick||''}">${t.label}</button>`
   ).join('');
   switchTab(active, false);
+}
+
+function hapListenLendeve() {
+  const sel = document.getElementById('lendet-select');
+  if (sel) sel.focus();
 }
 
 function switchTab(id, scroll=true) {
@@ -1187,17 +1192,23 @@ async function ngarkoPanelLendet() {
     '</div>';
 }
 
-function ngjyroNoten(sel) {
-  if (sel.value) {
-    sel.style.background = '#e3f2fd';
-    sel.style.borderColor = '#1976d2';
-    sel.style.color = '#1976d2';
-    sel.style.fontWeight = '600';
+function ngjyroNoten(inp) {
+  const v = parseInt(inp.value);
+  if (inp.value && v >= 1 && v <= 5) {
+    inp.style.background = '#e3f2fd';
+    inp.style.borderColor = '#1976d2';
+    inp.style.color = '#1976d2';
+    inp.style.fontWeight = '700';
+  } else if (inp.value && (v < 1 || v > 5)) {
+    inp.value = '';
+    inp.style.background = 'white';
+    inp.style.borderColor = '#e74c3c';
+    inp.style.color = 'inherit';
   } else {
-    sel.style.background = 'white';
-    sel.style.borderColor = 'var(--border)';
-    sel.style.color = 'inherit';
-    sel.style.fontWeight = 'normal';
+    inp.style.background = 'white';
+    inp.style.borderColor = 'var(--border)';
+    inp.style.color = 'inherit';
+    inp.style.fontWeight = 'normal';
   }
 }
 
