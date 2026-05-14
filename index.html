@@ -460,16 +460,12 @@
 
     <!-- PANEL: LENDET -->
     <div class="panel" id="panel-lendet-notat">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lëndët</h2>
+        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lëndën për të vendosur nota</p>
       </div>
-      <div class="card">
-        <div class="form-row">
-          <label>Zgjedh Lëndën</label>
-          <select id="lendet-select" onchange="ngarkoPanelLendet()">
-            <option value="">— Zgjedh lëndën —</option>
-          </select>
-        </div>
+      <div id="lendet-lista-card" class="card" style="padding:10px;">
+        <div id="lendet-lista"></div>
       </div>
       <div id="lendet-nxenesit-list"></div>
     </div>
@@ -721,8 +717,7 @@ function buildTabs(tabs, active) {
 }
 
 function hapListenLendeve() {
-  const sel = document.getElementById('lendet-select');
-  if (sel) sel.focus();
+  populateLendetSelect();
 }
 
 function switchTab(id, scroll=true) {
@@ -882,10 +877,36 @@ async function loadBallina() {
 }
 
 function populateLendetSelect() {
-  const sel = document.getElementById('lendet-select');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">— Zgjedh lëndën —</option>' +
-    allLendet.map(l => '<option value="' + l.id + '">' + l.emri + '</option>').join('');
+  const el = document.getElementById('lendet-lista');
+  if (!el) return;
+  el.innerHTML = allLendet.map(l => `
+    <div onclick="zgjedhLenden('${l.id}')" id="lenda-item-${l.id}" style="
+      padding:14px 16px; border-radius:var(--radius-sm);
+      cursor:pointer; font-size:15px; font-weight:500;
+      border-bottom:1px solid var(--green-ultra);
+      display:flex; align-items:center; justify-content:space-between;
+      transition: background 0.15s;
+    " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='white'">
+      <span>${l.emri}</span>
+      <span style="font-size:12px;color:var(--text-soft);">→</span>
+    </div>
+  `).join('');
+}
+
+function zgjedhLenden(lId) {
+  // Highlight selected
+  document.querySelectorAll('[id^="lenda-item-"]').forEach(el => {
+    el.style.background = 'white';
+    el.style.fontWeight = '500';
+    el.style.color = 'inherit';
+  });
+  const selected = document.getElementById('lenda-item-' + lId);
+  if (selected) {
+    selected.style.background = 'var(--green-pale)';
+    selected.style.fontWeight = '700';
+    selected.style.color = 'var(--green-main)';
+  }
+  ngarkoPanelLendet(lId);
 }
 
 function populateNotaForm() {
@@ -1136,8 +1157,8 @@ async function loadFemijaData() {
   }
 }
 
-async function ngarkoPanelLendet() {
-  const lId = document.getElementById('lendet-select').value;
+async function ngarkoPanelLendet(lId) {
+  if (!lId) return;
   const el = document.getElementById('lendet-nxenesit-list');
   if (!lId) { el.innerHTML = ''; return; }
 
@@ -1212,8 +1233,10 @@ function ngjyroNoten(inp) {
   }
 }
 
+let currentLendaId = null;
+
 async function ruajNotatLendes() {
-  const lId = document.getElementById('lendet-select').value;
+  const lId = currentLendaId;
   const sukEl = document.getElementById('lendet-sukses');
   if (!lId) return;
 
