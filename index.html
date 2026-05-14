@@ -421,9 +421,10 @@
         </div>
         <div class="form-row">
           <label>Lënda</label>
-          <select id="nota-lenda">
+          <select id="nota-lenda" onchange="shfaqNotEnFundit()">
             <option value="">— Zgjedh lëndën —</option>
           </select>
+          <div id="nota-e-fundit" style="display:none; margin-top:8px; padding:10px 12px; background:#f5f5f5; border-radius:var(--radius-sm); color:#999; font-size:13px;"></div>
         </div>
         <div class="form-grid">
           <div class="form-row">
@@ -1102,6 +1103,31 @@ async function loadFemijaData() {
         </div>
       `;
     }).join('');
+  }
+}
+
+async function shfaqNotEnFundit() {
+  const nxId = document.getElementById('nota-nxenesi').value;
+  const lId = document.getElementById('nota-lenda').value;
+  const el = document.getElementById('nota-e-fundit');
+  
+  if (!nxId || !lId) { el.style.display = 'none'; return; }
+  
+  const { data } = await db.from('notat')
+    .select('nota, data_shenimit')
+    .eq('nxenesi_id', nxId)
+    .eq('lenda_id', lId)
+    .order('data_shenimit', { ascending: false })
+    .limit(1);
+  
+  if (data && data.length > 0) {
+    const d = new Date(data[0].data_shenimit);
+    const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
+    el.textContent = 'Nota e fundit: ' + data[0].nota + ' — ' + ds;
+    el.style.display = 'block';
+  } else {
+    el.textContent = 'Ende nuk ka notë për këtë lëndë';
+    el.style.display = 'block';
   }
 }
 
