@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sq">
 <head>
 <meta charset="UTF-8">
@@ -292,10 +292,12 @@
   .subject-tile .s-grade { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
 
   .success-msg {
-    background: var(--green-pale); border: 1px solid #a8d5b8;
-    border-radius: var(--radius-sm); padding: 12px 14px;
-    color: var(--green-dark); font-size: 14px; margin-top: 12px;
-    display: none;
+    background: #fff3e0; border: 2px solid #ffb74d;
+    border-radius: var(--radius-sm); padding: 20px 22px;
+    color: #e65100; font-size: 18px; font-weight: 700;
+    margin-top: 16px; display: none;
+    letter-spacing: 0.3px;
+    text-align: center;
   }
   .error-msg {
     background: var(--danger-light); border: 1px solid #f0b4b0;
@@ -923,6 +925,9 @@ async function ruajNoten() {
     errEl.style.display = 'block'; return;
   }
 
+  const nxenesi = allNxenesit.find(n => n.id === nxId);
+  const emriNxenesit = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '';
+  sukEl.textContent = '✓ Nota e ' + emriNxenesit + ' u ruajt me sukses!';
   sukEl.style.display = 'block';
   document.getElementById('nota-koment').value = '';
   document.getElementById('nota-nota').value = '';
