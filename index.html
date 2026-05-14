@@ -458,6 +458,22 @@
       </div>
     </div>
 
+    <!-- PANEL: LENDET -->
+    <div class="panel" id="panel-lendet-notat">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lëndët</h2>
+      </div>
+      <div class="card">
+        <div class="form-row">
+          <label>Zgjedh Lëndën</label>
+          <select id="lendet-select" onchange="ngarkoPanelLendet()">
+            <option value="">— Zgjedh lëndën —</option>
+          </select>
+        </div>
+      </div>
+      <div id="lendet-nxenesit-list"></div>
+    </div>
+
     <!-- PANEL: MËSUESET (vetëm admin) -->
     <div class="panel" id="panel-mesueset">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -678,6 +694,7 @@ async function buildMesueseUI() {
   const tabs = [];
   tabs.push({ id: 'ballina', label: 'Ballina' });
   tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
+  tabs.push({ id: 'lendet-notat', label: 'Lëndët' });
   tabs.push({ id: 'notat', label: 'Shëno Notë' });
   if (isAdmin) {
     tabs.push({ id: 'mesueset', label: 'Mësueset' });
@@ -692,6 +709,7 @@ async function buildMesueseUI() {
     document.getElementById('btn-shto-nxenes').style.display = 'none';
   }
   populateNotaForm();
+  populateLendetSelect();
 }
 
 function buildTabs(tabs, active) {
@@ -856,6 +874,13 @@ async function loadBallina() {
       </div>
     `;
   }).join('');
+}
+
+function populateLendetSelect() {
+  const sel = document.getElementById('lendet-select');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Zgjedh lëndën —</option>' +
+    allLendet.map(l => '<option value="' + l.id + '">' + l.emri + '</option>').join('');
 }
 
 function populateNotaForm() {
@@ -1103,6 +1128,82 @@ async function loadFemijaData() {
         </div>
       `;
     }).join('');
+  }
+}
+
+async function ngarkoPanelLendet() {
+  const lId = document.getElementById('lendet-select').value;
+  const el = document.getElementById('lendet-nxenesit-list');
+  if (!lId) { el.innerHTML = ''; return; }
+
+  const lenda = allLendet.find(l => l.id === lId);
+  
+  if (!allNxenesit.length) { 
+    el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>'; 
+    return; 
+  }
+
+  // Load last grades for this subject
+  const { data: notat } = await db.from('notat')
+    .select('nxenesi_id, nota')
+    .eq('lenda_id', lId)
+    .order('data_shenimit', { ascending: false });
+
+  const lastGrades = {};
+  if (notat) {
+    notat.forEach(n => {
+      if (!lastGrades[n.nxenesi_id]) lastGrades[n.nxenesi_id] = n.nota;
+    });
+  }
+
+  el.innerHTML = '<div class="card">' +
+    '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxënësve</div>' +
+    allNxenesit.map(n => {
+      const lastGrade = lastGrades[n.id];
+      const gc = lastGrade ? ['','g1','g2','g3','g4','g5'][lastGrade] || 'gx' : 'gx';
+      return '<div class="student-item" style="cursor:default;">' +
+        '<div class="s-avatar">' + n.emri[0] + n.mbiemri[0] + '</div>' +
+        '<div class="s-name">' + n.emri + ' ' + n.mbiemri + '</div>' +
+        (lastGrade ? '<span class="grade-pill ' + gc + '" style="margin-right:8px;font-size:11px;color:#999;">E fundit: ' + lastGrade + '</span>' : '<span style="font-size:11px;color:#ccc;margin-right:8px;">Pa notë</span>') +
+        '<select id="nota-l-' + n.id + '" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:14px;background:white;">' +
+        '<option value="">—</option>' +
+        '<option value="5">5</option>' +
+        '<option value="4">4</option>' +
+        '<option value="3">3</option>' +
+        '<option value="2">2</option>' +
+        '<option value="1">1</option>' +
+        '</select>' +
+        '</div>';
+    }).join('') +
+    '<div style="margin-top:16px;">' +
+    '<button class="btn-green" onclick="ruajNotatLendes()">Ruaj të gjitha notat</button>' +
+    '<div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div>' +
+    '</div>' +
+    '</div>';
+}
+
+async function ruajNotatLendes() {
+  const lId = document.getElementById('lendet-select').value;
+  const sukEl = document.getElementById('lendet-sukses');
+  if (!lId) return;
+
+  let saved = 0;
+  for (const n of allNxenesit) {
+    const nota = document.getElementById('nota-l-' + n.id)?.value;
+    if (!nota) continue;
+    await db.from('notat').insert({
+      nxenesi_id: n.id, lenda_id: lId, mesuese_id: currentUser.id,
+      nota: parseInt(nota),
+      data_shenimit: new Date().toISOString()
+    });
+    saved++;
+  }
+
+  if (saved > 0) {
+    sukEl.textContent = '✓ U ruajtën ' + saved + ' nota me sukses!';
+    sukEl.style.display = 'block';
+    await ngarkoPanelLendet();
+    await loadBallina();
   }
 }
 
