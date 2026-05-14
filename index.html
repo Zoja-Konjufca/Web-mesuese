@@ -1145,14 +1145,18 @@ async function ngarkoPanelLendet() {
 
   // Load last grades for this subject
   const { data: notat } = await db.from('notat')
-    .select('nxenesi_id, nota')
+    .select('nxenesi_id, nota, data_shenimit')
     .eq('lenda_id', lId)
     .order('data_shenimit', { ascending: false });
 
   const lastGrades = {};
+  const lastDates = {};
   if (notat) {
     notat.forEach(n => {
-      if (!lastGrades[n.nxenesi_id]) lastGrades[n.nxenesi_id] = n.nota;
+      if (!lastGrades[n.nxenesi_id]) {
+        lastGrades[n.nxenesi_id] = n.nota;
+        lastDates[n.nxenesi_id] = n.data_shenimit;
+      }
     });
   }
 
@@ -1160,19 +1164,20 @@ async function ngarkoPanelLendet() {
     '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxënësve</div>' +
     allNxenesit.map(n => {
       const lastGrade = lastGrades[n.id];
-      const gc = lastGrade ? ['','g1','g2','g3','g4','g5'][lastGrade] || 'gx' : 'gx';
-      return '<div class="student-item" style="cursor:default;">' +
+      const lastDate = lastDates[n.id] ? new Date(lastDates[n.id]).toLocaleDateString('sq-AL', {day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+      const today = new Date().toISOString().split('T')[0];
+      return '<div class="student-item" style="cursor:default;flex-wrap:wrap;gap:8px;">' +
         '<div class="s-avatar">' + n.emri[0] + n.mbiemri[0] + '</div>' +
         '<div class="s-name">' + n.emri + ' ' + n.mbiemri + '</div>' +
-        (lastGrade ? '<span class="grade-pill ' + gc + '" style="margin-right:8px;font-size:11px;color:#999;">E fundit: ' + lastGrade + '</span>' : '<span style="font-size:11px;color:#ccc;margin-right:8px;">Pa notë</span>') +
-        '<select id="nota-l-' + n.id + '" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:14px;background:white;">' +
-        '<option value="">—</option>' +
+        '<select id="nota-l-' + n.id + '" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:14px;background:white;width:80px;" onchange="ngjyroNoten(this)">' +
+        '<option value="">' + (lastGrade ? lastGrade : '—') + '</option>' +
         '<option value="5">5</option>' +
         '<option value="4">4</option>' +
         '<option value="3">3</option>' +
         '<option value="2">2</option>' +
         '<option value="1">1</option>' +
         '</select>' +
+        '<input type="text" readonly value="' + (lastDate ? lastDate : 'Pa datë') + '" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:13px;color:#999;background:#f9f9f9;width:120px;">' +
         '</div>';
     }).join('') +
     '<div style="margin-top:16px;">' +
@@ -1180,6 +1185,20 @@ async function ngarkoPanelLendet() {
     '<div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div>' +
     '</div>' +
     '</div>';
+}
+
+function ngjyroNoten(sel) {
+  if (sel.value) {
+    sel.style.background = '#e3f2fd';
+    sel.style.borderColor = '#1976d2';
+    sel.style.color = '#1976d2';
+    sel.style.fontWeight = '600';
+  } else {
+    sel.style.background = 'white';
+    sel.style.borderColor = 'var(--border)';
+    sel.style.color = 'inherit';
+    sel.style.fontWeight = 'normal';
+  }
 }
 
 async function ruajNotatLendes() {
