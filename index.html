@@ -857,7 +857,11 @@ async function loadBallina() {
     <div class="stat-card"><div class="stat-num">${noCount || 0}</div><div class="stat-label">Nota të shënuara</div></div>
   `;
 
-  const { data: fund } = await db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
+  let fundQuery = db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
+  if (currentUser.roli !== 'admin') {
+    fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
+  }
+  const { data: fund } = await fundQuery;
   const el = document.getElementById('aktiviteti-list');
   if (!fund || !fund.length) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka shënime.</p></div>'; return; }
   el.innerHTML = fund.map(n => {
