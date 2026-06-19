@@ -839,16 +839,25 @@ async function shfaqDetailNxenes(id) {
 
 async function loadBallina() {
   let nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true });
-  let prQuery = db.from('prinderit').select('*', { count: 'exact', head: true });
   let noQuery = db.from('notat').select('*', { count: 'exact', head: true });
-  
+  let prCount = 0;
+
   if (currentUser.roli !== 'admin') {
     nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
     noQuery = db.from('notat').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
+    // Count parents of mesuese's students only
+    const { data: nxIds } = await db.from('nxenesit').select('id').eq('mesuese_id', currentUser.id);
+    if (nxIds && nxIds.length > 0) {
+      const ids = nxIds.map(n => n.id);
+      const { count: pc } = await db.from('prinderit').select('*', { count: 'exact', head: true }).in('nxenesi_id', ids);
+      prCount = pc || 0;
+    }
+  } else {
+    const { count: pc } = await db.from('prinderit').select('*', { count: 'exact', head: true });
+    prCount = pc || 0;
   }
-  
+
   const { count: nxCount } = await nxQuery;
-  const { count: prCount } = await prQuery;
   const { count: noCount } = await noQuery;
 
   document.getElementById('stats-grid').innerHTML = `
