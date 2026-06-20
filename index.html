@@ -417,56 +417,67 @@
     </div>
 
     <div class="panel" id="panel-notat">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Shëno Notë</h2>
+      <div style="margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Notat</h2>
+        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lëndën për të shënuar nota</p>
       </div>
-      <div class="card">
-        <div class="form-row">
-          <label>Nxënësi</label>
-          <select id="nota-nxenesi" onchange="ngarkoProfil()"><option value="">— Zgjedh nxënësin —</option></select>
-        </div>
-        <div class="form-row">
-          <label>Lënda</label>
-          <select id="nota-lenda" onchange="shfaqNotEnFundit()"><option value="">— Zgjedh lëndën —</option></select>
+
+      <!-- Lista e lëndëve -->
+      <div id="notat-lendet-lista" class="card" style="padding:10px;margin-bottom:16px;">
+        <div id="notat-lendet-items"></div>
+      </div>
+
+      <!-- Forma e shënimit (fshihet fillimisht) -->
+      <div id="notat-forma" style="display:none;">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
+            <h3 id="notat-lenda-emri" style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);"></h3>
+          </div>
+          <div class="form-row">
+            <label>Nxënësi</label>
+            <select id="nota-nxenesi" onchange="ngarkoProfil()"><option value="">— Zgjedh nxënësin —</option></select>
+          </div>
           <div id="nota-e-fundit" style="display:none; margin-top:8px; padding:10px 12px; background:#f5f5f5; border-radius:var(--radius-sm); color:#999; font-size:13px;"></div>
-        </div>
-        <div class="form-grid">
-          <div class="form-row">
-            <label>Periudha</label>
-            <select id="nota-periudha">
-              <option value="1">Periudha 1</option>
-              <option value="2">Periudha 2</option>
-              <option value="3">Periudha 3</option>
-              <option value="4">Periudha 4</option>
-            </select>
+          <div class="form-grid">
+            <div class="form-row">
+              <label>Periudha</label>
+              <select id="nota-periudha">
+                <option value="1">Periudha 1</option>
+                <option value="2">Periudha 2</option>
+                <option value="3">Periudha 3</option>
+                <option value="4">Periudha 4</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Nota (1–5)</label>
+              <select id="nota-nota">
+                <option value="">—</option>
+                <option value="5">5 — Shkëlqyeshëm</option>
+                <option value="4">4 — Mirë</option>
+                <option value="3">3 — Mjaftueshëm</option>
+                <option value="2">2 — Dobët</option>
+                <option value="1">1 — Shumë dobët</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Data</label>
+              <input type="date" id="nota-data">
+            </div>
           </div>
           <div class="form-row">
-            <label>Nota (1–5)</label>
-            <select id="nota-nota">
-              <option value="">—</option>
-              <option value="5">5 — Shkëlqyeshëm</option>
-              <option value="4">4 — Mirë</option>
-              <option value="3">3 — Mjaftueshëm</option>
-              <option value="2">2 — Dobët</option>
-              <option value="1">1 — Shumë dobët</option>
-            </select>
+            <label>Koment për prindin (opsional)</label>
+            <textarea id="nota-koment" placeholder="p.sh. Bëri progres të mirë këtë javë..."></textarea>
           </div>
-          <div class="form-row">
-            <label>Data</label>
-            <input type="date" id="nota-data">
-          </div>
+          <input type="hidden" id="nota-lenda">
+          <button class="btn-green" onclick="ruajNoten()" id="btn-ruaj-noten">Ruaj dhe Njofto Prindin</button>
+          <div class="success-msg" id="nota-sukses">✓ Nota u ruajt me sukses!</div>
+          <div class="error-msg" id="nota-error"></div>
         </div>
-        <div class="form-row">
-          <label>Koment për prindin (opsional)</label>
-          <textarea id="nota-koment" placeholder="p.sh. Bëri progres të mirë këtë javë..."></textarea>
+        <div class="card" id="card-historiku" style="display:none;">
+          <div class="card-title">Historiku i notave — <span id="historiku-emri"></span></div>
+          <div id="historiku-list"></div>
         </div>
-        <button class="btn-green" onclick="ruajNoten()" id="btn-ruaj-noten">Ruaj dhe Njofto Prindin</button>
-        <div class="success-msg" id="nota-sukses">✓ Nota u ruajt me sukses!</div>
-        <div class="error-msg" id="nota-error"></div>
-      </div>
-      <div class="card" id="card-historiku" style="display:none;">
-        <div class="card-title">Historiku i notave — <span id="historiku-emri"></span></div>
-        <div id="historiku-list"></div>
       </div>
     </div>
 
@@ -682,7 +693,7 @@ async function buildMesueseUI() {
   tabs.push({ id: 'ballina', label: 'Ballina' });
   tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
   tabs.push({ id: 'lendet-notat', label: 'Lëndët', onclick: 'hapListenLendeve()' });
-  tabs.push({ id: 'notat', label: 'Shëno Notë' });
+  tabs.push({ id: 'notat', label: 'Notat', onclick: 'hapPanelNotat()' });
   if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mësueset' });
   buildTabs(tabs, 'ballina');
   await loadLendet();
@@ -692,8 +703,8 @@ async function buildMesueseUI() {
     await loadMesueset();
     document.getElementById('btn-shto-nxenes').style.display = 'none';
   }
-  populateNotaForm();
   populateLendetSelect();
+  hapPanelNotat();
   if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
 }
 
@@ -705,7 +716,44 @@ function buildTabs(tabs, active) {
   switchTab(active, false);
 }
 
-function hapListenLendeve() { populateLendetSelect(); }
+function hapPanelNotat() {
+  // Shfaq listën e lëndëve, fshih formën
+  document.getElementById('notat-lendet-lista').style.display = 'block';
+  document.getElementById('notat-forma').style.display = 'none';
+  // Nderto listën e lëndëve
+  const el = document.getElementById('notat-lendet-items');
+  el.innerHTML = allLendet.map(l => `
+    <div onclick="zgjedhLendenPerNota('${l.id}', '${l.emri}')" style="
+      padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:500;
+      border-bottom:1px solid var(--green-ultra); display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
+    " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='white'">
+      <span>${l.emri}</span>
+      <span style="font-size:12px;color:var(--text-soft);">→</span>
+    </div>
+  `).join('');
+}
+
+function zgjedhLendenPerNota(lId, lEmri) {
+  document.getElementById('nota-lenda').value = lId;
+  document.getElementById('notat-lenda-emri').textContent = lEmri;
+  document.getElementById('notat-lendet-lista').style.display = 'none';
+  document.getElementById('notat-forma').style.display = 'block';
+  // Populate nxënësit
+  const selN = document.getElementById('nota-nxenesi');
+  selN.innerHTML = '<option value="">— Zgjedh nxënësin —</option>' +
+    allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri}</option>`).join('');
+  document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
+  document.getElementById('card-historiku').style.display = 'none';
+  document.getElementById('nota-sukses').style.display = 'none';
+  document.getElementById('nota-error').style.display = 'none';
+}
+
+function kthehuNeLendet() {
+  document.getElementById('notat-lendet-lista').style.display = 'block';
+  document.getElementById('notat-forma').style.display = 'none';
+}
+
+
 
 function switchTab(id, scroll=true) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
