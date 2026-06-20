@@ -821,7 +821,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
   tabelaDiv.innerHTML = html;
 }
 
-
+async function shfaqTeGjihaLendet() {
   document.getElementById('notat-lendet-lista').style.display = 'none';
   document.getElementById('notat-forma').style.display = 'none';
 
@@ -833,12 +833,10 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
   }
   tabelaDiv.style.display = 'block';
 
-  // Merr të gjitha notat
   const { data: notat } = await db.from('notat')
-    .select('nxenesi_id, lenda_id, nota, periudha')
+    .select('nxenesi_id, lenda_id, nota')
     .in('nxenesi_id', allNxenesit.map(n => n.id));
 
-  // Nderto strukturën: mesatare[nxenesi_id][lenda_id] = mesatare
   const mesataret = {};
   if (notat) {
     const grouped = {};
@@ -883,9 +881,6 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
   html += `</tbody></table></div>`;
   tabelaDiv.innerHTML = html;
 }
-
-
-
 
 
 function switchTab(id, scroll=true) {
