@@ -700,12 +700,17 @@ async function buildMesueseUI() {
   await loadLendet();
   await loadNxenesit();
   await loadBallina();
-  if (isAdmin) { 
+  if (isAdmin) {
     await loadMesueset();
     document.getElementById('btn-shto-nxenes').style.display = 'none';
   }
   populateNotaForm();
   populateLendetSelect();
+
+  // Fshih filter-in e klasës për mësueset (jo admin)
+  if (!isAdmin) {
+    document.getElementById('filter-klasa').style.display = 'none';
+  }
 }
 
 function buildTabs(tabs, active) {
@@ -731,9 +736,7 @@ function switchTab(id, scroll=true) {
 }
 
 async function loadLendet() {
-  let q = db.from('lendet').select('*');
-  // te gjitha lendet per mesuesin
-  const { data } = await q.order('emri');
+  const { data } = await db.from('lendet').select('*').order('emri');
   allLendet = data || [];
 }
 
@@ -845,7 +848,6 @@ async function loadBallina() {
   if (currentUser.roli !== 'admin') {
     nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
     noQuery = db.from('notat').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
-    // Count parents of mesuese's students only
     const { data: nxIds } = await db.from('nxenesit').select('id').eq('mesuese_id', currentUser.id);
     if (nxIds && nxIds.length > 0) {
       const ids = nxIds.map(n => n.id);
@@ -907,7 +909,6 @@ function populateLendetSelect() {
 }
 
 function zgjedhLenden(lId) {
-  // Highlight selected
   document.querySelectorAll('[id^="lenda-item-"]').forEach(el => {
     el.style.background = 'white';
     el.style.fontWeight = '500';
@@ -1003,7 +1004,6 @@ async function ruajNoten() {
 async function shtoNxenes() {
   const emri = document.getElementById('sn-emri').value.trim();
   const mbiemri = document.getElementById('sn-mbiemri').value.trim();
-  const klasa = currentUser.klasa || '';
   const p1emri = document.getElementById('sn-p1-emri').value.trim();
   const sukEl = document.getElementById('sn-sukses');
   const errEl = document.getElementById('sn-error');
@@ -1046,7 +1046,6 @@ async function shtoNxenes() {
   sukEl.style.display = 'block';
 
   ['sn-emri','sn-mbiemri','sn-p1-emri','sn-p1-tel','sn-p1-email','sn-p2-emri','sn-p2-tel','sn-p2-email'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('sn-klasa').value = '';
 
   await loadNxenesit();
   populateNotaForm();
@@ -1172,17 +1171,16 @@ async function loadFemijaData() {
 
 async function ngarkoPanelLendet(lId) {
   if (!lId) return;
+  currentLendaId = lId;
   const el = document.getElementById('lendet-nxenesit-list');
-  if (!lId) { el.innerHTML = ''; return; }
 
   const lenda = allLendet.find(l => l.id === lId);
-  
-  if (!allNxenesit.length) { 
-    el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>'; 
-    return; 
+
+  if (!allNxenesit.length) {
+    el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>';
+    return;
   }
 
-  // Load last grades for this subject
   const { data: notat } = await db.from('notat')
     .select('nxenesi_id, nota, data_shenimit')
     .eq('lenda_id', lId)
@@ -1261,7 +1259,7 @@ async function ruajNotatLendes() {
   if (saved > 0) {
     sukEl.textContent = '✓ U ruajtën ' + saved + ' nota me sukses!';
     sukEl.style.display = 'block';
-    await ngarkoPanelLendet();
+    await ngarkoPanelLendet(lId);
     await loadBallina();
   }
 }
@@ -1270,16 +1268,16 @@ async function shfaqNotEnFundit() {
   const nxId = document.getElementById('nota-nxenesi').value;
   const lId = document.getElementById('nota-lenda').value;
   const el = document.getElementById('nota-e-fundit');
-  
+
   if (!nxId || !lId) { el.style.display = 'none'; return; }
-  
+
   const { data } = await db.from('notat')
     .select('nota, data_shenimit')
     .eq('nxenesi_id', nxId)
     .eq('lenda_id', lId)
     .order('data_shenimit', { ascending: false })
     .limit(1);
-  
+
   if (data && data.length > 0) {
     const d = new Date(data[0].data_shenimit);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
