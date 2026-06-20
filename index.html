@@ -761,7 +761,67 @@ function kthehuNeLendet() {
   document.getElementById('te-gjitha-tabela').style.display = 'none';
 }
 
-async function shfaqTeGjihaLendet() {
+async function shfaqPeriudhatPerLende(lId, lEmri) {
+  let tabelaDiv = document.getElementById('te-gjitha-tabela');
+  tabelaDiv.style.display = 'block';
+
+  // Merr notat për këtë lëndë
+  const { data: notat } = await db.from('notat')
+    .select('nxenesi_id, nota, periudha')
+    .eq('lenda_id', lId)
+    .in('nxenesi_id', allNxenesit.map(n => n.id));
+
+  // Grupo sipas nxënësit dhe periudhës
+  const byNxenes = {};
+  if (notat) {
+    notat.forEach(n => {
+      if (!byNxenes[n.nxenesi_id]) byNxenes[n.nxenesi_id] = {};
+      byNxenes[n.nxenesi_id][n.periudha || 1] = n.nota;
+    });
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <button onclick="shfaqTeGjihaLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">${lEmri} — 4 Periudhat</h3>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <table class="notat-tabela" style="min-width:400px;">
+        <thead>
+          <tr>
+            <th>Nxënësi</th>
+            <th style="text-align:center;">P1</th>
+            <th style="text-align:center;">P2</th>
+            <th style="text-align:center;">P3</th>
+            <th style="text-align:center;">P4</th>
+            <th style="text-align:center;background:var(--green-mid);color:white;">Mesatare</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  allNxenesit.forEach(n => {
+    const periudhat = byNxenes[n.id] || {};
+    const vlerat = [1,2,3,4].map(p => periudhat[p] || null);
+    const vleratNumerike = vlerat.filter(v => v !== null);
+    const mesatare = vleratNumerike.length > 0
+      ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
+      : null;
+    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
+
+    html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
+    vlerat.forEach(v => {
+      const gc = v ? (['','g1','g2','g3','g4','g5'][v] || 'gx') : 'gx';
+      html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
+    });
+    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  tabelaDiv.innerHTML = html;
+}
+
+
   document.getElementById('notat-lendet-lista').style.display = 'none';
   document.getElementById('notat-forma').style.display = 'none';
 
@@ -804,7 +864,7 @@ async function shfaqTeGjihaLendet() {
         <thead>
           <tr>
             <th>Nxënësi</th>
-            ${allLendet.map(l => `<th style="text-align:center;">${l.emri}</th>`).join('')}
+            ${allLendet.map(l => `<th style="text-align:center;cursor:pointer;" onclick="shfaqPeriudhatPerLende('${l.id}', '${l.emri}')" title="Kliko për periudhat"><span style="border-bottom:1.5px dashed var(--green-light);">${l.emri}</span></th>`).join('')}
           </tr>
         </thead>
         <tbody>
