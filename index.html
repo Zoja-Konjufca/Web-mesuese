@@ -78,31 +78,23 @@
     padding: 40px 36px; width: 100%; max-width: 400px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.25);
   }
-  .login-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem; color: var(--green-main);
-    margin-bottom: 4px;
-  }
+  .login-logo { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); margin-bottom: 4px; }
   .login-logo span { color: var(--gold); }
   .login-sub { color: var(--text-soft); font-size: 13px; margin-bottom: 32px; }
   .form-group { margin-bottom: 18px; }
   .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
   .form-group input {
     width: 100%; padding: 12px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px; color: var(--text-dark);
-    transition: border-color 0.2s;
-    outline: none;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text-dark);
+    transition: border-color 0.2s; outline: none;
   }
   .form-group input:focus { border-color: var(--green-main); }
   .btn-primary {
     width: 100%; padding: 13px;
     background: var(--green-main); color: white;
     border: none; border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
     cursor: pointer; transition: background 0.2s;
   }
   .btn-primary:hover { background: var(--green-mid); }
@@ -118,16 +110,10 @@
     position: sticky; top: 0; z-index: 100;
     box-shadow: 0 2px 12px rgba(15,61,37,0.18);
   }
-  .nav-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem; color: white; letter-spacing: -0.5px;
-  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: white; letter-spacing: -0.5px; }
   .nav-logo span { color: var(--gold-light); }
   .nav-right { display: flex; align-items: center; gap: 12px; }
-  .nav-user {
-    font-size: 13px; color: rgba(255,255,255,0.75);
-    display: flex; align-items: center; gap: 8px;
-  }
+  .nav-user { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 8px; }
   .nav-avatar {
     width: 32px; height: 32px; border-radius: 50%;
     background: rgba(255,255,255,0.2);
@@ -144,16 +130,14 @@
 
   .tabs-bar {
     background: white; border-bottom: 1px solid var(--border);
-    display: flex; padding: 0 20px; overflow-x: auto;
-    scrollbar-width: none;
+    display: flex; padding: 0 20px; overflow-x: auto; scrollbar-width: none;
   }
   .tabs-bar::-webkit-scrollbar { display: none; }
   .tab-btn {
     padding: 14px 18px; border: none; background: none;
     font-family: 'DM Sans', sans-serif; font-size: 14px;
     color: var(--text-soft); cursor: pointer; white-space: nowrap;
-    border-bottom: 2.5px solid transparent; transition: all 0.2s;
-    font-weight: 500;
+    border-bottom: 2.5px solid transparent; transition: all 0.2s; font-weight: 500;
   }
   .tab-btn.active { color: var(--green-main); border-bottom-color: var(--green-main); font-weight: 600; }
   .tab-btn:hover:not(.active) { color: var(--text-mid); }
@@ -188,9 +172,7 @@
   }
   .s-name { flex: 1; font-weight: 500; }
   .s-klasa { font-size: 12px; color: var(--text-soft); }
-  .grade-pill {
-    padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
-  }
+  .grade-pill { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
   .g5 { background: #e8f5ee; color: #1a5c3a; }
   .g4 { background: #e8f0f5; color: #1a3c5c; }
   .g3 { background: #faf5e8; color: #5c4a1a; }
@@ -204,8 +186,7 @@
     width: 100%; padding: 10px 12px;
     border: 1.5px solid var(--border); border-radius: var(--radius-sm);
     font-family: 'DM Sans', sans-serif; font-size: 14px;
-    color: var(--text-dark); background: white; outline: none;
-    transition: border-color 0.2s;
+    color: var(--text-dark); background: white; outline: none; transition: border-color 0.2s;
   }
   .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--green-main); }
   .form-row textarea { resize: vertical; min-height: 80px; }
@@ -216,32 +197,24 @@
     background: var(--green-main); color: white; border: none;
     padding: 11px 20px; border-radius: var(--radius-sm);
     font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: background 0.2s; display: inline-flex;
-    align-items: center; gap: 6px;
+    cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px;
   }
   .btn-green:hover { background: var(--green-mid); }
   .btn-green:disabled { background: var(--border); cursor: not-allowed; }
   .btn-outline {
     background: transparent; color: var(--green-main);
-    border: 1.5px solid var(--green-main);
-    padding: 10px 18px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--green-main); padding: 10px 18px; border-radius: var(--radius-sm);
     font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
     cursor: pointer; transition: all 0.2s;
   }
   .btn-outline:hover { background: var(--green-pale); }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-  .stat-card {
-    background: white; border-radius: var(--radius); padding: 16px 18px;
-    border: 1px solid var(--border); text-align: center;
-  }
+  .stat-card { background: white; border-radius: var(--radius); padding: 16px 18px; border: 1px solid var(--border); text-align: center; }
   .stat-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
   .stat-label { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
 
-  .nota-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--green-ultra);
-  }
+  .nota-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--green-ultra); }
   .nota-item:last-child { border-bottom: none; }
   .nota-lenda { flex: 1; }
   .nota-lenda strong { font-size: 14px; color: var(--text-dark); }
@@ -249,65 +222,48 @@
   .nota-date { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
 
   .modal-overlay {
-    position: fixed; inset: 0;
-    background: rgba(15,61,37,0.45);
-    z-index: 500; display: none;
-    align-items: center; justify-content: center; padding: 20px;
+    position: fixed; inset: 0; background: rgba(15,61,37,0.45);
+    z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px;
   }
   .modal-overlay.open { display: flex; }
   .modal {
-    background: white; border-radius: 20px;
-    padding: 28px 26px; width: 100%; max-width: 500px;
-    max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    animation: modalIn 0.25s;
+    background: white; border-radius: 20px; padding: 28px 26px;
+    width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.25s;
   }
   @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--green-dark); margin-bottom: 20px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
 
-  .badge {
-    display: inline-block; padding: 3px 10px; border-radius: 20px;
-    font-size: 11px; font-weight: 600;
-  }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
   .badge-admin { background: var(--green-pale); color: var(--green-dark); }
-  .badge-anglisht { background: #e8eef5; color: #1a3c5c; }
   .badge-aktive { background: #e8f5ee; color: #1a5c3a; }
   .badge-joaktive { background: #fdf2f1; color: #c0392b; }
 
   .prind-header {
     background: linear-gradient(135deg, var(--green-main), var(--green-mid));
-    border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
-    color: white;
+    border-radius: var(--radius); padding: 24px; margin-bottom: 16px; color: white;
   }
   .prind-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
   .prind-header p { opacity: 0.75; font-size: 13px; margin-top: 4px; }
 
   .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
-  .subject-tile {
-    background: white; border-radius: var(--radius-sm);
-    border: 1px solid var(--border); padding: 14px 12px; text-align: center;
-  }
+  .subject-tile { background: white; border-radius: var(--radius-sm); border: 1px solid var(--border); padding: 14px 12px; text-align: center; }
   .subject-tile .s-name { font-size: 12px; color: var(--text-soft); margin-bottom: 6px; font-weight: 500; }
   .subject-tile .s-grade { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
 
   .success-msg {
-    background: #fff3e0; border: 2px solid #ffb74d;
-    border-radius: var(--radius-sm); padding: 20px 22px;
-    color: #e65100; font-size: 18px; font-weight: 700;
-    margin-top: 16px; display: none;
-    letter-spacing: 0.3px;
-    text-align: center;
+    background: #fff3e0; border: 2px solid #ffb74d; border-radius: var(--radius-sm);
+    padding: 20px 22px; color: #e65100; font-size: 18px; font-weight: 700;
+    margin-top: 16px; display: none; letter-spacing: 0.3px; text-align: center;
   }
   .error-msg {
     background: var(--danger-light); border: 1px solid #f0b4b0;
     border-radius: var(--radius-sm); padding: 12px 14px;
-    color: var(--danger); font-size: 14px; margin-top: 12px;
-    display: none;
+    color: var(--danger); font-size: 14px; margin-top: 12px; display: none;
   }
 
   .empty-state { text-align: center; padding: 40px 20px; color: var(--text-soft); }
-  .empty-state svg { opacity: 0.3; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; }
 
   .kodi-box {
@@ -319,15 +275,64 @@
 
   .sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 
-  .notat-tabela { width: 100%; border-collapse: collapse; margin-top: 8px; }
-  .notat-tabela th { background: var(--green-pale); color: var(--green-dark); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; text-align: left; }
-  .notat-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--green-ultra); font-size: 14px; }
+  /* FAQJA E DETAJEVE TË NXËNËSIT */
+  #nxenes-detail-page {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--green-ultra);
+    z-index: 200;
+    overflow-y: auto;
+    animation: slideIn 0.25s;
+  }
+  #nxenes-detail-page.open { display: block; }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .detail-header {
+    background: var(--green-main);
+    padding: 16px 20px;
+    display: flex; align-items: center; gap: 14px;
+    position: sticky; top: 0; z-index: 10;
+    box-shadow: 0 2px 12px rgba(15,61,37,0.18);
+  }
+  .detail-header button {
+    background: rgba(255,255,255,0.2); border: none; color: white;
+    padding: 8px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
+    font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+  }
+  .detail-header button:hover { background: rgba(255,255,255,0.3); }
+  .detail-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: white; flex: 1; }
+
+  .detail-content { padding: 20px; max-width: 860px; margin: 0 auto; }
+
+  .nxenes-hero {
+    background: linear-gradient(135deg, var(--green-main), var(--green-mid));
+    border-radius: var(--radius); padding: 24px; margin-bottom: 20px; color: white;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .nxenes-hero-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: white; flex-shrink: 0;
+  }
+  .nxenes-hero h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+  .nxenes-hero p { opacity: 0.8; font-size: 13px; margin-top: 4px; }
+
+  .notat-tabela { width: 100%; border-collapse: collapse; }
+  .notat-tabela th {
+    background: var(--green-pale); color: var(--green-dark);
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.5px; padding: 12px 14px; text-align: left;
+  }
+  .notat-tabela td { padding: 12px 14px; border-bottom: 1px solid var(--green-ultra); font-size: 14px; }
   .notat-tabela tr:last-child td { border-bottom: none; }
   .notat-tabela tr:hover td { background: var(--green-ultra); }
 
   @media (max-width: 600px) {
     .content { padding: 14px; }
     .login-card { padding: 28px 22px; }
+    .detail-content { padding: 14px; }
   }
 </style>
 </head>
@@ -343,12 +348,10 @@
   <div class="login-card">
     <div class="login-logo">Ditari i <span>Mësueses</span></div>
     <div class="login-sub">Platforma Shkollë–Prindër</div>
-
     <div style="display:flex; gap:0; margin-bottom:24px; border:1.5px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;">
       <button onclick="switchLoginTab('mesuese')" id="ltab-mesuese" style="flex:1;padding:10px;border:none;background:var(--green-main);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Mësuese</button>
       <button onclick="switchLoginTab('prind')" id="ltab-prind" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text-soft);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Prind / Kujdestar</button>
     </div>
-
     <div id="login-mesuese">
       <div class="form-group">
         <label>Email</label>
@@ -361,7 +364,6 @@
       <button class="btn-primary" onclick="loginMesuese()">Hyr si Mësuese</button>
       <div class="login-err" id="login-err"></div>
     </div>
-
     <div id="login-prind" style="display:none;">
       <div class="form-group">
         <label>Kodi i qasjes (nga mësuese)</label>
@@ -421,15 +423,11 @@
       <div class="card">
         <div class="form-row">
           <label>Nxënësi</label>
-          <select id="nota-nxenesi" onchange="ngarkoProfil()">
-            <option value="">— Zgjedh nxënësin —</option>
-          </select>
+          <select id="nota-nxenesi" onchange="ngarkoProfil()"><option value="">— Zgjedh nxënësin —</option></select>
         </div>
         <div class="form-row">
           <label>Lënda</label>
-          <select id="nota-lenda" onchange="shfaqNotEnFundit()">
-            <option value="">— Zgjedh lëndën —</option>
-          </select>
+          <select id="nota-lenda" onchange="shfaqNotEnFundit()"><option value="">— Zgjedh lëndën —</option></select>
           <div id="nota-e-fundit" style="display:none; margin-top:8px; padding:10px 12px; background:#f5f5f5; border-radius:var(--radius-sm); color:#999; font-size:13px;"></div>
         </div>
         <div class="form-grid">
@@ -457,7 +455,6 @@
         <div class="success-msg" id="nota-sukses">✓ Nota u ruajt me sukses!</div>
         <div class="error-msg" id="nota-error"></div>
       </div>
-
       <div class="card" id="card-historiku" style="display:none;">
         <div class="card-title">Historiku i notave — <span id="historiku-emri"></span></div>
         <div id="historiku-list"></div>
@@ -469,9 +466,7 @@
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lëndët</h2>
         <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lëndën për të vendosur nota</p>
       </div>
-      <div id="lendet-lista-card" class="card" style="padding:10px;">
-        <div id="lendet-lista"></div>
-      </div>
+      <div id="lendet-lista-card" class="card" style="padding:10px;"><div id="lendet-lista"></div></div>
       <div id="lendet-nxenesit-list"></div>
     </div>
 
@@ -497,7 +492,17 @@
         <div id="femija-komentet"></div>
       </div>
     </div>
+  </div>
+</div>
 
+<!-- FAQJA E DETAJEVE TË NXËNËSIT (dritare e plotë) -->
+<div id="nxenes-detail-page">
+  <div class="detail-header">
+    <button onclick="mbyllDetailPage()">← Kthehu</button>
+    <h2 id="detail-page-title">Profili i Nxënësit</h2>
+  </div>
+  <div class="detail-content">
+    <div id="detail-page-content"></div>
   </div>
 </div>
 
@@ -551,10 +556,8 @@
       <label>Klasa që mëson</label>
       <select id="sm-klasa">
         <option value="">— Zgjedh klasën —</option>
-        <option value="Klasa 1">Klasa 1</option>
-        <option value="Klasa 2">Klasa 2</option>
-        <option value="Klasa 3">Klasa 3</option>
-        <option value="Klasa 4">Klasa 4</option>
+        <option value="Klasa 1">Klasa 1</option><option value="Klasa 2">Klasa 2</option>
+        <option value="Klasa 3">Klasa 3</option><option value="Klasa 4">Klasa 4</option>
         <option value="Klasa 5">Klasa 5</option>
       </select>
     </div>
@@ -567,16 +570,6 @@
     <div class="modal-actions">
       <button class="btn-outline" onclick="closeModal('modal-shto-mesuese')">Anulo</button>
       <button class="btn-green" onclick="shtoMesuese()">Krijo Llogari</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: DETAJET E NXENESIT -->
-<div class="modal-overlay" id="modal-nxenes-detail">
-  <div class="modal">
-    <div id="modal-nxenes-content"></div>
-    <div class="modal-actions">
-      <button class="btn-outline" onclick="closeModal('modal-nxenes-detail')">Mbylle</button>
     </div>
   </div>
 </div>
@@ -682,7 +675,6 @@ async function buildMesueseUI() {
   tabs.push({ id: 'lendet-notat', label: 'Lëndët', onclick: 'hapListenLendeve()' });
   tabs.push({ id: 'notat', label: 'Shëno Notë' });
   if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mësueset' });
-
   buildTabs(tabs, 'ballina');
   await loadLendet();
   await loadNxenesit();
@@ -693,10 +685,7 @@ async function buildMesueseUI() {
   }
   populateNotaForm();
   populateLendetSelect();
-
-  if (!isAdmin) {
-    document.getElementById('filter-klasa').style.display = 'none';
-  }
+  if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
 }
 
 function buildTabs(tabs, active) {
@@ -768,24 +757,32 @@ async function shfaqDetailNxenes(id) {
 
   const { data: prinderit } = await db.from('prinderit').select('*').eq('nxenesi_id', id);
 
+  // Grupo notat sipas lëndës
+  const byLende = {};
+  if (notat) notat.forEach(n => { if (n.lendet && !byLende[n.lenda_id]) byLende[n.lenda_id] = n; });
+
+  document.getElementById('detail-page-title').textContent = nxenesi.emri + ' ' + nxenesi.mbiemri;
+
   let html = `
-    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
-      <div style="width:52px;height:52px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:600;">${nxenesi.emri[0]}${nxenesi.mbiemri[0]}</div>
+    <div class="nxenes-hero">
+      <div class="nxenes-hero-avatar">${nxenesi.emri[0]}${nxenesi.mbiemri[0]}</div>
       <div>
-        <div style="font-family:'DM Serif Display',serif;font-size:1.3rem;">${nxenesi.emri} ${nxenesi.mbiemri}</div>
-        <div style="font-size:13px;color:var(--text-soft);">${nxenesi.klasat ? nxenesi.klasat.emri : '—'} • Kodi: <strong>${nxenesi.kodi_unik}</strong></div>
+        <h2>${nxenesi.emri} ${nxenesi.mbiemri}</h2>
+        <p>${nxenesi.klasat ? nxenesi.klasat.emri : '—'} &nbsp;•&nbsp; Kodi: <strong>${nxenesi.kodi_unik}</strong></p>
       </div>
     </div>
-    <div style="font-size:12px;font-weight:600;color:var(--text-soft);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;">Prindërit / Kujdestarët</div>
+
+    <div class="card">
+      <div class="card-title">Prindërit / Kujdestarët</div>
   `;
 
   if (prinderit && prinderit.length) {
     prinderit.forEach(p => {
       html += `
-        <div style="background:var(--green-ultra);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:8px;">
-          <div style="font-weight:500;">${p.emri}</div>
-          <div style="font-size:12px;color:var(--text-soft);">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
-          <div class="kodi-box" style="margin-top:8px;">
+        <div style="background:var(--green-ultra);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:10px;">
+          <div style="font-weight:600;font-size:15px;">${p.emri}</div>
+          <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
+          <div class="kodi-box" style="margin-top:10px;">
             <div class="kodi-label">Kodi i qasjes</div>
             <div class="kodi-val">${p.kodi_qasjes}</div>
           </div>
@@ -796,49 +793,50 @@ async function shfaqDetailNxenes(id) {
     html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk janë shtuar prindërit.</div>';
   }
 
-  // TABELA E NOTAVE SIPAS LËNDËVE
-  html += `<div style="font-size:12px;font-weight:600;color:var(--text-soft);letter-spacing:0.5px;text-transform:uppercase;margin:16px 0 10px;">Notat sipas lëndëve</div>`;
+  html += `</div>
 
-  // Grupo notat sipas lëndës — merr notën e fundit për secilën lëndë
-  const byLende = {};
-  if (notat) {
-    notat.forEach(n => {
-      if (n.lendet && !byLende[n.lenda_id]) {
-        byLende[n.lenda_id] = n;
-      }
-    });
-  }
-
-  const lendetMeNota = Object.values(byLende);
-
-  // Shfaq të gjitha lëndët — me notë ose pa notë
-  html += `<table class="notat-tabela">
-    <thead><tr><th>Lënda</th><th style="text-align:center;">Nota</th><th>Data</th></tr></thead>
-    <tbody>`;
+    <div class="card">
+      <div class="card-title">Notat sipas lëndëve</div>
+      <table class="notat-tabela">
+        <thead>
+          <tr>
+            <th>Lënda</th>
+            <th style="text-align:center;">Nota</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
 
   allLendet.forEach(l => {
     const notaObj = byLende[l.id];
     const gc = notaObj ? (['','g1','g2','g3','g4','g5'][notaObj.nota] || 'gx') : 'gx';
     const notaVal = notaObj ? notaObj.nota : '—';
     const dataVal = notaObj ? new Date(notaObj.data_shenimit).toLocaleDateString('sq-AL', {day:'2-digit', month:'short', year:'numeric'}) : '—';
-    html += `<tr>
-      <td>${l.emri}</td>
-      <td style="text-align:center;"><span class="grade-pill ${gc}">${notaVal}</span></td>
-      <td style="color:var(--text-soft);font-size:13px;">${dataVal}</td>
-    </tr>`;
+    html += `
+      <tr>
+        <td style="font-weight:500;">${l.emri}</td>
+        <td style="text-align:center;"><span class="grade-pill ${gc}">${notaVal}</span></td>
+        <td style="color:var(--text-soft);font-size:13px;">${dataVal}</td>
+      </tr>
+    `;
   });
 
-  html += `</tbody></table>`;
+  html += `</tbody></table></div>`;
 
-  document.getElementById('modal-nxenes-content').innerHTML = html;
-  openModal('modal-nxenes-detail');
+  document.getElementById('detail-page-content').innerHTML = html;
+  document.getElementById('nxenes-detail-page').classList.add('open');
+  document.getElementById('nxenes-detail-page').scrollTop = 0;
+}
+
+function mbyllDetailPage() {
+  document.getElementById('nxenes-detail-page').classList.remove('open');
 }
 
 async function loadBallina() {
   let nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true });
   let noQuery = db.from('notat').select('*', { count: 'exact', head: true });
   let prCount = 0;
-
   if (currentUser.roli !== 'admin') {
     nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
     noQuery = db.from('notat').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
@@ -852,16 +850,13 @@ async function loadBallina() {
     const { count: pc } = await db.from('prinderit').select('*', { count: 'exact', head: true });
     prCount = pc || 0;
   }
-
   const { count: nxCount } = await nxQuery;
   const { count: noCount } = await noQuery;
-
   document.getElementById('stats-grid').innerHTML = `
     <div class="stat-card"><div class="stat-num">${nxCount || 0}</div><div class="stat-label">Nxënës</div></div>
     <div class="stat-card"><div class="stat-num">${prCount || 0}</div><div class="stat-label">Prindër</div></div>
     <div class="stat-card"><div class="stat-num">${noCount || 0}</div><div class="stat-label">Nota të shënuara</div></div>
   `;
-
   let fundQuery = db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
   if (currentUser.roli !== 'admin') fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
   const { data: fund } = await fundQuery;
@@ -888,11 +883,8 @@ function populateLendetSelect() {
   if (!el) return;
   el.innerHTML = allLendet.map(l => `
     <div onclick="zgjedhLenden('${l.id}')" id="lenda-item-${l.id}" style="
-      padding:14px 16px; border-radius:var(--radius-sm);
-      cursor:pointer; font-size:15px; font-weight:500;
-      border-bottom:1px solid var(--green-ultra);
-      display:flex; align-items:center; justify-content:space-between;
-      transition: background 0.15s;
+      padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:500;
+      border-bottom:1px solid var(--green-ultra); display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
     " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='white'">
       <span>${l.emri}</span>
       <span style="font-size:12px;color:var(--text-soft);">→</span>
@@ -905,11 +897,7 @@ function zgjedhLenden(lId) {
     el.style.background = 'white'; el.style.fontWeight = '500'; el.style.color = 'inherit';
   });
   const selected = document.getElementById('lenda-item-' + lId);
-  if (selected) {
-    selected.style.background = 'var(--green-pale)';
-    selected.style.fontWeight = '700';
-    selected.style.color = 'var(--green-main)';
-  }
+  if (selected) { selected.style.background = 'var(--green-pale)'; selected.style.fontWeight = '700'; selected.style.color = 'var(--green-main)'; }
   ngarkoPanelLendet(lId);
 }
 
@@ -938,16 +926,7 @@ async function ngarkoProfil() {
       const d = new Date(n.data_shenimit);
       const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
       const gc = ['','g1','g2','g3','g4','g5'][n.nota] || 'gx';
-      return `
-        <div class="nota-item">
-          <span class="grade-pill ${gc}">${n.nota}</span>
-          <div class="nota-lenda">
-            <strong>${n.lendet ? n.lendet.emri : '—'}</strong>
-            ${n.koment ? `<p>${n.koment}</p>` : ''}
-            <div class="nota-date">📅 ${ds}</div>
-          </div>
-        </div>
-      `;
+      return `<div class="nota-item"><span class="grade-pill ${gc}">${n.nota}</span><div class="nota-lenda"><strong>${n.lendet ? n.lendet.emri : '—'}</strong>${n.koment ? `<p>${n.koment}</p>` : ''}<div class="nota-date">📅 ${ds}</div></div></div>`;
     }).join('');
   }
   hCard.style.display = 'block';
@@ -962,19 +941,11 @@ async function ruajNoten() {
   const sukEl = document.getElementById('nota-sukses');
   const errEl = document.getElementById('nota-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!nxId || !lId || !nota || !data) {
-    errEl.textContent = 'Plotëso nxënësin, lëndën, notën dhe datën.';
-    errEl.style.display = 'block'; return;
-  }
-  const { error } = await db.from('notat').insert({
-    nxenesi_id: nxId, lenda_id: lId, mesuese_id: currentUser.id,
-    nota: parseInt(nota), koment: koment || null,
-    data_shenimit: new Date(data).toISOString()
-  });
-  if (error) { errEl.textContent = 'Gabim gjatë ruajtjes. Provo sërisht.'; errEl.style.display = 'block'; return; }
+  if (!nxId || !lId || !nota || !data) { errEl.textContent = 'Plotëso nxënësin, lëndën, notën dhe datën.'; errEl.style.display = 'block'; return; }
+  const { error } = await db.from('notat').insert({ nxenesi_id: nxId, lenda_id: lId, mesuese_id: currentUser.id, nota: parseInt(nota), koment: koment || null, data_shenimit: new Date(data).toISOString() });
+  if (error) { errEl.textContent = 'Gabim gjatë ruajtjes.'; errEl.style.display = 'block'; return; }
   const nxenesi = allNxenesit.find(n => n.id === nxId);
-  const emriNxenesit = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '';
-  sukEl.textContent = '✓ Nota e ' + emriNxenesit + ' u ruajt me sukses!';
+  sukEl.textContent = '✓ Nota e ' + (nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '') + ' u ruajt!';
   sukEl.style.display = 'block';
   document.getElementById('nota-koment').value = '';
   document.getElementById('nota-nota').value = '';
@@ -989,38 +960,21 @@ async function shtoNxenes() {
   const sukEl = document.getElementById('sn-sukses');
   const errEl = document.getElementById('sn-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!emri || !mbiemri || !p1emri) {
-    errEl.textContent = 'Emri, mbiemri dhe prindi 1 janë të detyrueshëm.';
-    errEl.style.display = 'block'; return;
-  }
+  if (!emri || !mbiemri || !p1emri) { errEl.textContent = 'Emri, mbiemri dhe prindi 1 janë të detyrueshëm.'; errEl.style.display = 'block'; return; }
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
-  const { data: nx, error: nxErr } = await db.from('nxenesit').insert({
-    emri, mbiemri, kodi_unik: kodiNx, mesuese_id: currentUser.id
-  }).select().single();
-  if (nxErr) { errEl.textContent = 'Gabim gjatë shtimit të nxënësit.'; errEl.style.display = 'block'; return; }
+  const { data: nx, error: nxErr } = await db.from('nxenesit').insert({ emri, mbiemri, kodi_unik: kodiNx, mesuese_id: currentUser.id }).select().single();
+  if (nxErr) { errEl.textContent = 'Gabim gjatë shtimit.'; errEl.style.display = 'block'; return; }
   const kod1 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
-  await db.from('prinderit').insert({
-    nxenesi_id: nx.id, emri: p1emri,
-    nr_telefoni: document.getElementById('sn-p1-tel').value.trim() || null,
-    email: document.getElementById('sn-p1-email').value.trim() || null,
-    kodi_qasjes: kod1
-  });
+  await db.from('prinderit').insert({ nxenesi_id: nx.id, emri: p1emri, nr_telefoni: document.getElementById('sn-p1-tel').value.trim() || null, email: document.getElementById('sn-p1-email').value.trim() || null, kodi_qasjes: kod1 });
   const p2emri = document.getElementById('sn-p2-emri').value.trim();
   if (p2emri) {
     const kod2 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
-    await db.from('prinderit').insert({
-      nxenesi_id: nx.id, emri: p2emri,
-      nr_telefoni: document.getElementById('sn-p2-tel').value.trim() || null,
-      email: document.getElementById('sn-p2-email').value.trim() || null,
-      kodi_qasjes: kod2
-    });
+    await db.from('prinderit').insert({ nxenesi_id: nx.id, emri: p2emri, nr_telefoni: document.getElementById('sn-p2-tel').value.trim() || null, email: document.getElementById('sn-p2-email').value.trim() || null, kodi_qasjes: kod2 });
   }
-  sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi i qasjes për prindin: ${kod1}`;
+  sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi: ${kod1}`;
   sukEl.style.display = 'block';
   ['sn-emri','sn-mbiemri','sn-p1-emri','sn-p1-tel','sn-p1-email','sn-p2-emri','sn-p2-tel','sn-p2-email'].forEach(id => document.getElementById(id).value = '');
-  await loadNxenesit();
-  populateNotaForm();
-  await loadBallina();
+  await loadNxenesit(); populateNotaForm(); await loadBallina();
 }
 
 async function loadMesueset() {
@@ -1034,7 +988,7 @@ async function loadMesueset() {
         <div style="font-weight:500;">${m.emri}</div>
         <div style="font-size:13px;color:var(--text-soft);">${m.email}</div>
         <div style="margin-top:4px;display:flex;gap:6px;">
-          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : 'badge-mesuesja'}">${m.roli === 'admin' ? 'Admin' : 'Mësuese'}</span>
+          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : ''}">${m.roli === 'admin' ? 'Admin' : 'Mësuese'}</span>
           <span class="badge ${m.aktive ? 'badge-aktive' : 'badge-joaktive'}">${m.aktive ? 'Aktive' : 'Jo aktive'}</span>
         </div>
       </div>
@@ -1057,23 +1011,11 @@ async function shtoMesuese() {
   const sukEl = document.getElementById('sm-sukses');
   const errEl = document.getElementById('sm-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!emri || !email || !pass || !roli) {
-    errEl.textContent = 'Plotëso të gjitha fushat e detyrueshme.';
-    errEl.style.display = 'block'; return;
-  }
+  if (!emri || !email || !pass || !roli) { errEl.textContent = 'Plotëso të gjitha fushat.'; errEl.style.display = 'block'; return; }
   const klasa = document.getElementById('sm-klasa').value;
-  const { error } = await db.from('mesueset').insert({
-    emri, email, fjalekalimi: pass, roli,
-    aktive: false, paguar: false,
-    iban_konfirmim: iban || null,
-    klasa: klasa || null
-  });
-  if (error) {
-    errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashmë.' : 'Gabim gjatë shtimit.';
-    errEl.style.display = 'block'; return;
-  }
-  sukEl.textContent = '✓ Mësuese u shtua! Aktivizoje pas konfirmimit të pagesës.';
-  sukEl.style.display = 'block';
+  const { error } = await db.from('mesueset').insert({ emri, email, fjalekalimi: pass, roli, aktive: false, paguar: false, iban_konfirmim: iban || null, klasa: klasa || null });
+  if (error) { errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashmë.' : 'Gabim gjatë shtimit.'; errEl.style.display = 'block'; return; }
+  sukEl.textContent = '✓ Mësuese u shtua!'; sukEl.style.display = 'block';
   ['sm-emri','sm-email','sm-pass','sm-iban'].forEach(id => document.getElementById(id).value = '');
   await loadMesueset();
 }
@@ -1095,9 +1037,8 @@ async function loadFemijaData() {
   if (notat) notat.forEach(n => { if (!byLende[n.lenda_id]) byLende[n.lenda_id] = n; });
   const notaEl = document.getElementById('femija-notat');
   const vals = Object.values(byLende);
-  if (!vals.length) {
-    notaEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka nota.</p></div>';
-  } else {
+  if (!vals.length) { notaEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka nota.</p></div>'; }
+  else {
     notaEl.innerHTML = vals.map(n => `
       <div class="subject-tile">
         <div class="s-name">${n.lendet ? n.lendet.emri : '—'}</div>
@@ -1110,19 +1051,12 @@ async function loadFemijaData() {
   }
   const komentEl = document.getElementById('femija-komentet');
   const meKoment = notat ? notat.filter(n => n.koment).slice(0, 5) : [];
-  if (!meKoment.length) {
-    komentEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente.</p></div>';
-  } else {
+  if (!meKoment.length) { komentEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente.</p></div>'; }
+  else {
     komentEl.innerHTML = meKoment.map(n => {
       const d = new Date(n.data_shenimit);
       const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
-      return `
-        <div style="background:var(--green-ultra);border-left:3px solid var(--green-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-bottom:10px;">
-          <div style="font-size:12px;font-weight:600;color:var(--green-main);">${n.lendet ? n.lendet.emri : ''} — Nota ${n.nota}</div>
-          <div style="font-size:14px;color:var(--text-dark);margin-top:4px;">${n.koment}</div>
-          <div style="font-size:11px;color:var(--text-soft);margin-top:4px;">📅 ${ds}</div>
-        </div>
-      `;
+      return `<div style="background:var(--green-ultra);border-left:3px solid var(--green-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--green-main);">${n.lendet ? n.lendet.emri : ''} — Nota ${n.nota}</div><div style="font-size:14px;color:var(--text-dark);margin-top:4px;">${n.koment}</div><div style="font-size:11px;color:var(--text-soft);margin-top:4px;">📅 ${ds}</div></div>`;
     }).join('');
   }
 }
@@ -1132,53 +1066,30 @@ async function ngarkoPanelLendet(lId) {
   currentLendaId = lId;
   const el = document.getElementById('lendet-nxenesit-list');
   const lenda = allLendet.find(l => l.id === lId);
-  if (!allNxenesit.length) {
-    el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>';
-    return;
-  }
-  const { data: notat } = await db.from('notat')
-    .select('nxenesi_id, nota, data_shenimit')
-    .eq('lenda_id', lId)
-    .order('data_shenimit', { ascending: false });
-  const lastGrades = {};
-  const lastDates = {};
-  if (notat) {
-    notat.forEach(n => {
-      if (!lastGrades[n.nxenesi_id]) {
-        lastGrades[n.nxenesi_id] = n.nota;
-        lastDates[n.nxenesi_id] = n.data_shenimit;
-      }
-    });
-  }
+  if (!allNxenesit.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>'; return; }
+  const { data: notat } = await db.from('notat').select('nxenesi_id, nota, data_shenimit').eq('lenda_id', lId).order('data_shenimit', { ascending: false });
+  const lastGrades = {}; const lastDates = {};
+  if (notat) notat.forEach(n => { if (!lastGrades[n.nxenesi_id]) { lastGrades[n.nxenesi_id] = n.nota; lastDates[n.nxenesi_id] = n.data_shenimit; } });
   el.innerHTML = '<div class="card">' +
     '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxënësve</div>' +
     allNxenesit.map(n => {
       const lastGrade = lastGrades[n.id];
       const lastDate = lastDates[n.id] ? new Date(lastDates[n.id]).toLocaleDateString('sq-AL', {day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
-      const lastDateText = lastDate ? 'Nota e fundit vendosur më: ' + lastDate.replace(',', ', Ora') : 'Pa notë ende';
+      const lastDateText = lastDate ? 'Nota e fundit: ' + lastDate : 'Pa notë ende';
       return '<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--green-ultra);flex-wrap:wrap;">' +
         '<div class="s-avatar">' + n.emri[0] + n.mbiemri[0] + '</div>' +
         '<div style="flex:1;font-weight:500;">' + n.emri + ' ' + n.mbiemri + '</div>' +
         '<input type="number" id="nota-l-' + n.id + '" min="1" max="5" placeholder="' + (lastGrade ? lastGrade : '—') + '" style="padding:8px 10px;border:1.5px solid #ddd;border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:20px;font-weight:700;width:72px;text-align:center;color:#bbb;" oninput="ngjyroNoten(this)" onkeypress="return[\'1\',\'2\',\'3\',\'4\',\'5\'].includes(event.key)">' +
-        '<div style="font-size:12px;color:#aaa;background:#f9f9f9;border:1px solid #eee;border-radius:var(--radius-sm);padding:7px 12px;">' + lastDateText + '</div>' +
-        '</div>';
+        '<div style="font-size:12px;color:#aaa;background:#f9f9f9;border:1px solid #eee;border-radius:var(--radius-sm);padding:7px 12px;">' + lastDateText + '</div></div>';
     }).join('') +
-    '<div style="margin-top:16px;">' +
-    '<button class="btn-green" onclick="ruajNotatLendes()">Ruaj të gjitha notat</button>' +
-    '<div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div>' +
-    '</div>' +
-    '</div>';
+    '<div style="margin-top:16px;"><button class="btn-green" onclick="ruajNotatLendes()">Ruaj të gjitha notat</button><div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div></div></div>';
 }
 
 function ngjyroNoten(inp) {
   const v = parseInt(inp.value);
-  if (inp.value && v >= 1 && v <= 5) {
-    inp.style.background = '#e3f2fd'; inp.style.borderColor = '#1976d2'; inp.style.color = '#1976d2'; inp.style.fontWeight = '700';
-  } else if (inp.value && (v < 1 || v > 5)) {
-    inp.value = ''; inp.style.background = 'white'; inp.style.borderColor = '#e74c3c'; inp.style.color = 'inherit';
-  } else {
-    inp.style.background = 'white'; inp.style.borderColor = 'var(--border)'; inp.style.color = 'inherit'; inp.style.fontWeight = 'normal';
-  }
+  if (inp.value && v >= 1 && v <= 5) { inp.style.background = '#e3f2fd'; inp.style.borderColor = '#1976d2'; inp.style.color = '#1976d2'; inp.style.fontWeight = '700'; }
+  else if (inp.value && (v < 1 || v > 5)) { inp.value = ''; inp.style.background = 'white'; inp.style.borderColor = '#e74c3c'; inp.style.color = 'inherit'; }
+  else { inp.style.background = 'white'; inp.style.borderColor = 'var(--border)'; inp.style.color = 'inherit'; inp.style.fontWeight = 'normal'; }
 }
 
 let currentLendaId = null;
@@ -1191,18 +1102,10 @@ async function ruajNotatLendes() {
   for (const n of allNxenesit) {
     const nota = document.getElementById('nota-l-' + n.id)?.value;
     if (!nota) continue;
-    await db.from('notat').insert({
-      nxenesi_id: n.id, lenda_id: lId, mesuese_id: currentUser.id,
-      nota: parseInt(nota), data_shenimit: new Date().toISOString()
-    });
+    await db.from('notat').insert({ nxenesi_id: n.id, lenda_id: lId, mesuese_id: currentUser.id, nota: parseInt(nota), data_shenimit: new Date().toISOString() });
     saved++;
   }
-  if (saved > 0) {
-    sukEl.textContent = '✓ U ruajtën ' + saved + ' nota me sukses!';
-    sukEl.style.display = 'block';
-    await ngarkoPanelLendet(lId);
-    await loadBallina();
-  }
+  if (saved > 0) { sukEl.textContent = '✓ U ruajtën ' + saved + ' nota!'; sukEl.style.display = 'block'; await ngarkoPanelLendet(lId); await loadBallina(); }
 }
 
 async function shfaqNotEnFundit() {
@@ -1210,19 +1113,11 @@ async function shfaqNotEnFundit() {
   const lId = document.getElementById('nota-lenda').value;
   const el = document.getElementById('nota-e-fundit');
   if (!nxId || !lId) { el.style.display = 'none'; return; }
-  const { data } = await db.from('notat')
-    .select('nota, data_shenimit')
-    .eq('nxenesi_id', nxId).eq('lenda_id', lId)
-    .order('data_shenimit', { ascending: false }).limit(1);
+  const { data } = await db.from('notat').select('nota, data_shenimit').eq('nxenesi_id', nxId).eq('lenda_id', lId).order('data_shenimit', { ascending: false }).limit(1);
   if (data && data.length > 0) {
-    const d = new Date(data[0].data_shenimit);
-    const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
-    el.textContent = 'Nota e fundit: ' + data[0].nota + ' — ' + ds;
-    el.style.display = 'block';
-  } else {
-    el.textContent = 'Ende nuk ka notë për këtë lëndë';
-    el.style.display = 'block';
-  }
+    const ds = new Date(data[0].data_shenimit).toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
+    el.textContent = 'Nota e fundit: ' + data[0].nota + ' — ' + ds; el.style.display = 'block';
+  } else { el.textContent = 'Ende nuk ka notë për këtë lëndë'; el.style.display = 'block'; }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
