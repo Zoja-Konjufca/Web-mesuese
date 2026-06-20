@@ -794,7 +794,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
             <th style="text-align:center;">P2</th>
             <th style="text-align:center;">P3</th>
             <th style="text-align:center;">P4</th>
-            <th style="text-align:center;background:var(--green-mid);color:white;">Mesatare</th>
+            <th style="text-align:center;background:var(--green-mid);color:white;">Nota Perfundimtare</th>
           </tr>
         </thead>
         <tbody>
@@ -804,17 +804,17 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
     const periudhat = byNxenes[n.id] || {};
     const vlerat = [1,2,3,4].map(p => periudhat[p] || null);
     const vleratNumerike = vlerat.filter(v => v !== null);
-    const mesatare = vleratNumerike.length > 0
+    const Nota Perfundimtare = vleratNumerike.length > 0
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
-    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
+    const gcMes = Nota Perfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(Nota Perfundimtare))] || 'gx') : 'gx';
 
     html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
     vlerat.forEach(v => {
       const gc = v ? (['','g1','g2','g3','g4','g5'][v] || 'gx') : 'gx';
       html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
     });
-    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
+    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${Nota Perfundimtare || '—'}</span></td></tr>`;
   });
 
   html += `</tbody></table></div>`;
@@ -837,7 +837,7 @@ async function shfaqTeGjihaLendet() {
     .select('nxenesi_id, lenda_id, nota')
     .in('nxenesi_id', allNxenesit.map(n => n.id));
 
-  const mesataret = {};
+  const Nota Perfundimtaret = {};
   if (notat) {
     const grouped = {};
     notat.forEach(n => {
@@ -847,15 +847,15 @@ async function shfaqTeGjihaLendet() {
     });
     Object.entries(grouped).forEach(([key, vlerat]) => {
       const [nxId, lId] = key.split('_');
-      if (!mesataret[nxId]) mesataret[nxId] = {};
-      mesataret[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
+      if (!Nota Perfundimtaret[nxId]) Nota Perfundimtaret[nxId] = {};
+      Nota Perfundimtaret[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
     });
   }
 
   let html = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Mesataret</h3>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Nota Perfundimtaret</h3>
     </div>
     <div class="card" style="overflow-x:auto;">
       <table class="notat-tabela" style="min-width:600px;">
@@ -871,7 +871,7 @@ async function shfaqTeGjihaLendet() {
   allNxenesit.forEach(n => {
     html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
     allLendet.forEach(l => {
-      const mes = mesataret[n.id] ? mesataret[n.id][l.id] : null;
+      const mes = Nota Perfundimtaret[n.id] ? Nota Perfundimtaret[n.id][l.id] : null;
       const gc = mes ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mes))] || 'gx') : 'gx';
       html += `<td style="text-align:center;"><span class="grade-pill ${gc}">${mes || '—'}</span></td>`;
     });
@@ -975,7 +975,7 @@ async function shfaqDetailNxenes(id) {
             <th style="text-align:center;">P2</th>
             <th style="text-align:center;">P3</th>
             <th style="text-align:center;">P4</th>
-            <th style="text-align:center;background:var(--green-mid);color:white;">Mesatare</th>
+            <th style="text-align:center;background:var(--green-mid);color:white;">Nota Perfundimtare</th>
           </tr>
         </thead>
         <tbody>
@@ -986,10 +986,10 @@ async function shfaqDetailNxenes(id) {
     const notat_per_periudha = lData ? lData.periudhat : {};
     const vlerat = [1,2,3,4].map(p => notat_per_periudha[p] || null);
     const vleratNumerike = vlerat.filter(v => v !== null);
-    const mesatare = vleratNumerike.length > 0 
+    const Nota Perfundimtare = vleratNumerike.length > 0 
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
-    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
+    const gcMes = Nota Perfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(Nota Perfundimtare))] || 'gx') : 'gx';
 
     html += `<tr><td style="font-weight:500;">${l.emri}</td>`;
     
@@ -998,7 +998,7 @@ async function shfaqDetailNxenes(id) {
       html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
     });
 
-    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
+    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${Nota Perfundimtare || '—'}</span></td></tr>`;
   });
 
   html += `</tbody></table></div>
