@@ -773,29 +773,6 @@ async function shfaqDetailNxenes(id) {
     </div>
 
     <div class="card">
-      <div class="card-title">Prindërit / Kujdestarët</div>
-  `;
-
-  if (prinderit && prinderit.length) {
-    prinderit.forEach(p => {
-      html += `
-        <div style="background:var(--green-ultra);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:10px;">
-          <div style="font-weight:600;font-size:15px;">${p.emri}</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
-          <div class="kodi-box" style="margin-top:10px;">
-            <div class="kodi-label">Kodi i qasjes</div>
-            <div class="kodi-val">${p.kodi_qasjes}</div>
-          </div>
-        </div>
-      `;
-    });
-  } else {
-    html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk janë shtuar prindërit.</div>';
-  }
-
-  html += `</div>
-
-    <div class="card">
       <div class="card-title">Notat sipas lëndëve</div>
       <table class="notat-tabela">
         <thead>
@@ -822,7 +799,30 @@ async function shfaqDetailNxenes(id) {
     `;
   });
 
-  html += `</tbody></table></div>`;
+  html += `</tbody></table></div>
+
+    <div class="card">
+      <div class="card-title">Prindërit / Kujdestarët</div>
+  `;
+
+  if (prinderit && prinderit.length) {
+    prinderit.forEach(p => {
+      html += `
+        <div style="background:var(--green-ultra);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:10px;">
+          <div style="font-weight:600;font-size:15px;">${p.emri}</div>
+          <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
+          <div class="kodi-box" style="margin-top:10px;">
+            <div class="kodi-label">Kodi i qasjes</div>
+            <div class="kodi-val">${p.kodi_qasjes}</div>
+          </div>
+        </div>
+      `;
+    });
+  } else {
+    html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk janë shtuar prindërit.</div>';
+  }
+
+  html += `</div>`;
 
   document.getElementById('detail-page-content').innerHTML = html;
   document.getElementById('nxenes-detail-page').classList.add('open');
