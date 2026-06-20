@@ -717,10 +717,8 @@ function buildTabs(tabs, active) {
 }
 
 function hapPanelNotat() {
-  // Shfaq listën e lëndëve, fshih formën
   document.getElementById('notat-lendet-lista').style.display = 'block';
   document.getElementById('notat-forma').style.display = 'none';
-  // Nderto listën e lëndëve
   const el = document.getElementById('notat-lendet-items');
   el.innerHTML = allLendet.map(l => `
     <div onclick="zgjedhLendenPerNota('${l.id}', '${l.emri}')" style="
@@ -730,7 +728,16 @@ function hapPanelNotat() {
       <span>${l.emri}</span>
       <span style="font-size:12px;color:var(--text-soft);">→</span>
     </div>
-  `).join('');
+  `).join('') + `
+    <div onclick="shfaqTeGjihaLendet()" style="
+      padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:600;
+      display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
+      color:var(--green-main); background:var(--green-pale);
+    " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='var(--green-pale)'">
+      <span>📊 Të gjitha lëndët</span>
+      <span style="font-size:12px;">→</span>
+    </div>
+  `;
 }
 
 function zgjedhLendenPerNota(lId, lEmri) {
@@ -751,7 +758,73 @@ function zgjedhLendenPerNota(lId, lEmri) {
 function kthehuNeLendet() {
   document.getElementById('notat-lendet-lista').style.display = 'block';
   document.getElementById('notat-forma').style.display = 'none';
+  document.getElementById('te-gjitha-tabela').style.display = 'none';
 }
+
+async function shfaqTeGjihaLendet() {
+  document.getElementById('notat-lendet-lista').style.display = 'none';
+  document.getElementById('notat-forma').style.display = 'none';
+
+  let tabelaDiv = document.getElementById('te-gjitha-tabela');
+  if (!tabelaDiv) {
+    tabelaDiv = document.createElement('div');
+    tabelaDiv.id = 'te-gjitha-tabela';
+    document.getElementById('panel-notat').appendChild(tabelaDiv);
+  }
+  tabelaDiv.style.display = 'block';
+
+  // Merr të gjitha notat
+  const { data: notat } = await db.from('notat')
+    .select('nxenesi_id, lenda_id, nota, periudha')
+    .in('nxenesi_id', allNxenesit.map(n => n.id));
+
+  // Nderto strukturën: mesatare[nxenesi_id][lenda_id] = mesatare
+  const mesataret = {};
+  if (notat) {
+    const grouped = {};
+    notat.forEach(n => {
+      const key = n.nxenesi_id + '_' + n.lenda_id;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(n.nota);
+    });
+    Object.entries(grouped).forEach(([key, vlerat]) => {
+      const [nxId, lId] = key.split('_');
+      if (!mesataret[nxId]) mesataret[nxId] = {};
+      mesataret[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
+    });
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+      <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Mesataret</h3>
+    </div>
+    <div class="card" style="overflow-x:auto;">
+      <table class="notat-tabela" style="min-width:600px;">
+        <thead>
+          <tr>
+            <th>Nxënësi</th>
+            ${allLendet.map(l => `<th style="text-align:center;">${l.emri}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  allNxenesit.forEach(n => {
+    html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
+    allLendet.forEach(l => {
+      const mes = mesataret[n.id] ? mesataret[n.id][l.id] : null;
+      const gc = mes ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mes))] || 'gx') : 'gx';
+      html += `<td style="text-align:center;"><span class="grade-pill ${gc}">${mes || '—'}</span></td>`;
+    });
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  tabelaDiv.innerHTML = html;
+}
+
+
 
 
 
