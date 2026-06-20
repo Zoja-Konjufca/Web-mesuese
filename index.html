@@ -319,6 +319,12 @@
 
   .sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 
+  .notat-tabela { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .notat-tabela th { background: var(--green-pale); color: var(--green-dark); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; text-align: left; }
+  .notat-tabela td { padding: 10px 12px; border-bottom: 1px solid var(--green-ultra); font-size: 14px; }
+  .notat-tabela tr:last-child td { border-bottom: none; }
+  .notat-tabela tr:hover td { background: var(--green-ultra); }
+
   @media (max-width: 600px) {
     .content { padding: 14px; }
     .login-card { padding: 28px 22px; }
@@ -458,7 +464,6 @@
       </div>
     </div>
 
-    <!-- PANEL: LENDET -->
     <div class="panel" id="panel-lendet-notat">
       <div style="margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lëndët</h2>
@@ -470,7 +475,6 @@
       <div id="lendet-nxenesit-list"></div>
     </div>
 
-    <!-- PANEL: MËSUESET (vetëm admin) -->
     <div class="panel" id="panel-mesueset">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Mësueset</h2>
@@ -506,7 +510,6 @@
       <div class="form-row"><label>Emri</label><input type="text" id="sn-emri" placeholder="Emri i nxënësit"></div>
       <div class="form-row"><label>Mbiemri</label><input type="text" id="sn-mbiemri" placeholder="Mbiemri i nxënësit"></div>
     </div>
-
     <hr class="sep">
     <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px;">Prindi / Kujdestari 1</div>
     <div class="form-row"><label>Emri i plotë</label><input type="text" id="sn-p1-emri" placeholder="Avni Nushi"></div>
@@ -596,18 +599,10 @@ window.addEventListener('load', async () => {
       const s = JSON.parse(sess);
       if (s.type === 'mesuese') {
         const { data } = await db.from('mesueset').select('*').eq('id', s.id).single();
-        if (data && data.aktive) {
-          currentUser = data;
-          showApp();
-          return;
-        }
+        if (data && data.aktive) { currentUser = data; showApp(); return; }
       } else if (s.type === 'prind') {
         const { data } = await db.from('prinderit').select('*, nxenesit(*)').eq('id', s.id).single();
-        if (data) {
-          currentPrind = data;
-          showApp();
-          return;
-        }
+        if (data) { currentPrind = data; showApp(); return; }
       }
     } catch(e) {}
     localStorage.removeItem('dm_session');
@@ -617,8 +612,7 @@ window.addEventListener('load', async () => {
 
 function showLogin() {
   document.getElementById('loading-screen').style.display = 'none';
-  const ls = document.getElementById('login-screen');
-  ls.style.display = 'flex';
+  document.getElementById('login-screen').style.display = 'flex';
 }
 
 function switchLoginTab(tab) {
@@ -636,11 +630,9 @@ async function loginMesuese() {
   const errEl = document.getElementById('login-err');
   errEl.textContent = '';
   if (!email || !pass) { errEl.textContent = 'Plotëso të gjitha fushat.'; return; }
-
   const { data, error } = await db.from('mesueset').select('*').eq('email', email).eq('fjalekalimi', pass).single();
   if (error || !data) { errEl.textContent = 'Email ose fjalëkalim i gabuar.'; return; }
-  if (!data.aktive) { errEl.textContent = 'Llogaria nuk është aktive ende. Kontakto administratorin.'; return; }
-
+  if (!data.aktive) { errEl.textContent = 'Llogaria nuk është aktive ende.'; return; }
   currentUser = data;
   localStorage.setItem('dm_session', JSON.stringify({ type: 'mesuese', id: data.id }));
   showApp();
@@ -651,10 +643,8 @@ async function loginPrind() {
   const errEl = document.getElementById('login-err-prind');
   errEl.textContent = '';
   if (!kod) { errEl.textContent = 'Shkruaj kodin e qasjes.'; return; }
-
   const { data, error } = await db.from('prinderit').select('*, nxenesit(*, klasat(*))').eq('kodi_qasjes', kod).single();
-  if (error || !data) { errEl.textContent = 'Kodi i qasjes nuk u gjet. Kontrollo me mësuesen.'; return; }
-
+  if (error || !data) { errEl.textContent = 'Kodi i qasjes nuk u gjet.'; return; }
   currentPrind = data;
   localStorage.setItem('dm_session', JSON.stringify({ type: 'prind', id: data.id }));
   showApp();
@@ -672,7 +662,6 @@ async function showApp() {
   document.getElementById('loading-screen').style.display = 'none';
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
-
   if (currentUser) {
     const initials = currentUser.emri.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     document.getElementById('nav-avatar').textContent = initials;
@@ -692,9 +681,7 @@ async function buildMesueseUI() {
   tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
   tabs.push({ id: 'lendet-notat', label: 'Lëndët', onclick: 'hapListenLendeve()' });
   tabs.push({ id: 'notat', label: 'Shëno Notë' });
-  if (isAdmin) {
-    tabs.push({ id: 'mesueset', label: 'Mësueset' });
-  }
+  if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mësueset' });
 
   buildTabs(tabs, 'ballina');
   await loadLendet();
@@ -707,7 +694,6 @@ async function buildMesueseUI() {
   populateNotaForm();
   populateLendetSelect();
 
-  // Fshih filter-in e klasës për mësueset (jo admin)
   if (!isAdmin) {
     document.getElementById('filter-klasa').style.display = 'none';
   }
@@ -721,9 +707,7 @@ function buildTabs(tabs, active) {
   switchTab(active, false);
 }
 
-function hapListenLendeve() {
-  populateLendetSelect();
-}
+function hapListenLendeve() { populateLendetSelect(); }
 
 function switchTab(id, scroll=true) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -742,9 +726,7 @@ async function loadLendet() {
 
 async function loadNxenesit() {
   let q = db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
-  if (currentUser.roli !== 'admin') {
-    q = q.eq('mesuese_id', currentUser.id);
-  }
+  if (currentUser.roli !== 'admin') q = q.eq('mesuese_id', currentUser.id);
   const { data } = await q;
   allNxenesit = data || [];
   renderNxenesitList(allNxenesit);
@@ -814,27 +796,39 @@ async function shfaqDetailNxenes(id) {
     html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk janë shtuar prindërit.</div>';
   }
 
-  html += `<div style="font-size:12px;font-weight:600;color:var(--text-soft);letter-spacing:0.5px;text-transform:uppercase;margin:16px 0 10px;">Notat e fundit</div>`;
+  // TABELA E NOTAVE SIPAS LËNDËVE
+  html += `<div style="font-size:12px;font-weight:600;color:var(--text-soft);letter-spacing:0.5px;text-transform:uppercase;margin:16px 0 10px;">Notat sipas lëndëve</div>`;
 
-  if (notat && notat.length) {
-    notat.slice(0, 8).forEach(n => {
-      const d = new Date(n.data_shenimit);
-      const dateStr = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
-      const gc = ['','g1','g2','g3','g4','g5'][n.nota] || 'gx';
-      html += `
-        <div class="nota-item">
-          <span class="grade-pill ${gc}" style="font-size:1.1rem;min-width:36px;text-align:center;">${n.nota}</span>
-          <div class="nota-lenda">
-            <strong>${n.lendet ? n.lendet.emri : '—'}</strong>
-            ${n.koment ? `<p>${n.koment}</p>` : ''}
-            <div class="nota-date">📅 ${dateStr} &nbsp;•&nbsp; ${n.mesueset ? n.mesueset.emri : ''}</div>
-          </div>
-        </div>
-      `;
+  // Grupo notat sipas lëndës — merr notën e fundit për secilën lëndë
+  const byLende = {};
+  if (notat) {
+    notat.forEach(n => {
+      if (n.lendet && !byLende[n.lenda_id]) {
+        byLende[n.lenda_id] = n;
+      }
     });
-  } else {
-    html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka nota.</div>';
   }
+
+  const lendetMeNota = Object.values(byLende);
+
+  // Shfaq të gjitha lëndët — me notë ose pa notë
+  html += `<table class="notat-tabela">
+    <thead><tr><th>Lënda</th><th style="text-align:center;">Nota</th><th>Data</th></tr></thead>
+    <tbody>`;
+
+  allLendet.forEach(l => {
+    const notaObj = byLende[l.id];
+    const gc = notaObj ? (['','g1','g2','g3','g4','g5'][notaObj.nota] || 'gx') : 'gx';
+    const notaVal = notaObj ? notaObj.nota : '—';
+    const dataVal = notaObj ? new Date(notaObj.data_shenimit).toLocaleDateString('sq-AL', {day:'2-digit', month:'short', year:'numeric'}) : '—';
+    html += `<tr>
+      <td>${l.emri}</td>
+      <td style="text-align:center;"><span class="grade-pill ${gc}">${notaVal}</span></td>
+      <td style="color:var(--text-soft);font-size:13px;">${dataVal}</td>
+    </tr>`;
+  });
+
+  html += `</tbody></table>`;
 
   document.getElementById('modal-nxenes-content').innerHTML = html;
   openModal('modal-nxenes-detail');
@@ -869,9 +863,7 @@ async function loadBallina() {
   `;
 
   let fundQuery = db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
-  if (currentUser.roli !== 'admin') {
-    fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
-  }
+  if (currentUser.roli !== 'admin') fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
   const { data: fund } = await fundQuery;
   const el = document.getElementById('aktiviteti-list');
   if (!fund || !fund.length) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka shënime.</p></div>'; return; }
@@ -910,9 +902,7 @@ function populateLendetSelect() {
 
 function zgjedhLenden(lId) {
   document.querySelectorAll('[id^="lenda-item-"]').forEach(el => {
-    el.style.background = 'white';
-    el.style.fontWeight = '500';
-    el.style.color = 'inherit';
+    el.style.background = 'white'; el.style.fontWeight = '500'; el.style.color = 'inherit';
   });
   const selected = document.getElementById('lenda-item-' + lId);
   if (selected) {
@@ -937,10 +927,8 @@ async function ngarkoProfil() {
   const id = document.getElementById('nota-nxenesi').value;
   const hCard = document.getElementById('card-historiku');
   if (!id) { hCard.style.display = 'none'; return; }
-
   const nxenesi = allNxenesit.find(n => n.id === id);
   document.getElementById('historiku-emri').textContent = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '';
-
   const { data } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', id).order('data_shenimit', { ascending: false }).limit(10);
   const list = document.getElementById('historiku-list');
   if (!data || !data.length) {
@@ -974,23 +962,16 @@ async function ruajNoten() {
   const sukEl = document.getElementById('nota-sukses');
   const errEl = document.getElementById('nota-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-
   if (!nxId || !lId || !nota || !data) {
     errEl.textContent = 'Plotëso nxënësin, lëndën, notën dhe datën.';
     errEl.style.display = 'block'; return;
   }
-
   const { error } = await db.from('notat').insert({
     nxenesi_id: nxId, lenda_id: lId, mesuese_id: currentUser.id,
     nota: parseInt(nota), koment: koment || null,
     data_shenimit: new Date(data).toISOString()
   });
-
-  if (error) {
-    errEl.textContent = 'Gabim gjatë ruajtjes. Provo sërisht.';
-    errEl.style.display = 'block'; return;
-  }
-
+  if (error) { errEl.textContent = 'Gabim gjatë ruajtjes. Provo sërisht.'; errEl.style.display = 'block'; return; }
   const nxenesi = allNxenesit.find(n => n.id === nxId);
   const emriNxenesit = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '';
   sukEl.textContent = '✓ Nota e ' + emriNxenesit + ' u ruajt me sukses!';
@@ -1008,21 +989,15 @@ async function shtoNxenes() {
   const sukEl = document.getElementById('sn-sukses');
   const errEl = document.getElementById('sn-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-
   if (!emri || !mbiemri || !p1emri) {
     errEl.textContent = 'Emri, mbiemri dhe prindi 1 janë të detyrueshëm.';
     errEl.style.display = 'block'; return;
   }
-
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
-
   const { data: nx, error: nxErr } = await db.from('nxenesit').insert({
-    emri, mbiemri, kodi_unik: kodiNx,
-    mesuese_id: currentUser.id
+    emri, mbiemri, kodi_unik: kodiNx, mesuese_id: currentUser.id
   }).select().single();
-
   if (nxErr) { errEl.textContent = 'Gabim gjatë shtimit të nxënësit.'; errEl.style.display = 'block'; return; }
-
   const kod1 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
   await db.from('prinderit').insert({
     nxenesi_id: nx.id, emri: p1emri,
@@ -1030,7 +1005,6 @@ async function shtoNxenes() {
     email: document.getElementById('sn-p1-email').value.trim() || null,
     kodi_qasjes: kod1
   });
-
   const p2emri = document.getElementById('sn-p2-emri').value.trim();
   if (p2emri) {
     const kod2 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
@@ -1041,12 +1015,9 @@ async function shtoNxenes() {
       kodi_qasjes: kod2
     });
   }
-
   sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi i qasjes për prindin: ${kod1}`;
   sukEl.style.display = 'block';
-
   ['sn-emri','sn-mbiemri','sn-p1-emri','sn-p1-tel','sn-p1-email','sn-p2-emri','sn-p2-tel','sn-p2-email'].forEach(id => document.getElementById(id).value = '');
-
   await loadNxenesit();
   populateNotaForm();
   await loadBallina();
@@ -1086,12 +1057,10 @@ async function shtoMesuese() {
   const sukEl = document.getElementById('sm-sukses');
   const errEl = document.getElementById('sm-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-
   if (!emri || !email || !pass || !roli) {
     errEl.textContent = 'Plotëso të gjitha fushat e detyrueshme.';
     errEl.style.display = 'block'; return;
   }
-
   const klasa = document.getElementById('sm-klasa').value;
   const { error } = await db.from('mesueset').insert({
     emri, email, fjalekalimi: pass, roli,
@@ -1099,12 +1068,10 @@ async function shtoMesuese() {
     iban_konfirmim: iban || null,
     klasa: klasa || null
   });
-
   if (error) {
     errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashmë.' : 'Gabim gjatë shtimit.';
     errEl.style.display = 'block'; return;
   }
-
   sukEl.textContent = '✓ Mësuese u shtua! Aktivizoje pas konfirmimit të pagesës.';
   sukEl.style.display = 'block';
   ['sm-emri','sm-email','sm-pass','sm-iban'].forEach(id => document.getElementById(id).value = '');
@@ -1121,19 +1088,11 @@ async function loadFemijaData() {
   const nxId = currentPrind.nxenesi_id;
   const { data: nx } = await db.from('nxenesit').select('*, klasat(emri)').eq('id', nxId).single();
   if (!nx) return;
-
   document.getElementById('femija-emri').textContent = nx.emri + ' ' + nx.mbiemri;
   document.getElementById('femija-klasa').textContent = nx.klasat ? nx.klasat.emri : '';
-
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: false });
-
   const byLende = {};
-  if (notat) {
-    notat.forEach(n => {
-      if (!byLende[n.lenda_id]) byLende[n.lenda_id] = n;
-    });
-  }
-
+  if (notat) notat.forEach(n => { if (!byLende[n.lenda_id]) byLende[n.lenda_id] = n; });
   const notaEl = document.getElementById('femija-notat');
   const vals = Object.values(byLende);
   if (!vals.length) {
@@ -1149,7 +1108,6 @@ async function loadFemijaData() {
       </div>
     `).join('');
   }
-
   const komentEl = document.getElementById('femija-komentet');
   const meKoment = notat ? notat.filter(n => n.koment).slice(0, 5) : [];
   if (!meKoment.length) {
@@ -1173,19 +1131,15 @@ async function ngarkoPanelLendet(lId) {
   if (!lId) return;
   currentLendaId = lId;
   const el = document.getElementById('lendet-nxenesit-list');
-
   const lenda = allLendet.find(l => l.id === lId);
-
   if (!allNxenesit.length) {
     el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>';
     return;
   }
-
   const { data: notat } = await db.from('notat')
     .select('nxenesi_id, nota, data_shenimit')
     .eq('lenda_id', lId)
     .order('data_shenimit', { ascending: false });
-
   const lastGrades = {};
   const lastDates = {};
   if (notat) {
@@ -1196,7 +1150,6 @@ async function ngarkoPanelLendet(lId) {
       }
     });
   }
-
   el.innerHTML = '<div class="card">' +
     '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxënësve</div>' +
     allNxenesit.map(n => {
@@ -1220,20 +1173,11 @@ async function ngarkoPanelLendet(lId) {
 function ngjyroNoten(inp) {
   const v = parseInt(inp.value);
   if (inp.value && v >= 1 && v <= 5) {
-    inp.style.background = '#e3f2fd';
-    inp.style.borderColor = '#1976d2';
-    inp.style.color = '#1976d2';
-    inp.style.fontWeight = '700';
+    inp.style.background = '#e3f2fd'; inp.style.borderColor = '#1976d2'; inp.style.color = '#1976d2'; inp.style.fontWeight = '700';
   } else if (inp.value && (v < 1 || v > 5)) {
-    inp.value = '';
-    inp.style.background = 'white';
-    inp.style.borderColor = '#e74c3c';
-    inp.style.color = 'inherit';
+    inp.value = ''; inp.style.background = 'white'; inp.style.borderColor = '#e74c3c'; inp.style.color = 'inherit';
   } else {
-    inp.style.background = 'white';
-    inp.style.borderColor = 'var(--border)';
-    inp.style.color = 'inherit';
-    inp.style.fontWeight = 'normal';
+    inp.style.background = 'white'; inp.style.borderColor = 'var(--border)'; inp.style.color = 'inherit'; inp.style.fontWeight = 'normal';
   }
 }
 
@@ -1243,19 +1187,16 @@ async function ruajNotatLendes() {
   const lId = currentLendaId;
   const sukEl = document.getElementById('lendet-sukses');
   if (!lId) return;
-
   let saved = 0;
   for (const n of allNxenesit) {
     const nota = document.getElementById('nota-l-' + n.id)?.value;
     if (!nota) continue;
     await db.from('notat').insert({
       nxenesi_id: n.id, lenda_id: lId, mesuese_id: currentUser.id,
-      nota: parseInt(nota),
-      data_shenimit: new Date().toISOString()
+      nota: parseInt(nota), data_shenimit: new Date().toISOString()
     });
     saved++;
   }
-
   if (saved > 0) {
     sukEl.textContent = '✓ U ruajtën ' + saved + ' nota me sukses!';
     sukEl.style.display = 'block';
@@ -1268,16 +1209,11 @@ async function shfaqNotEnFundit() {
   const nxId = document.getElementById('nota-nxenesi').value;
   const lId = document.getElementById('nota-lenda').value;
   const el = document.getElementById('nota-e-fundit');
-
   if (!nxId || !lId) { el.style.display = 'none'; return; }
-
   const { data } = await db.from('notat')
     .select('nota, data_shenimit')
-    .eq('nxenesi_id', nxId)
-    .eq('lenda_id', lId)
-    .order('data_shenimit', { ascending: false })
-    .limit(1);
-
+    .eq('nxenesi_id', nxId).eq('lenda_id', lId)
+    .order('data_shenimit', { ascending: false }).limit(1);
   if (data && data.length > 0) {
     const d = new Date(data[0].data_shenimit);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
