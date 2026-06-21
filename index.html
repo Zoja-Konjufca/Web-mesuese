@@ -1134,11 +1134,10 @@ function mbyllDetailPage() {
 function togglePeriudhe(lendaId, periudha) {
   const key = lendaId + '_' + periudha;
   periudhatHapura[key] = !periudhatHapura[key];
-  renderDetailPage();
-  // Ruaj pozicionin e scrollit
   const page = document.getElementById('nxenes-detail-page');
   const scrollY = page.scrollTop;
-  setTimeout(() => { page.scrollTop = scrollY; }, 10);
+  renderDetailPage();
+  requestAnimationFrame(() => { page.scrollTop = scrollY; });
 }
 
 function toggleTePeriudhat(idx) {
@@ -1158,10 +1157,36 @@ function aktivizoInput(inputId) {
   inp.select();
 }
 
+// Ruaj noten - me mbrojtje nga thirrjet e dyfishta
+let _ruajtjeNeProcees = false;
 async function ruajNotënDetaje(lendaId, periudha, kolona, vlere, inputId) {
+  if (_ruajtjeNeProcees) return;
   const nota = parseInt(vlere);
   if (!nota || nota < 1 || nota > 5) return;
+  
+  // Kontrollo nëse kjo notë ekziston tashmë në të dhënat lokale
+  const byLende = window._detailByLende || {};
+  const lData = byLende[lendaId];
+  if (lData && lData.periudhat[periudha]) {
+    const ekziston = lData.periudhat[periudha].find(n => n.lloji === kolona);
+    if (ekziston && ekziston.nota === nota) return; // E njëjta notë, mos ruaj
+  }
+
+  _ruajtjeNeProcees = true;
   const nxenesId = window._detailNxenesId;
+  
+  // Fshij notën e vjetër për këtë kolonë nëse ekziston
+  const { data: notatEkzistuese } = await db.from('notat')
+    .select('id')
+    .eq('nxenesi_id', nxenesId)
+    .eq('lenda_id', lendaId)
+    .eq('periudha', periudha)
+    .eq('lloji', kolona);
+  
+  if (notatEkzistuese && notatEkzistuese.length > 0) {
+    await db.from('notat').delete().eq('id', notatEkzistuese[0].id);
+  }
+
   const { error } = await db.from('notat').insert({
     nxenesi_id: nxenesId,
     lenda_id: lendaId,
@@ -1171,23 +1196,31 @@ async function ruajNotënDetaje(lendaId, periudha, kolona, vlere, inputId) {
     lloji: kolona,
     data_shenimit: new Date().toISOString()
   });
+  
+  _ruajtjeNeProcees = false;
   if (error) { console.error('Gabim:', error); return; }
+  
+  // Ruaj periudhat e hapura
+  const periudhatMbajtura = {...periudhatHapura};
+  periudhatMbajtura[lendaId + '_' + periudha] = true;
+  
   // Fresko të dhënat
   const { data: notatRe } = await db.from('notat')
     .select('*, lendet(emri)')
     .eq('nxenesi_id', nxenesId)
     .order('data_shenimit', { ascending: true });
-  const byLende = {};
+  const byLendeRe = {};
   if (notatRe) {
     notatRe.forEach(n => {
       if (!n.lendet) return;
-      if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
+      if (!byLendeRe[n.lenda_id]) byLendeRe[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
       const p = n.periudha || 1;
-      if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
-      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, lloji: n.lloji });
+      if (!byLendeRe[n.lenda_id].periudhat[p]) byLendeRe[n.lenda_id].periudhat[p] = [];
+      byLendeRe[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, lloji: n.lloji });
     });
   }
-  window._detailByLende = byLende;
+  window._detailByLende = byLendeRe;
+  periudhatHapura = periudhatMbajtura;
   renderDetailPage();
 }
 
