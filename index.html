@@ -807,7 +807,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
      const mesatare = vleratNumerike.length > 0
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
-    const gcMes = Nota Perfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(Nota Perfundimtare))] || 'gx') : 'gx';
+    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(Nota Perfundimtare))] || 'gx') : 'gx';
 
     html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
     vlerat.forEach(v => {
@@ -847,15 +847,15 @@ async function shfaqTeGjihaLendet() {
     });
     Object.entries(grouped).forEach(([key, vlerat]) => {
       const [nxId, lId] = key.split('_');
-      if (!Nota Perfundimtaret[nxId]) Nota Perfundimtaret[nxId] = {};
-      Nota Perfundimtaret[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
+      if (!mesataret[nxId]) mesataret[nxId] = {};
+      mesatare[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
     });
   }
 
   let html = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Nota Perfundimtaret</h3>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — mesataret</h3>
     </div>
     <div class="card" style="overflow-x:auto;">
       <table class="notat-tabela" style="min-width:600px;">
@@ -871,7 +871,7 @@ async function shfaqTeGjihaLendet() {
   allNxenesit.forEach(n => {
     html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
     allLendet.forEach(l => {
-      const mes = Nota Perfundimtaret[n.id] ? Nota Perfundimtaret[n.id][l.id] : null;
+      const mes = mesatare[n.id] ? mesatare[n.id][l.id] : null;
       const gc = mes ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mes))] || 'gx') : 'gx';
       html += `<td style="text-align:center;"><span class="grade-pill ${gc}">${mes || '—'}</span></td>`;
     });
