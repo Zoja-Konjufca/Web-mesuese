@@ -329,6 +329,10 @@
     text-transform: none;
     font-size: 13px;
   }
+  /* Hiq shigjetat e input[type=number] */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   .notat-tabela td { padding: 12px 14px; border-bottom: 1px solid var(--green-ultra); font-size: 14px; }
   .notat-tabela tr:last-child td { border-bottom: none; }
   .notat-tabela tr:hover td { background: var(--green-ultra); }
@@ -953,7 +957,7 @@ async function shfaqDetailNxenes(id) {
       if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
       const p = n.periudha || 1;
       if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
-      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, id: n.id });
+      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, id: n.id, lloji: n.lloji });
     });
   }
 
