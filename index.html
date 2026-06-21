@@ -257,7 +257,6 @@
     padding: 20px 22px; color: #e65100; font-size: 18px; font-weight: 700;
     margin-top: 16px; display: none; letter-spacing: 0.3px; text-align: center;
   }
-  
   .error-msg {
     background: var(--danger-light); border: 1px solid #f0b4b0;
     border-radius: var(--radius-sm); padding: 12px 14px;
@@ -325,6 +324,10 @@
     background: var(--green-pale); color: var(--green-dark);
     font-size: 12px; font-weight: 600; text-transform: uppercase;
     letter-spacing: 0.5px; padding: 12px 14px; text-align: left;
+  }
+  .notat-tabela th.nota-perfundimtare {
+    text-transform: none;
+    font-size: 13px;
   }
   .notat-tabela td { padding: 12px 14px; border-bottom: 1px solid var(--green-ultra); font-size: 14px; }
   .notat-tabela tr:last-child td { border-bottom: none; }
@@ -423,12 +426,10 @@
         <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lëndën për të shënuar nota</p>
       </div>
 
-      <!-- Lista e lëndëve -->
       <div id="notat-lendet-lista" class="card" style="padding:10px;margin-bottom:16px;">
         <div id="notat-lendet-items"></div>
       </div>
 
-      <!-- Forma e shënimit (fshihet fillimisht) -->
       <div id="notat-forma" style="display:none;">
         <div class="card">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
@@ -746,7 +747,6 @@ function zgjedhLendenPerNota(lId, lEmri) {
   document.getElementById('notat-lenda-emri').textContent = lEmri;
   document.getElementById('notat-lendet-lista').style.display = 'none';
   document.getElementById('notat-forma').style.display = 'block';
-  // Populate nxënësit
   const selN = document.getElementById('nota-nxenesi');
   selN.innerHTML = '<option value="">— Zgjedh nxënësin —</option>' +
     allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri}</option>`).join('');
@@ -759,20 +759,19 @@ function zgjedhLendenPerNota(lId, lEmri) {
 function kthehuNeLendet() {
   document.getElementById('notat-lendet-lista').style.display = 'block';
   document.getElementById('notat-forma').style.display = 'none';
-  document.getElementById('te-gjitha-tabela').style.display = 'none';
+  const tabelaDiv = document.getElementById('te-gjitha-tabela');
+  if (tabelaDiv) tabelaDiv.style.display = 'none';
 }
 
 async function shfaqPeriudhatPerLende(lId, lEmri) {
   let tabelaDiv = document.getElementById('te-gjitha-tabela');
   tabelaDiv.style.display = 'block';
 
-  // Merr notat për këtë lëndë
   const { data: notat } = await db.from('notat')
     .select('nxenesi_id, nota, periudha')
     .eq('lenda_id', lId)
     .in('nxenesi_id', allNxenesit.map(n => n.id));
 
-  // Grupo sipas nxënësit dhe periudhës
   const byNxenes = {};
   if (notat) {
     notat.forEach(n => {
@@ -795,7 +794,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
             <th style="text-align:center;">P2</th>
             <th style="text-align:center;">P3</th>
             <th style="text-align:center;">P4</th>
-            <th style="text-align:center;background:var(--green-mid);color:white;text-transform:none;">Nota Përfundimtare</th>
+            <th class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;">Nota Përfundimtare</th>
           </tr>
         </thead>
         <tbody>
@@ -805,7 +804,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
     const periudhat = byNxenes[n.id] || {};
     const vlerat = [1,2,3,4].map(p => periudhat[p] || null);
     const vleratNumerike = vlerat.filter(v => v !== null);
-     const mesatare = vleratNumerike.length > 0
+    const mesatare = vleratNumerike.length > 0
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
     const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
@@ -838,7 +837,7 @@ async function shfaqTeGjihaLendet() {
     .select('nxenesi_id, lenda_id, nota')
     .in('nxenesi_id', allNxenesit.map(n => n.id));
 
-   const mesataret = {};
+  const mesataret = {};
   if (notat) {
     const grouped = {};
     notat.forEach(n => {
@@ -849,14 +848,14 @@ async function shfaqTeGjihaLendet() {
     Object.entries(grouped).forEach(([key, vlerat]) => {
       const [nxId, lId] = key.split('_');
       if (!mesataret[nxId]) mesataret[nxId] = {};
-      mesatare[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
+      mesataret[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
     });
   }
 
   let html = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Nota Perfundimtaret</h3>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Notat Përfundimtare</h3>
     </div>
     <div class="card" style="overflow-x:auto;">
       <table class="notat-tabela" style="min-width:600px;">
@@ -872,7 +871,7 @@ async function shfaqTeGjihaLendet() {
   allNxenesit.forEach(n => {
     html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
     allLendet.forEach(l => {
-      const mes = mesatare[n.id] ? mesatare[n.id][l.id] : null;
+      const mes = mesataret[n.id] ? mesataret[n.id][l.id] : null;
       const gc = mes ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mes))] || 'gx') : 'gx';
       html += `<td style="text-align:center;"><span class="grade-pill ${gc}">${mes || '—'}</span></td>`;
     });
@@ -882,7 +881,6 @@ async function shfaqTeGjihaLendet() {
   html += `</tbody></table></div>`;
   tabelaDiv.innerHTML = html;
 }
-
 
 function switchTab(id, scroll=true) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -943,8 +941,6 @@ async function shfaqDetailNxenes(id) {
 
   const { data: prinderit } = await db.from('prinderit').select('*').eq('nxenesi_id', id);
 
-  // Grupo notat sipas lëndës dhe periudhës
-  // byLende[lenda_id][periudha] = nota
   const byLende = {};
   if (notat) {
     notat.forEach(n => {
@@ -976,7 +972,7 @@ async function shfaqDetailNxenes(id) {
             <th style="text-align:center;">P2</th>
             <th style="text-align:center;">P3</th>
             <th style="text-align:center;">P4</th>
-            <th style="text-align:center;background:var(--green-mid);color:white;">mesatare</th>
+            <th class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;">Nota Përfundimtare</th>
           </tr>
         </thead>
         <tbody>
@@ -987,18 +983,16 @@ async function shfaqDetailNxenes(id) {
     const notat_per_periudha = lData ? lData.periudhat : {};
     const vlerat = [1,2,3,4].map(p => notat_per_periudha[p] || null);
     const vleratNumerike = vlerat.filter(v => v !== null);
-     const mesatare = vleratNumerike.length > 0 
+    const mesatare = vleratNumerike.length > 0
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
     const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
 
     html += `<tr><td style="font-weight:500;">${l.emri}</td>`;
-    
     vlerat.forEach(v => {
       const gc = v ? (['','g1','g2','g3','g4','g5'][v] || 'gx') : 'gx';
       html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
     });
-
     html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
   });
 
