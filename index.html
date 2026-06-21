@@ -741,8 +741,8 @@ async function buildMesueseUI() {
   const tabs = [];
   tabs.push({ id: 'ballina', label: 'Ballina' });
   tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
-  tabs.push({ id: 'lendet-notat', label: 'Lëndët', onclick: 'hapListenLendeve()' });
-  tabs.push({ id: 'notat', label: 'Notat', onclick: 'hapPanelNotat()' });
+
+
   if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mësueset' });
   buildTabs(tabs, 'ballina');
   await loadLendet();
@@ -752,8 +752,8 @@ async function buildMesueseUI() {
     await loadMesueset();
     document.getElementById('btn-shto-nxenes').style.display = 'none';
   }
-  populateLendetSelect();
-  hapPanelNotat();
+
+
   if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
 }
 
@@ -1265,18 +1265,11 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
       await db.from('notat').delete().eq('id', notatEkz[0].id);
     }
 
-    // Merr mesuese_id-në e saktë nga databaza
-    const { data: mesueseData } = await db.from('mesueset')
-      .select('id')
-      .eq('email', currentUser.email)
-      .single();
-    const mesueseId = mesueseData ? mesueseData.id : currentUser.id;
-
     // Shto notën e re
     const { error } = await db.from('notat').insert({
       nxenesi_id: nxenesId,
       lenda_id: lendaId,
-      mesuese_id: mesueseId,
+      mesuese_id: currentUser.id,
       nota: nota,
       periudha: periudha,
       lloji: kolona,
