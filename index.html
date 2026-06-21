@@ -945,10 +945,18 @@ async function loadLendet() {
 }
 
 async function loadNxenesit() {
-  let q = db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
-  if (currentUser.roli !== 'admin') q = q.eq('mesuese_id', currentUser.id);
-  const { data } = await q;
-  allNxenesit = data || [];
+  if (currentUser.roli !== 'admin') {
+    const { data: nxMine } = await db.from('nxenesit').select('*, klasat(emri)').eq('mesuese_id', currentUser.id).order('mbiemri');
+    if (nxMine && nxMine.length > 0) {
+      allNxenesit = nxMine;
+    } else {
+      const { data: nxAll } = await db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
+      allNxenesit = nxAll || [];
+    }
+  } else {
+    const { data } = await db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
+    allNxenesit = data || [];
+  }
   renderNxenesitList(allNxenesit);
 }
 
@@ -1257,11 +1265,18 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
       await db.from('notat').delete().eq('id', notatEkz[0].id);
     }
 
+    // Merr mesuese_id-në e saktë nga databaza
+    const { data: mesueseData } = await db.from('mesueset')
+      .select('id')
+      .eq('email', currentUser.email)
+      .single();
+    const mesueseId = mesueseData ? mesueseData.id : currentUser.id;
+
     // Shto notën e re
     const { error } = await db.from('notat').insert({
       nxenesi_id: nxenesId,
       lenda_id: lendaId,
-      mesuese_id: currentUser.id,
+      mesuese_id: mesueseId,
       nota: nota,
       periudha: periudha,
       lloji: kolona,
