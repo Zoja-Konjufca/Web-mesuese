@@ -930,28 +930,52 @@ function renderNxenesitList(list) {
   `).join('');
 }
 
+// Gjendja e periudhave të hapura: { lendaId_periudha: true/false }
+let periudhatHapura = {};
+
 async function shfaqDetailNxenes(id) {
+  periudhatHapura = {};
   const nxenesi = allNxenesit.find(n => n.id === id);
   if (!nxenesi) return;
 
   const { data: notat } = await db.from('notat')
     .select('*, lendet(emri), mesueset(emri)')
     .eq('nxenesi_id', id)
-    .order('periudha', { ascending: true });
+    .order('data_shenimit', { ascending: true });
 
   const { data: prinderit } = await db.from('prinderit').select('*').eq('nxenesi_id', id);
 
+  // byLende[lenda_id][periudha] = [{ nota, data, id }]
   const byLende = {};
   if (notat) {
     notat.forEach(n => {
       if (!n.lendet) return;
       if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
       const p = n.periudha || 1;
-      if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = n.nota;
+      if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
+      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, id: n.id });
     });
   }
 
+  // Ruaj të dhënat globalisht për toggle
+  window._detailNxenesId = id;
+  window._detailByLende = byLende;
+  window._detailNxenesi = nxenesi;
+  window._detailPrinderit = prinderit;
+
   document.getElementById('detail-page-title').textContent = nxenesi.emri + ' ' + nxenesi.mbiemri;
+  renderDetailPage();
+}
+
+function mesatarePeriudhes(notatArr) {
+  if (!notatArr || notatArr.length === 0) return 0;
+  return notatArr.reduce((a,b) => a + b.nota, 0) / notatArr.length;
+}
+
+function renderDetailPage() {
+  const nxenesi = window._detailNxenesi;
+  const byLende = window._detailByLende;
+  const prinderit = window._detailPrinderit;
 
   let html = `
     <div class="nxenes-hero">
@@ -964,14 +988,14 @@ async function shfaqDetailNxenes(id) {
 
     <div class="card" style="overflow-x:auto;">
       <div class="card-title">Notat sipas lëndëve dhe periudhave</div>
-      <table class="notat-tabela" style="min-width:500px;">
+      <table class="notat-tabela" style="min-width:600px;">
         <thead>
           <tr>
             <th>Lënda</th>
-            <th style="text-align:center;">P1</th>
-            <th style="text-align:center;">P2</th>
-            <th style="text-align:center;">P3</th>
-            <th style="text-align:center;">P4</th>
+            <th style="text-align:center;cursor:pointer;" onclick="toggleTePeriudhat(0)" title="Kliko për të zgjeruar të gjitha">P1 <span style="font-size:10px;">▼</span></th>
+            <th style="text-align:center;cursor:pointer;" onclick="toggleTePeriudhat(1)" title="Kliko për të zgjeruar të gjitha">P2 <span style="font-size:10px;">▼</span></th>
+            <th style="text-align:center;cursor:pointer;" onclick="toggleTePeriudhat(2)" title="Kliko për të zgjeruar të gjitha">P3 <span style="font-size:10px;">▼</span></th>
+            <th style="text-align:center;cursor:pointer;" onclick="toggleTePeriudhat(3)" title="Kliko për të zgjeruar të gjitha">P4 <span style="font-size:10px;">▼</span></th>
             <th class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;">Nota Përfundimtare</th>
           </tr>
         </thead>
@@ -980,20 +1004,64 @@ async function shfaqDetailNxenes(id) {
 
   allLendet.forEach(l => {
     const lData = byLende[l.id];
-    const notat_per_periudha = lData ? lData.periudhat : {};
-    const vlerat = [1,2,3,4].map(p => notat_per_periudha[p] || null);
-    const vleratNumerike = vlerat.filter(v => v !== null);
-    const mesatare = vleratNumerike.length > 0
-      ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
-      : null;
-    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
+    const periudhat = lData ? lData.periudhat : {};
 
-    html += `<tr><td style="font-weight:500;">${l.emri}</td>`;
-    vlerat.forEach(v => {
-      const gc = v ? (['','g1','g2','g3','g4','g5'][v] || 'gx') : 'gx';
-      html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
+    // Mesatarja e çdo periudhe (0 nëse s'ka notë)
+    const mesPerPeriudhe = [1,2,3,4].map(p => {
+      const arr = periudhat[p] || [];
+      return arr.length > 0 ? mesatarePeriudhes(arr) : 0;
     });
-    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
+
+    // Nota përfundimtare = mesatare e 4 periudhave (duke llogaritur 0-t)
+    const kaMeseNjePeriudhe = mesPerPeriudhe.some(m => m > 0);
+    const notaPerfundimtare = kaMeseNjePeriudhe
+      ? (mesPerPeriudhe.reduce((a,b) => a+b, 0) / 4).toFixed(1)
+      : null;
+    const gcFinal = notaPerfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(notaPerfundimtare))] || 'gx') : 'gx';
+
+    html += `<tr><td style="font-weight:500;padding:12px 14px;">${l.emri}</td>`;
+
+    [1,2,3,4].forEach((p, idx) => {
+      const key = l.id + '_' + p;
+      const hapur = periudhatHapura[key];
+      const arr = periudhat[p] || [];
+      const mes = mesPerPeriudhe[idx];
+      const gc = mes > 0 ? (['','g1','g2','g3','g4','g5'][Math.round(mes)] || 'gx') : 'gx';
+      const mesStr = mes > 0 ? mes.toFixed(1) : '0';
+
+      if (hapur) {
+        // Kolona e zgjeruar — trego të gjitha notat
+        const notatHTML = arr.length > 0
+          ? arr.map(n => {
+              const dt = new Date(n.data).toLocaleDateString('sq-AL', {day:'2-digit', month:'short'});
+              const gc2 = ['','g1','g2','g3','g4','g5'][n.nota] || 'gx';
+              return `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(--green-ultra);">
+                <span style="font-size:11px;color:var(--text-soft);">${dt}</span>
+                <span class="grade-pill ${gc2}" style="padding:2px 8px;font-size:12px;">${n.nota}</span>
+              </div>`;
+            }).join('')
+          : `<div style="font-size:11px;color:#aaa;padding:4px 0;">Pa notë → 0</div>`;
+
+        html += `<td style="text-align:center;vertical-align:top;padding:8px;background:#f8fffe;min-width:120px;">
+          <div onclick="togglePeriudhe('${l.id}', ${p})" style="cursor:pointer;margin-bottom:6px;">
+            <span class="grade-pill ${gc}" style="font-size:12px;">${mesStr}</span>
+            <span style="font-size:10px;color:var(--green-main);margin-left:4px;">▲</span>
+          </div>
+          <div style="font-size:12px;">${notatHTML}</div>
+          <div style="font-size:10px;color:var(--text-soft);margin-top:4px;border-top:1px solid var(--border);padding-top:4px;">
+            Mes. P${p}: <strong>${mesStr}</strong>
+          </div>
+        </td>`;
+      } else {
+        // Kolona e mbyllur — trego vetëm mesataren
+        html += `<td style="text-align:center;cursor:pointer;" onclick="togglePeriudhe('${l.id}', ${p})" title="Kliko për të parë notat">
+          <span class="grade-pill ${gc}">${mesStr}</span>
+          <div style="font-size:9px;color:var(--text-soft);margin-top:2px;">${arr.length} notë${arr.length !== 1 ? '' : ''}</div>
+        </td>`;
+      }
+    });
+
+    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcFinal}" style="font-weight:700;">${notaPerfundimtare || '—'}</span></td></tr>`;
   });
 
   html += `</tbody></table></div>
@@ -1028,6 +1096,27 @@ async function shfaqDetailNxenes(id) {
 
 function mbyllDetailPage() {
   document.getElementById('nxenes-detail-page').classList.remove('open');
+}
+
+function togglePeriudhe(lendaId, periudha) {
+  const key = lendaId + '_' + periudha;
+  periudhatHapura[key] = !periudhatHapura[key];
+  renderDetailPage();
+  // Ruaj pozicionin e scrollit
+  const page = document.getElementById('nxenes-detail-page');
+  const scrollY = page.scrollTop;
+  setTimeout(() => { page.scrollTop = scrollY; }, 10);
+}
+
+function toggleTePeriudhat(idx) {
+  // Kliko header-in P1/P2/P3/P4 — hap/mbyll atë periudhë për të gjitha lëndët
+  const periudha = idx + 1;
+  const byLende = window._detailByLende || {};
+  const hapur = allLendet.some(l => periudhatHapura[l.id + '_' + periudha]);
+  allLendet.forEach(l => {
+    periudhatHapura[l.id + '_' + periudha] = !hapur;
+  });
+  renderDetailPage();
 }
 
 async function loadBallina() {
