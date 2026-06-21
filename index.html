@@ -814,7 +814,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
       const gc = v ? (['','g1','g2','g3','g4','g5'][v] || 'gx') : 'gx';
       html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
     });
-    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${Nota Perfundimtare || '—'}</span></td></tr>`;
+    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
   });
 
   html += `</tbody></table></div>`;
