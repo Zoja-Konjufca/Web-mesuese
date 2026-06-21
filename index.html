@@ -1008,14 +1008,23 @@ function renderDetailPage() {
     const lData = byLende[l.id];
     const periudhat = lData ? lData.periudhat : {};
 
-    // byKolone[periudha][emriKolones] = nota (ose null)
-    // Për tani notat ekzistuese i shpërndajmë sipas rendit (Test, Ushtrime, Projekt, Vlerësim me gojë)
+    // byKolone[periudha][emriKolones] = nota (lexon sipas lloji)
     const byKolone = {};
     [1,2,3,4].forEach(p => {
       byKolone[p] = {};
+      KOLONAT_FIKSE.forEach(k => { byKolone[p][k] = null; });
       const arr = periudhat[p] || [];
-      KOLONAT_FIKSE.forEach((k, idx) => {
-        byKolone[p][k] = arr[idx] ? arr[idx].nota : null;
+      arr.forEach(n => {
+        if (n.lloji && KOLONAT_FIKSE.includes(n.lloji)) {
+          byKolone[p][n.lloji] = n.nota;
+        }
+      });
+      // Fallback: nëse notat janë pa lloji, shpërnda sipas rendit
+      const paLloji = arr.filter(n => !n.lloji || !KOLONAT_FIKSE.includes(n.lloji));
+      paLloji.forEach((n, idx) => {
+        if (idx < KOLONAT_FIKSE.length && byKolone[p][KOLONAT_FIKSE[idx]] === null) {
+          byKolone[p][KOLONAT_FIKSE[idx]] = n.nota;
+        }
       });
     });
 
@@ -1044,16 +1053,25 @@ function renderDetailPage() {
       const gc = mes !== null ? (['','g1','g2','g3','g4','g5'][Math.round(mes)] || 'gx') : 'gx';
 
       if (hapur) {
-        // Periudha e zgjeruar — trego 4 kolonat
+        // Periudha e zgjeruar — trego 4 kolonat të editueshme
         let kolonatHTML = KOLONAT_FIKSE.map(k => {
           const nota = byKolone[p][k];
           const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
-          const notaStr = nota !== null ? nota : '0';
-          const isZero = nota === null;
-          return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:80px;vertical-align:top;">
-            <div style="font-size:10px;color:var(--text-soft);margin-bottom:4px;font-weight:600;">${k}</div>
-            <span class="grade-pill ${isZero ? 'gx' : gc2}" style="font-size:12px;${isZero ? 'opacity:0.5;' : ''}">${notaStr}</span>
-            ${isZero ? '<div style="font-size:9px;color:#aaa;margin-top:2px;">→ 0</div>' : ''}
+          const inputId = `inp_${l.id}_${p}_${k.replace(/\s/g,'_')}`;
+          return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:90px;vertical-align:top;">
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}</div>
+            ${nota !== null
+              ? `<span class="grade-pill ${gc2}" style="font-size:13px;cursor:pointer;" onclick="aktivizoInput('${inputId}')">${nota}</span>
+                 <div style="font-size:9px;color:var(--text-soft);margin-top:3px;cursor:pointer;" onclick="aktivizoInput('${inputId}')">✏️ ndrysho</div>`
+              : `<div style="font-size:10px;color:#bbb;margin-bottom:4px;">pa notë → 0</div>`
+            }
+            <input id="${inputId}" type="number" min="1" max="5"
+              placeholder="${nota !== null ? nota : '—'}"
+              style="width:52px;padding:6px;border:2px solid var(--green-main);border-radius:6px;font-size:16px;font-weight:700;text-align:center;font-family:'DM Sans',sans-serif;color:var(--green-dark);margin-top:4px;${nota !== null ? 'display:none;' : ''}"
+              onkeydown="if(event.key==='Enter'){ruajNotënDetaje('${l.id}',${p},'${k}',this.value,'${inputId}')}"
+              onblur="if(this.value)ruajNotënDetaje('${l.id}',${p},'${k}',this.value,'${inputId}')"
+              oninput="this.value=this.value.replace(/[^1-5]/g,'').slice(0,1)"
+            >
           </td>`;
         }).join('');
 
@@ -1120,13 +1138,52 @@ function togglePeriudhe(lendaId, periudha) {
 }
 
 function toggleTePeriudhat(idx) {
-  // Kliko header-in P1/P2/P3/P4 — hap/mbyll atë periudhë për të gjitha lëndët
   const periudha = idx + 1;
-  const byLende = window._detailByLende || {};
   const hapur = allLendet.some(l => periudhatHapura[l.id + '_' + periudha]);
   allLendet.forEach(l => {
     periudhatHapura[l.id + '_' + periudha] = !hapur;
   });
+  renderDetailPage();
+}
+
+function aktivizoInput(inputId) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  inp.style.display = 'block';
+  inp.focus();
+  inp.select();
+}
+
+async function ruajNotënDetaje(lendaId, periudha, kolona, vlere, inputId) {
+  const nota = parseInt(vlere);
+  if (!nota || nota < 1 || nota > 5) return;
+  const nxenesId = window._detailNxenesId;
+  const { error } = await db.from('notat').insert({
+    nxenesi_id: nxenesId,
+    lenda_id: lendaId,
+    mesuese_id: currentUser.id,
+    nota: nota,
+    periudha: periudha,
+    lloji: kolona,
+    data_shenimit: new Date().toISOString()
+  });
+  if (error) { console.error('Gabim:', error); return; }
+  // Fresko të dhënat
+  const { data: notatRe } = await db.from('notat')
+    .select('*, lendet(emri)')
+    .eq('nxenesi_id', nxenesId)
+    .order('data_shenimit', { ascending: true });
+  const byLende = {};
+  if (notatRe) {
+    notatRe.forEach(n => {
+      if (!n.lendet) return;
+      if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
+      const p = n.periudha || 1;
+      if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
+      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, lloji: n.lloji });
+    });
+  }
+  window._detailByLende = byLende;
   renderDetailPage();
 }
 
