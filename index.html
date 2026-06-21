@@ -807,7 +807,7 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
      const mesatare = vleratNumerike.length > 0
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
-    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(Nota Perfundimtare))] || 'gx') : 'gx';
+    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
 
     html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
     vlerat.forEach(v => {
@@ -975,7 +975,7 @@ async function shfaqDetailNxenes(id) {
             <th style="text-align:center;">P2</th>
             <th style="text-align:center;">P3</th>
             <th style="text-align:center;">P4</th>
-            <th style="text-align:center;background:var(--green-mid);color:white;">Nota Perfundimtare</th>
+            <th style="text-align:center;background:var(--green-mid);color:white;">mesatare</th>
           </tr>
         </thead>
         <tbody>
@@ -989,7 +989,7 @@ async function shfaqDetailNxenes(id) {
      const mesatare = vleratNumerike.length > 0 
       ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
       : null;
-    const gcMes = Nota Perfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(Nota Perfundimtare))] || 'gx') : 'gx';
+    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
 
     html += `<tr><td style="font-weight:500;">${l.emri}</td>`;
     
