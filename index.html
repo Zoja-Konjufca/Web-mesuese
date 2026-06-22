@@ -998,7 +998,7 @@ async function shfaqDetailNxenes(id) {
   if (!nxenesi) return;
 
   const { data: notat } = await db.from('notat')
-    .select('*, lendet(emri), mesueset(emri)')
+    .select('*, lendet(emri)')
     .eq('nxenesi_id', id)
     .order('data_shenimit', { ascending: true });
 
