@@ -551,7 +551,7 @@ function renderDetailPage() {
           const inputId = `inp_${l.id}_${p}_${safeKey}`;
           const timerKey = `${l.id}_${p}_${k}`;
           return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:100px;vertical-align:top;">
-            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}</div>
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;cursor:text;" onclick="editoEmrinKolones(this,'${l.id}',${p},'${k}')">${k}</div>
             <div class="nota-input-cell">
               <input id="${inputId}" type="number" min="1" max="5" value="${nota !== null ? nota : ''}" placeholder="—"
                 oninput="this.value=this.value.replace(/[^1-5]/g,'').slice(0,1); autoSaveNota('${l.id}',${p},'${k}','${inputId}','${timerKey}')"
@@ -838,6 +838,37 @@ async function loadFemijaData() {
   const meKoment = notat ? notat.filter(n => n.koment).slice(0,5) : [];
   if (!meKoment.length) { komentEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente.</p></div>'; }
   else { komentEl.innerHTML = meKoment.map(n => { const d = new Date(n.data_shenimit); const ds = d.toLocaleDateString('sq-AL', {day:'2-digit',month:'long',year:'numeric'}); return `<div style="background:var(--green-ultra);border-left:3px solid var(--green-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--green-main);">${n.lendet?n.lendet.emri:''} — Nota ${n.nota}</div><div style="font-size:14px;color:var(--text-dark);margin-top:4px;">${n.koment}</div><div style="font-size:11px;color:var(--text-soft);margin-top:4px;">📅 ${ds}</div></div>`; }).join(''); }
+}
+
+function editoEmrinKolones(el, lendaId, periudha, emriAktual) {
+  const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = emriAktual; inp.maxLength = 30;
+  inp.style.cssText = 'width:90px;padding:2px 4px;border:1px solid var(--green-main);border-radius:4px;font-size:10px;font-weight:600;font-family:DM Sans,sans-serif;color:var(--green-dark);outline:none;';
+  el.replaceWith(inp); inp.focus(); inp.select();
+
+  async function ruaj() {
+    const emriRi = inp.value.trim();
+    const div = document.createElement('div');
+    div.style.cssText = 'font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;cursor:text;';
+    div.onclick = function() { editoEmrinKolones(this, lendaId, periudha, emriRi || emriAktual); };
+    div.textContent = emriRi || emriAktual;
+    inp.replaceWith(div);
+    if (!emriRi || emriRi === emriAktual) return;
+    if (!fikse.includes(emriAktual)) {
+      const { error } = await db.from('kolonat_lendeve').update({ emri: emriRi }).eq('lenda_id', lendaId).eq('mesuese_id', currentUser.id).eq('periudha', periudha).eq('emri', emriAktual);
+      if (!error) {
+        window._kolonatDB = (window._kolonatDB || []).map(k => k.lenda_id === lendaId && k.periudha === periudha && k.emri === emriAktual ? { ...k, emri: emriRi } : k);
+        await db.from('notat').update({ lloji: emriRi }).eq('lenda_id', lendaId).eq('mesuese_id', currentUser.id).eq('periudha', periudha).eq('lloji', emriAktual);
+        const byLende = window._detailByLende || {};
+        if (byLende[lendaId] && byLende[lendaId].periudhat[periudha]) {
+          byLende[lendaId].periudhat[periudha].forEach(n => { if (n.lloji === emriAktual) n.lloji = emriRi; });
+        }
+      }
+    }
+  }
+  inp.onblur = ruaj;
+  inp.onkeydown = e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') { inp.value = emriAktual; inp.blur(); } };
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
