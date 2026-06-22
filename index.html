@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#1a5c3a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Ditari i Mësueses">
+<meta name="apple-mobile-web-app-title" content="Ditari i Mesueses">
 <link rel="manifest" href="manifest.json">
-<title>Ditari i Mësueses — Platforma Shkollë-Prindër</title>
+<title>Ditari i Mesueses — Platforma Shkolle-Prinder</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -275,7 +275,7 @@
 
   .sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
 
-  /* FAQJA E DETAJEVE TË NXËNËSIT */
+  /* FAQJA E DETAJEVE TE NXENESIT */
   #nxenes-detail-page {
     display: none;
     position: fixed;
@@ -390,17 +390,17 @@
 <body>
 
 <div id="loading-screen">
-  <div class="logo-big">Ditari i <span>Mësueses</span></div>
+  <div class="logo-big">Ditari i <span>Mesueses</span></div>
   <p>Duke ngarkuar...</p>
   <div class="spinner"></div>
 </div>
 
 <div id="login-screen" style="display:none; min-height:100vh; background:linear-gradient(160deg,#0f3d25,#1a5c3a,#2d7a52); align-items:center; justify-content:center; padding:20px;">
   <div class="login-card">
-    <div class="login-logo">Ditari i <span>Mësueses</span></div>
-    <div class="login-sub">Platforma Shkollë–Prindër</div>
+    <div class="login-logo">Ditari i <span>Mesueses</span></div>
+    <div class="login-sub">Platforma Shkolle–Prinder</div>
     <div style="display:flex; gap:0; margin-bottom:24px; border:1.5px solid var(--border); border-radius:var(--radius-sm); overflow:hidden;">
-      <button onclick="switchLoginTab('mesuese')" id="ltab-mesuese" style="flex:1;padding:10px;border:none;background:var(--green-main);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Mësuese</button>
+      <button onclick="switchLoginTab('mesuese')" id="ltab-mesuese" style="flex:1;padding:10px;border:none;background:var(--green-main);color:white;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">Mesuese</button>
       <button onclick="switchLoginTab('prind')" id="ltab-prind" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text-soft);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Prind / Kujdestar</button>
     </div>
     <div id="login-mesuese">
@@ -409,15 +409,15 @@
         <input type="email" id="inp-email" placeholder="emaili juaj personal">
       </div>
       <div class="form-group">
-        <label>Fjalëkalimi</label>
+        <label>Fjalekalimi</label>
         <input type="password" id="inp-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginMesuese()">
       </div>
-      <button class="btn-primary" onclick="loginMesuese()">Hyr si Mësuese</button>
+      <button class="btn-primary" onclick="loginMesuese()">Hyr si Mesuese</button>
       <div class="login-err" id="login-err"></div>
     </div>
     <div id="login-prind" style="display:none;">
       <div class="form-group">
-        <label>Kodi i qasjes (nga mësuese)</label>
+        <label>Kodi i qasjes (nga mesuese)</label>
         <input type="text" id="inp-kod" placeholder="p.sh. PR-3A-0912" style="font-size:1.1rem;letter-spacing:2px;text-transform:uppercase;" onkeydown="if(event.key==='Enter')loginPrind()">
       </div>
       <button class="btn-primary" onclick="loginPrind()">Hyr si Prind</button>
@@ -428,7 +428,7 @@
 
 <div id="app">
   <nav class="topnav">
-    <div class="nav-logo">Ditari i <span>Mësueses</span></div>
+    <div class="nav-logo">Ditari i <span>Mesueses</span></div>
     <div class="nav-right">
       <div class="nav-user">
         <div class="nav-avatar" id="nav-avatar">M</div>
@@ -445,20 +445,20 @@
       <div class="stats-grid" id="stats-grid"></div>
       <div class="card">
         <div class="card-title">Veprimet e fundit</div>
-        <div id="aktiviteti-list"><div class="empty-state"><p>Ende nuk ka shënime.</p></div></div>
+        <div id="aktiviteti-list"><div class="empty-state"><p>Ende nuk ka shenime.</p></div></div>
       </div>
     </div>
 
     <div class="panel" id="panel-nxenesit">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Nxënësit</h2>
-        <button class="btn-green" id="btn-shto-nxenes" onclick="openModal('modal-shto-nxenes')">+ Shto nxënës</button>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Nxenesit</h2>
+        <button class="btn-green" id="btn-shto-nxenes" onclick="openModal('modal-shto-nxenes')">+ Shto nxenes</button>
       </div>
       <div class="card">
         <div style="display:flex;gap:10px;margin-bottom:16px;">
-          <input type="text" id="search-nxenes" placeholder="Kërko nxënës..." oninput="filtroNxenesit()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;">
+          <input type="text" id="search-nxenes" placeholder="Kerko nxenes..." oninput="filtroNxenesit()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;">
           <select id="filter-klasa" onchange="filtroNxenesit()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:white;">
-            <option value="">Të gjitha klasat</option>
+            <option value="">Te gjitha klasat</option>
             <option>Klasa 1</option><option>Klasa 2</option><option>Klasa 3</option>
             <option>Klasa 4</option><option>Klasa 5</option>
           </select>
@@ -470,7 +470,7 @@
     <div class="panel" id="panel-notat">
       <div style="margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Notat</h2>
-        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lëndën për të shënuar nota</p>
+        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lenden per te shenuar nota</p>
       </div>
 
       <div id="notat-lendet-lista" class="card" style="padding:10px;margin-bottom:16px;">
@@ -484,8 +484,8 @@
             <h3 id="notat-lenda-emri" style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);"></h3>
           </div>
           <div class="form-row">
-            <label>Nxënësi</label>
-            <select id="nota-nxenesi" onchange="ngarkoProfil()"><option value="">— Zgjedh nxënësin —</option></select>
+            <label>Nxenesi</label>
+            <select id="nota-nxenesi" onchange="ngarkoProfil()"><option value="">— Zgjedh nxenesin —</option></select>
           </div>
           <div id="nota-e-fundit" style="display:none; margin-top:8px; padding:10px 12px; background:#f5f5f5; border-radius:var(--radius-sm); color:#999; font-size:13px;"></div>
           <div class="form-grid">
@@ -502,11 +502,11 @@
               <label>Nota (1–5)</label>
               <select id="nota-nota">
                 <option value="">—</option>
-                <option value="5">5 — Shkëlqyeshëm</option>
-                <option value="4">4 — Mirë</option>
-                <option value="3">3 — Mjaftueshëm</option>
-                <option value="2">2 — Dobët</option>
-                <option value="1">1 — Shumë dobët</option>
+                <option value="5">5 — Shkelqyeshem</option>
+                <option value="4">4 — Mire</option>
+                <option value="3">3 — Mjaftueshem</option>
+                <option value="2">2 — Dobet</option>
+                <option value="1">1 — Shume dobet</option>
               </select>
             </div>
             <div class="form-row">
@@ -515,8 +515,8 @@
             </div>
           </div>
           <div class="form-row">
-            <label>Koment për prindin (opsional)</label>
-            <textarea id="nota-koment" placeholder="p.sh. Bëri progres të mirë këtë javë..."></textarea>
+            <label>Koment per prindin (opsional)</label>
+            <textarea id="nota-koment" placeholder="p.sh. Beri progres te mire kete jave..."></textarea>
           </div>
           <input type="hidden" id="nota-lenda">
           <button class="btn-green" onclick="ruajNoten()" id="btn-ruaj-noten">Ruaj dhe Njofto Prindin</button>
@@ -532,8 +532,8 @@
 
     <div class="panel" id="panel-lendet-notat">
       <div style="margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lëndët</h2>
-        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lëndën për të vendosur nota</p>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lendet</h2>
+        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lenden per te vendosur nota</p>
       </div>
       <div id="lendet-lista-card" class="card" style="padding:10px;"><div id="lendet-lista"></div></div>
       <div id="lendet-nxenesit-list"></div>
@@ -541,8 +541,8 @@
 
     <div class="panel" id="panel-mesueset">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Mësueset</h2>
-        <button class="btn-green" onclick="openModal('modal-shto-mesuese')">+ Shto mësuese</button>
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Mesueset</h2>
+        <button class="btn-green" onclick="openModal('modal-shto-mesuese')">+ Shto mesuese</button>
       </div>
       <div id="mesueset-list"></div>
     </div>
@@ -553,7 +553,7 @@
         <p id="femija-klasa">—</p>
       </div>
       <div class="card">
-        <div class="card-title">Notat sipas lëndës</div>
+        <div class="card-title">Notat sipas lendes</div>
         <div class="subject-grid" id="femija-notat"></div>
       </div>
       <div class="card">
@@ -564,36 +564,36 @@
   </div>
 </div>
 
-<!-- FAQJA E DETAJEVE TË NXËNËSIT (dritare e plotë) -->
+<!-- FAQJA E DETAJEVE TE NXENESIT (dritare e plote) -->
 <div id="nxenes-detail-page">
   <div class="detail-header">
     <button onclick="mbyllDetailPage()">← Kthehu</button>
-    <h2 id="detail-page-title">Profili i Nxënësit</h2>
+    <h2 id="detail-page-title">Profili i Nxenesit</h2>
   </div>
   <div class="detail-content">
     <div id="detail-page-content"></div>
   </div>
 </div>
 
-<!-- MODAL: SHTO NXËNËS -->
+<!-- MODAL: SHTO NXENES -->
 <div class="modal-overlay" id="modal-shto-nxenes">
   <div class="modal">
-    <div class="modal-title">Shto Nxënës të Ri</div>
-    <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px;">Të dhënat e nxënësit</div>
+    <div class="modal-title">Shto Nxenes te Ri</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px;">Te dhenat e nxenesit</div>
     <div class="form-grid">
-      <div class="form-row"><label>Emri</label><input type="text" id="sn-emri" placeholder="Emri i nxënësit"></div>
-      <div class="form-row"><label>Mbiemri</label><input type="text" id="sn-mbiemri" placeholder="Mbiemri i nxënësit"></div>
+      <div class="form-row"><label>Emri</label><input type="text" id="sn-emri" placeholder="Emri i nxenesit"></div>
+      <div class="form-row"><label>Mbiemri</label><input type="text" id="sn-mbiemri" placeholder="Mbiemri i nxenesit"></div>
     </div>
     <hr class="sep">
     <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px;">Prindi / Kujdestari 1</div>
-    <div class="form-row"><label>Emri i plotë</label><input type="text" id="sn-p1-emri" placeholder="Avni Nushi"></div>
+    <div class="form-row"><label>Emri i plote</label><input type="text" id="sn-p1-emri" placeholder="Avni Nushi"></div>
     <div class="form-grid">
       <div class="form-row"><label>Nr. Telefoni (Viber)</label><input type="tel" id="sn-p1-tel" placeholder="+383 4X XXX XXX"></div>
       <div class="form-row"><label>Email (opsional)</label><input type="email" id="sn-p1-email" placeholder="email@..."></div>
     </div>
     <hr class="sep">
     <div style="font-size:13px;font-weight:600;color:var(--text-mid);margin-bottom:12px;">Prindi / Kujdestari 2 (opsional)</div>
-    <div class="form-row"><label>Emri i plotë</label><input type="text" id="sn-p2-emri" placeholder="Fitnete Nushi"></div>
+    <div class="form-row"><label>Emri i plote</label><input type="text" id="sn-p2-emri" placeholder="Fitnete Nushi"></div>
     <div class="form-grid">
       <div class="form-row"><label>Nr. Telefoni (Viber)</label><input type="tel" id="sn-p2-tel" placeholder="+383 4X XXX XXX"></div>
       <div class="form-row"><label>Email (opsional)</label><input type="email" id="sn-p2-email" placeholder="email@..."></div>
@@ -607,24 +607,24 @@
   </div>
 </div>
 
-<!-- MODAL: SHTO MËSUESE -->
+<!-- MODAL: SHTO MESUESE -->
 <div class="modal-overlay" id="modal-shto-mesuese">
   <div class="modal">
-    <div class="modal-title">Shto Mësuese</div>
-    <div class="form-row"><label>Emri i plotë</label><input type="text" id="sm-emri" placeholder="Fatmire Krasniqi"></div>
+    <div class="modal-title">Shto Mesuese</div>
+    <div class="form-row"><label>Emri i plote</label><input type="text" id="sm-emri" placeholder="Fatmire Krasniqi"></div>
     <div class="form-row"><label>Email</label><input type="email" id="sm-email" placeholder="emaili juaj personal"></div>
-    <div class="form-row"><label>Fjalëkalimi fillestar</label><input type="text" id="sm-pass" placeholder="min. 8 karaktere"></div>
+    <div class="form-row"><label>Fjalekalimi fillestar</label><input type="text" id="sm-pass" placeholder="min. 8 karaktere"></div>
     <div class="form-row">
       <label>Roli</label>
       <select id="sm-roli">
-        <option value="admin">Admin (Mësuese Kryesore — 9 lëndë)</option>
-        <option value="mesuesja">Mësuese</option>
+        <option value="admin">Admin (Mesuese Kryesore — 9 lende)</option>
+        <option value="mesuesja">Mesuese</option>
       </select>
     </div>
     <div class="form-row">
-      <label>Klasa që mëson</label>
+      <label>Klasa qe meson</label>
       <select id="sm-klasa">
-        <option value="">— Zgjedh klasën —</option>
+        <option value="">— Zgjedh klasen —</option>
         <option value="Klasa 1">Klasa 1</option><option value="Klasa 2">Klasa 2</option>
         <option value="Klasa 3">Klasa 3</option><option value="Klasa 4">Klasa 4</option>
         <option value="Klasa 5">Klasa 5</option>
@@ -632,7 +632,7 @@
     </div>
     <div class="form-row">
       <label>IBAN Konfirmimi (transferta bankare)</label>
-      <input type="text" id="sm-iban" placeholder="Screenshot / ref. e transfertës">
+      <input type="text" id="sm-iban" placeholder="Screenshot / ref. e transfertes">
     </div>
     <div class="success-msg" id="sm-sukses"></div>
     <div class="error-msg" id="sm-error"></div>
@@ -691,10 +691,10 @@ async function loginMesuese() {
   const pass = document.getElementById('inp-pass').value;
   const errEl = document.getElementById('login-err');
   errEl.textContent = '';
-  if (!email || !pass) { errEl.textContent = 'Plotëso të gjitha fushat.'; return; }
+  if (!email || !pass) { errEl.textContent = 'Ploteso te gjitha fushat.'; return; }
   const { data, error } = await db.from('mesueset').select('*').eq('email', email).eq('fjalekalimi', pass).single();
-  if (error || !data) { errEl.textContent = 'Email ose fjalëkalim i gabuar.'; return; }
-  if (!data.aktive) { errEl.textContent = 'Llogaria nuk është aktive ende.'; return; }
+  if (error || !data) { errEl.textContent = 'Email ose fjalekalim i gabuar.'; return; }
+  if (!data.aktive) { errEl.textContent = 'Llogaria nuk eshte aktive ende.'; return; }
   currentUser = data;
   localStorage.setItem('dm_session', JSON.stringify({ type: 'mesuese', id: data.id }));
   showApp();
@@ -740,10 +740,10 @@ async function buildMesueseUI() {
   const isAdmin = currentUser.roli === 'admin';
   const tabs = [];
   tabs.push({ id: 'ballina', label: 'Ballina' });
-  tabs.push({ id: 'nxenesit', label: 'Nxënësit' });
+  tabs.push({ id: 'nxenesit', label: 'Nxenesit' });
 
 
-  if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mësueset' });
+  if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mesueset' });
   buildTabs(tabs, 'ballina');
   await loadLendet();
   await loadNxenesit();
@@ -783,7 +783,7 @@ function hapPanelNotat() {
       display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
       color:var(--green-main); background:var(--green-pale);
     " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='var(--green-pale)'">
-      <span>📊 Të gjitha lëndët</span>
+      <span>📊 Te gjitha lendet</span>
       <span style="font-size:12px;">→</span>
     </div>
   `;
@@ -795,7 +795,7 @@ function zgjedhLendenPerNota(lId, lEmri) {
   document.getElementById('notat-lendet-lista').style.display = 'none';
   document.getElementById('notat-forma').style.display = 'block';
   const selN = document.getElementById('nota-nxenesi');
-  selN.innerHTML = '<option value="">— Zgjedh nxënësin —</option>' +
+  selN.innerHTML = '<option value="">— Zgjedh nxenesin —</option>' +
     allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri}</option>`).join('');
   document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
   document.getElementById('card-historiku').style.display = 'none';
@@ -836,12 +836,12 @@ async function shfaqPeriudhatPerLende(lId, lEmri) {
       <table class="notat-tabela" style="min-width:400px;">
         <thead>
           <tr>
-            <th>Nxënësi</th>
+            <th>Nxenesi</th>
             <th style="text-align:center;">P1</th>
             <th style="text-align:center;">P2</th>
             <th style="text-align:center;">P3</th>
             <th style="text-align:center;">P4</th>
-            <th class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;">Nota Përfundimtare</th>
+            <th class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;">Nota Perfundimtare</th>
           </tr>
         </thead>
         <tbody>
@@ -902,14 +902,14 @@ async function shfaqTeGjihaLendet() {
   let html = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
       <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Të gjitha lëndët — Notat Përfundimtare</h3>
+      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Te gjitha lendet — Notat Perfundimtare</h3>
     </div>
     <div class="card" style="overflow-x:auto;">
       <table class="notat-tabela" style="min-width:600px;">
         <thead>
           <tr>
-            <th>Nxënësi</th>
-            ${allLendet.map(l => `<th style="text-align:center;cursor:pointer;" onclick="shfaqPeriudhatPerLende('${l.id}', '${l.emri}')" title="Kliko për periudhat"><span style="border-bottom:1.5px dashed var(--green-light);">${l.emri}</span></th>`).join('')}
+            <th>Nxenesi</th>
+            ${allLendet.map(l => `<th style="text-align:center;cursor:pointer;" onclick="shfaqPeriudhatPerLende('${l.id}', '${l.emri}')" title="Kliko per periudhat"><span style="border-bottom:1.5px dashed var(--green-light);">${l.emri}</span></th>`).join('')}
           </tr>
         </thead>
         <tbody>
@@ -974,7 +974,7 @@ function filtroNxenesit() {
 
 function renderNxenesitList(list) {
   const el = document.getElementById('nxenesit-list');
-  if (!list.length) { el.innerHTML = '<div class="empty-state"><p>Nuk u gjetën nxënës.</p></div>'; return; }
+  if (!list.length) { el.innerHTML = '<div class="empty-state"><p>Nuk u gjeten nxenes.</p></div>'; return; }
   el.innerHTML = list.map(n => `
     <div class="student-item" onclick="shfaqDetailNxenes('${n.id}')">
       <div class="s-avatar">${n.emri[0]}${n.mbiemri[0]}</div>
@@ -985,7 +985,7 @@ function renderNxenesitList(list) {
   `).join('');
 }
 
-// Gjendja e periudhave të hapura: { lendaId_periudha: true/false }
+// Gjendja e periudhave te hapura: { lendaId_periudha: true/false }
 let periudhatHapura = {};
 
 // Debounce timers per input: { inputKey: timerId }
@@ -1029,7 +1029,7 @@ function mesatarePeriudhes(notatArr) {
   return notatArr.reduce((a,b) => a + b.nota, 0) / notatArr.length;
 }
 
-const KOLONAT_FIKSE = ['Test', 'Ushtrime', 'Projekt', 'Vlerësim me gojë'];
+const KOLONAT_FIKSE = ['Test', 'Ushtrime', 'Projekt', 'Vleresim_me_goje'];
 
 function renderDetailPage() {
   const nxenesi = window._detailNxenesi;
@@ -1046,16 +1046,16 @@ function renderDetailPage() {
     </div>
 
     <div class="card" style="overflow-x:auto;">
-      <div class="card-title">Notat sipas lëndëve dhe periudhave</div>
+      <div class="card-title">Notat sipas lendeve dhe periudhave</div>
       <table class="notat-tabela" style="min-width:700px;border-collapse:collapse;">
         <thead>
           <tr>
-            <th rowspan="2" style="vertical-align:middle;">Lënda</th>
+            <th rowspan="2" style="vertical-align:middle;">Lenda</th>
             <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(0)">P1 <span style="font-size:10px;">▼</span></th>
             <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(1)">P2 <span style="font-size:10px;">▼</span></th>
             <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(2)">P3 <span style="font-size:10px;">▼</span></th>
             <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(3)">P4 <span style="font-size:10px;">▼</span></th>
-            <th rowspan="2" class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;vertical-align:middle;">Nota Përfundimtare</th>
+            <th rowspan="2" class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;vertical-align:middle;">Nota Perfundimtare</th>
           </tr>
         </thead>
         <tbody>
@@ -1085,14 +1085,15 @@ function renderDetailPage() {
 
     const mesPerPeriudhe = [1,2,3,4].map(p => {
       const notatP = KOLONAT_FIKSE.map(k => byKolone[p][k] !== null ? byKolone[p][k] : 0);
-      const kaNjeMeNotë = KOLONAT_FIKSE.some(k => byKolone[p][k] !== null);
-      if (!kaNjeMeNotë) return null;
+      const kaNjeMeNote = KOLONAT_FIKSE.some(k => byKolone[p][k] !== null);
+      if (!kaNjeMeNote) return null;
       return notatP.reduce((a,b) => a+b, 0) / KOLONAT_FIKSE.length;
     });
 
     const kaMeseNjePeriudhe = mesPerPeriudhe.some(m => m !== null);
+    const periudhatMeNote = mesPerPeriudhe.filter(m => m !== null);
     const notaPerfundimtare = kaMeseNjePeriudhe
-      ? (mesPerPeriudhe.map(m => m !== null ? m : 0).reduce((a,b) => a+b, 0) / 4).toFixed(1)
+      ? (periudhatMeNote.reduce((a,b) => a+b, 0) / periudhatMeNote.length).toFixed(1)
       : null;
     const gcFinal = notaPerfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(notaPerfundimtare))] || 'gx') : 'gx';
 
@@ -1106,7 +1107,7 @@ function renderDetailPage() {
       const gc = mes !== null ? (['','g1','g2','g3','g4','g5'][Math.round(mes)] || 'gx') : 'gx';
 
       if (hapur) {
-        // Periudha e zgjeruar — inputet gjithmonë të dukshme, me auto-save
+        // Periudha e zgjeruar — inputet gjithmone te dukshme, me auto-save
         let kolonatHTML = KOLONAT_FIKSE.map(k => {
           const nota = byKolone[p][k];
           const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
@@ -1114,7 +1115,7 @@ function renderDetailPage() {
           const inputId = `inp_${l.id}_${p}_${safeKey}`;
           const timerKey = `${l.id}_${p}_${k}`;
           return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:100px;vertical-align:top;">
-            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}</div>
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k === 'Vleresim_me_goje' ? 'Vleresim me goje' : k}</div>
             <div class="nota-input-cell">
               <input
                 id="${inputId}"
@@ -1136,7 +1137,7 @@ function renderDetailPage() {
           <table style="width:100%;border-collapse:collapse;"><tr>${kolonatHTML}</tr></table>
         </td>`;
       } else {
-        html += `<td style="text-align:center;cursor:pointer;border-left:2px solid var(--border);padding:12px 8px;" onclick="togglePeriudhe('${l.id}', ${p})" title="Kliko për të parë notat">
+        html += `<td style="text-align:center;cursor:pointer;border-left:2px solid var(--border);padding:12px 8px;" onclick="togglePeriudhe('${l.id}', ${p})" title="Kliko per te pare notat">
           <span class="grade-pill ${gc}">${mesStr}</span>
           <div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>
         </td>`;
@@ -1149,7 +1150,7 @@ function renderDetailPage() {
   html += `</tbody></table></div>
 
     <div class="card">
-      <div class="card-title">Prindërit / Kujdestarët</div>
+      <div class="card-title">Prinderit / Kujdestaret</div>
   `;
 
   if (prinderit && prinderit.length) {
@@ -1166,7 +1167,7 @@ function renderDetailPage() {
       `;
     });
   } else {
-    html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk janë shtuar prindërit.</div>';
+    html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk jane shtuar prinderit.</div>';
   }
 
   html += `</div>`;
@@ -1198,7 +1199,7 @@ function toggleTePeriudhat(idx) {
   renderDetailPage();
 }
 
-// AUTO-SAVE me debounce — thirret me çdo tastë
+// AUTO-SAVE me debounce — thirret me çdo taste
 function autoSaveNota(lendaId, periudha, kolona, inputId, timerKey, immediate) {
   const inp = document.getElementById(inputId);
   const statusEl = document.getElementById('status_' + inputId);
@@ -1219,10 +1220,10 @@ function autoSaveNota(lendaId, periudha, kolona, inputId, timerKey, immediate) {
   inp.classList.remove('saved');
   if (statusEl) { statusEl.textContent = 'duke ruajtur...'; statusEl.className = 'save-status duke-ruajtur'; }
 
-  // Fshij timer-in e mëparshëm
+  // Fshij timer-in e meparshem
   if (_debounceTimers[timerKey]) clearTimeout(_debounceTimers[timerKey]);
 
-  const delay = immediate ? 0 : 900; // 900ms pas tastit të fundit
+  const delay = immediate ? 0 : 900; // 900ms pas tastit te fundit
   _debounceTimers[timerKey] = setTimeout(async () => {
     await _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timerKey);
   }, delay);
@@ -1239,13 +1240,13 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
   const inp = document.getElementById(inputId);
 
   try {
-    // Kontrollo nëse ekziston nota e njëjtë tashmë
+    // Kontrollo nese ekziston nota e njejte tashme
     const byLende = window._detailByLende || {};
     const lData = byLende[lendaId];
     if (lData && lData.periudhat[periudha]) {
       const ekziston = lData.periudhat[periudha].find(n => n.lloji === kolona);
       if (ekziston && ekziston.nota === nota) {
-        // E njëjta notë — mos bëj asgjë, trego si e ruajtur
+        // E njejta note — mos bej asgje, trego si e ruajtur
         if (inp) { inp.classList.remove('saving'); inp.classList.add('saved'); }
         if (statusEl) { statusEl.textContent = '✓ e ruajtur'; statusEl.className = 'save-status ok'; }
         _ruajtjeNeProcees[timerKey] = false;
@@ -1253,7 +1254,7 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
       }
     }
 
-    // Fshij notën e vjetër nëse ekziston
+    // Fshij noten e vjeter nese ekziston
     const { data: notatEkz } = await db.from('notat')
       .select('id')
       .eq('nxenesi_id', nxenesId)
@@ -1265,7 +1266,7 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
       await db.from('notat').delete().eq('id', notatEkz[0].id);
     }
 
-    // Shto notën e re
+    // Shto noten e re
     const { error } = await db.from('notat').insert({
       nxenesi_id: nxenesId,
       lenda_id: lendaId,
@@ -1278,7 +1279,7 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
 
     if (error) throw error;
 
-    // Fresko të dhënat lokale
+    // Fresko te dhenat lokale
     const { data: notatRe } = await db.from('notat')
       .select('*, lendet(emri)')
       .eq('nxenesi_id', nxenesId)
@@ -1301,17 +1302,17 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
     periudhatMbajtura[lendaId + '_' + periudha] = true;
     periudhatHapura = periudhatMbajtura;
 
-    // Fresko vetëm qelizën e mesatares — pa ri-render të gjithë faqen
+    // Fresko vetem qelizen e mesatares — pa ri-render te gjithe faqen
     _rifresko_mesataret(lendaId, periudha, byLendeRe);
 
-    // Trego sukses në input-in aktual (pa re-render)
+    // Trego sukses ne input-in aktual (pa re-render)
     const inpAkt = document.getElementById(inputId);
     const statusAkt = document.getElementById('status_' + inputId);
     if (inpAkt) { inpAkt.classList.remove('saving'); inpAkt.classList.add('saved'); }
     if (statusAkt) { statusAkt.textContent = '✓ e ruajtur'; statusAkt.className = 'save-status ok'; }
 
   } catch(e) {
-    console.error('Gabim gjatë ruajtjes:', e);
+    console.error('Gabim gjate ruajtjes:', e);
     const inpAkt = document.getElementById(inputId);
     const statusAkt = document.getElementById('status_' + inputId);
     if (inpAkt) { inpAkt.classList.remove('saving'); inpAkt.style.borderColor = 'var(--danger)'; }
@@ -1321,10 +1322,10 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
   _ruajtjeNeProcees[timerKey] = false;
 }
 
-// Rifresko mesataret në tabelë pa ri-renderuar gjithçka
+// Rifresko mesataret ne tabele pa ri-renderuar gjithçka
 function _rifresko_mesataret(lendaId, periudha, byLendeRe) {
-  // Gjej të gjitha rreshtat e tabelës dhe rifresko Notën Përfundimtare
-  // Kjo bëhet duke lexuar të dhënat nga byLendeRe dhe duke përditësuar DOM
+  // Gjej te gjitha rreshtat e tabeles dhe rifresko Noten Perfundimtare
+  // Kjo behet duke lexuar te dhenat nga byLendeRe dhe duke perditesuar DOM
   const lData = byLendeRe[lendaId];
   if (!lData) return;
 
@@ -1354,10 +1355,10 @@ function _rifresko_mesataret(lendaId, periudha, byLendeRe) {
       return notatP.reduce((a,b) => a+b, 0) / KOLONAT_FIKSE.length;
     });
 
-    // Përditëso titullin e periudhës së hapur (mesatarja)
+    // Perditeso titullin e periudhes se hapur (mesatarja)
     const mesP = mesPerPeriudhe[periudha - 1];
     const mesPStr = mesP !== null ? mesP.toFixed(1) : '—';
-    // Gjej butonin e periudhës
+    // Gjej butonin e periudhes
     const periudhaHeader = document.querySelector(`[onclick="togglePeriudhe('${lendaId}', ${periudha})"] span`);
     if (periudhaHeader) periudhaHeader.textContent = `P${periudha}: ${mesPStr} ▲`;
   });
@@ -1383,15 +1384,15 @@ async function loadBallina() {
   const { count: nxCount } = await nxQuery;
   const { count: noCount } = await noQuery;
   document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${nxCount || 0}</div><div class="stat-label">Nxënës</div></div>
-    <div class="stat-card"><div class="stat-num">${prCount || 0}</div><div class="stat-label">Prindër</div></div>
-    <div class="stat-card"><div class="stat-num">${noCount || 0}</div><div class="stat-label">Nota të shënuara</div></div>
+    <div class="stat-card"><div class="stat-num">${nxCount || 0}</div><div class="stat-label">Nxenes</div></div>
+    <div class="stat-card"><div class="stat-num">${prCount || 0}</div><div class="stat-label">Prinder</div></div>
+    <div class="stat-card"><div class="stat-num">${noCount || 0}</div><div class="stat-label">Nota te shenuara</div></div>
   `;
   let fundQuery = db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
   if (currentUser.roli !== 'admin') fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
   const { data: fund } = await fundQuery;
   const el = document.getElementById('aktiviteti-list');
-  if (!fund || !fund.length) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka shënime.</p></div>'; return; }
+  if (!fund || !fund.length) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka shenime.</p></div>'; return; }
   el.innerHTML = fund.map(n => {
     const d = new Date(n.data_shenimit);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
@@ -1434,9 +1435,9 @@ function zgjedhLenden(lId) {
 function populateNotaForm() {
   const selN = document.getElementById('nota-nxenesi');
   const selL = document.getElementById('nota-lenda');
-  selN.innerHTML = '<option value="">— Zgjedh nxënësin —</option>' +
+  selN.innerHTML = '<option value="">— Zgjedh nxenesin —</option>' +
     allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri} (${n.klasat ? n.klasat.emri : '—'})</option>`).join('');
-  selL.innerHTML = '<option value="">— Zgjedh lëndën —</option>' +
+  selL.innerHTML = '<option value="">— Zgjedh lenden —</option>' +
     allLendet.map(l => `<option value="${l.id}">${l.emri}</option>`).join('');
   document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
 }
@@ -1471,10 +1472,10 @@ async function ruajNoten() {
   const sukEl = document.getElementById('nota-sukses');
   const errEl = document.getElementById('nota-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!nxId || !lId || !nota || !data) { errEl.textContent = 'Plotëso nxënësin, lëndën, notën dhe datën.'; errEl.style.display = 'block'; return; }
+  if (!nxId || !lId || !nota || !data) { errEl.textContent = 'Ploteso nxenesin, lenden, noten dhe daten.'; errEl.style.display = 'block'; return; }
   const periudha = parseInt(document.getElementById('nota-periudha').value) || 1;
   const { error } = await db.from('notat').insert({ nxenesi_id: nxId, lenda_id: lId, mesuese_id: currentUser.id, nota: parseInt(nota), periudha: periudha, koment: koment || null, data_shenimit: new Date(data).toISOString() });
-  if (error) { errEl.textContent = 'Gabim gjatë ruajtjes.'; errEl.style.display = 'block'; return; }
+  if (error) { errEl.textContent = 'Gabim gjate ruajtjes.'; errEl.style.display = 'block'; return; }
   const nxenesi = allNxenesit.find(n => n.id === nxId);
   sukEl.textContent = '✓ Nota e ' + (nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '') + ' u ruajt!';
   sukEl.style.display = 'block';
@@ -1491,10 +1492,10 @@ async function shtoNxenes() {
   const sukEl = document.getElementById('sn-sukses');
   const errEl = document.getElementById('sn-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!emri || !mbiemri || !p1emri) { errEl.textContent = 'Emri, mbiemri dhe prindi 1 janë të detyrueshëm.'; errEl.style.display = 'block'; return; }
+  if (!emri || !mbiemri || !p1emri) { errEl.textContent = 'Emri, mbiemri dhe prindi 1 jane te detyrueshem.'; errEl.style.display = 'block'; return; }
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
   const { data: nx, error: nxErr } = await db.from('nxenesit').insert({ emri, mbiemri, kodi_unik: kodiNx, mesuese_id: currentUser.id }).select().single();
-  if (nxErr) { errEl.textContent = 'Gabim gjatë shtimit.'; errEl.style.display = 'block'; return; }
+  if (nxErr) { errEl.textContent = 'Gabim gjate shtimit.'; errEl.style.display = 'block'; return; }
   const kod1 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
   await db.from('prinderit').insert({ nxenesi_id: nx.id, emri: p1emri, nr_telefoni: document.getElementById('sn-p1-tel').value.trim() || null, email: document.getElementById('sn-p1-email').value.trim() || null, kodi_qasjes: kod1 });
   const p2emri = document.getElementById('sn-p2-emri').value.trim();
@@ -1511,7 +1512,7 @@ async function shtoNxenes() {
 async function loadMesueset() {
   const { data } = await db.from('mesueset').select('*').order('emri');
   const el = document.getElementById('mesueset-list');
-  if (!data || !data.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka mësuese.</p></div></div>'; return; }
+  if (!data || !data.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka mesuese.</p></div></div>'; return; }
   el.innerHTML = data.map(m => `
     <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
       <div style="width:42px;height:42px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:600;">${m.emri.split(' ').map(w=>w[0]).join('').substring(0,2)}</div>
@@ -1519,7 +1520,7 @@ async function loadMesueset() {
         <div style="font-weight:500;">${m.emri}</div>
         <div style="font-size:13px;color:var(--text-soft);">${m.email}</div>
         <div style="margin-top:4px;display:flex;gap:6px;">
-          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : ''}">${m.roli === 'admin' ? 'Admin' : 'Mësuese'}</span>
+          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : ''}">${m.roli === 'admin' ? 'Admin' : 'Mesuese'}</span>
           <span class="badge ${m.aktive ? 'badge-aktive' : 'badge-joaktive'}">${m.aktive ? 'Aktive' : 'Jo aktive'}</span>
         </div>
       </div>
@@ -1542,17 +1543,17 @@ async function shtoMesuese() {
   const sukEl = document.getElementById('sm-sukses');
   const errEl = document.getElementById('sm-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!emri || !email || !pass || !roli) { errEl.textContent = 'Plotëso të gjitha fushat.'; errEl.style.display = 'block'; return; }
+  if (!emri || !email || !pass || !roli) { errEl.textContent = 'Ploteso te gjitha fushat.'; errEl.style.display = 'block'; return; }
   const klasa = document.getElementById('sm-klasa').value;
   const { error } = await db.from('mesueset').insert({ emri, email, fjalekalimi: pass, roli, aktive: false, paguar: false, iban_konfirmim: iban || null, klasa: klasa || null });
-  if (error) { errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashmë.' : 'Gabim gjatë shtimit.'; errEl.style.display = 'block'; return; }
-  sukEl.textContent = '✓ Mësuese u shtua!'; sukEl.style.display = 'block';
+  if (error) { errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashme.' : 'Gabim gjate shtimit.'; errEl.style.display = 'block'; return; }
+  sukEl.textContent = '✓ Mesuese u shtua!'; sukEl.style.display = 'block';
   ['sm-emri','sm-email','sm-pass','sm-iban'].forEach(id => document.getElementById(id).value = '');
   await loadMesueset();
 }
 
 async function buildPrindUI() {
-  const tabs = [{ id: 'femija', label: 'Fëmija im' }];
+  const tabs = [{ id: 'femija', label: 'Femija im' }];
   buildTabs(tabs, 'femija');
   await loadFemijaData();
 }
@@ -1597,23 +1598,23 @@ async function ngarkoPanelLendet(lId) {
   currentLendaId = lId;
   const el = document.getElementById('lendet-nxenesit-list');
   const lenda = allLendet.find(l => l.id === lId);
-  if (!allNxenesit.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxënës.</p></div></div>'; return; }
+  if (!allNxenesit.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxenes.</p></div></div>'; return; }
   const { data: notat } = await db.from('notat').select('nxenesi_id, nota, data_shenimit').eq('lenda_id', lId).order('data_shenimit', { ascending: false });
   const lastGrades = {}; const lastDates = {};
   if (notat) notat.forEach(n => { if (!lastGrades[n.nxenesi_id]) { lastGrades[n.nxenesi_id] = n.nota; lastDates[n.nxenesi_id] = n.data_shenimit; } });
   el.innerHTML = '<div class="card">' +
-    '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxënësve</div>' +
+    '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxenesve</div>' +
     allNxenesit.map(n => {
       const lastGrade = lastGrades[n.id];
       const lastDate = lastDates[n.id] ? new Date(lastDates[n.id]).toLocaleDateString('sq-AL', {day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
-      const lastDateText = lastDate ? 'Nota e fundit: ' + lastDate : 'Pa notë ende';
+      const lastDateText = lastDate ? 'Nota e fundit: ' + lastDate : 'Pa note ende';
       return '<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--green-ultra);flex-wrap:wrap;">' +
         '<div class="s-avatar">' + n.emri[0] + n.mbiemri[0] + '</div>' +
         '<div style="flex:1;font-weight:500;">' + n.emri + ' ' + n.mbiemri + '</div>' +
         '<input type="number" id="nota-l-' + n.id + '" min="1" max="5" placeholder="' + (lastGrade ? lastGrade : '—') + '" style="padding:8px 10px;border:1.5px solid #ddd;border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:20px;font-weight:700;width:72px;text-align:center;color:#bbb;" oninput="ngjyroNoten(this)" onkeypress="return[\'1\',\'2\',\'3\',\'4\',\'5\'].includes(event.key)">' +
         '<div style="font-size:12px;color:#aaa;background:#f9f9f9;border:1px solid #eee;border-radius:var(--radius-sm);padding:7px 12px;">' + lastDateText + '</div></div>';
     }).join('') +
-    '<div style="margin-top:16px;"><button class="btn-green" onclick="ruajNotatLendes()">Ruaj të gjitha notat</button><div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div></div></div>';
+    '<div style="margin-top:16px;"><button class="btn-green" onclick="ruajNotatLendes()">Ruaj te gjitha notat</button><div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div></div></div>';
 }
 
 function ngjyroNoten(inp) {
@@ -1636,7 +1637,7 @@ async function ruajNotatLendes() {
     await db.from('notat').insert({ nxenesi_id: n.id, lenda_id: lId, mesuese_id: currentUser.id, nota: parseInt(nota), data_shenimit: new Date().toISOString() });
     saved++;
   }
-  if (saved > 0) { sukEl.textContent = '✓ U ruajtën ' + saved + ' nota!'; sukEl.style.display = 'block'; await ngarkoPanelLendet(lId); await loadBallina(); }
+  if (saved > 0) { sukEl.textContent = '✓ U ruajten ' + saved + ' nota!'; sukEl.style.display = 'block'; await ngarkoPanelLendet(lId); await loadBallina(); }
 }
 
 async function shfaqNotEnFundit() {
@@ -1648,7 +1649,7 @@ async function shfaqNotEnFundit() {
   if (data && data.length > 0) {
     const ds = new Date(data[0].data_shenimit).toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
     el.textContent = 'Nota e fundit: ' + data[0].nota + ' — ' + ds; el.style.display = 'block';
-  } else { el.textContent = 'Ende nuk ka notë për këtë lëndë'; el.style.display = 'block'; }
+  } else { el.textContent = 'Ende nuk ka note per kete lende'; el.style.display = 'block'; }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
