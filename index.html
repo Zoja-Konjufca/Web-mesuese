@@ -1084,10 +1084,9 @@ function renderDetailPage() {
     });
 
     const mesPerPeriudhe = [1,2,3,4].map(p => {
-      const notatP = KOLONAT_FIKSE.map(k => byKolone[p][k] !== null ? byKolone[p][k] : 0);
-      const kaNjeMeNote = KOLONAT_FIKSE.some(k => byKolone[p][k] !== null);
-      if (!kaNjeMeNote) return null;
-      return notatP.reduce((a,b) => a+b, 0) / KOLONAT_FIKSE.length;
+      const notatP = KOLONAT_FIKSE.filter(k => byKolone[p][k] !== null).map(k => byKolone[p][k]);
+      if (notatP.length === 0) return null;
+      return notatP.reduce((a,b) => a+b, 0) / notatP.length;
     });
 
     const kaMeseNjePeriudhe = mesPerPeriudhe.some(m => m !== null);
@@ -1349,10 +1348,9 @@ function _rifresko_mesataret(lendaId, periudha, byLendeRe) {
     });
 
     const mesPerPeriudhe = [1,2,3,4].map(p => {
-      const notatP = KOLONAT_FIKSE.map(k => byKolone[p][k] !== null ? byKolone[p][k] : 0);
-      const kaNje = KOLONAT_FIKSE.some(k => byKolone[p][k] !== null);
-      if (!kaNje) return null;
-      return notatP.reduce((a,b) => a+b, 0) / KOLONAT_FIKSE.length;
+      const notatP = KOLONAT_FIKSE.filter(k => byKolone[p][k] !== null).map(k => byKolone[p][k]);
+      if (notatP.length === 0) return null;
+      return notatP.reduce((a,b) => a+b, 0) / notatP.length;
     });
 
     // Perditeso titullin e periudhes se hapur (mesatarja)
