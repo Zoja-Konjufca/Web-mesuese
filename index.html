@@ -13,378 +13,143 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --green-dark: #0f3d25;
-    --green-main: #1a5c3a;
-    --green-mid: #2d7a52;
-    --green-light: #4a9e72;
-    --green-pale: #e8f5ee;
-    --green-ultra: #f2faf5;
-    --gold: #c8973a;
-    --gold-light: #f0d98a;
-    --text-dark: #0d1f15;
-    --text-mid: #3a5544;
-    --text-soft: #6b8a78;
-    --border: #cde0d6;
-    --white: #ffffff;
-    --danger: #c0392b;
-    --danger-light: #fdf2f1;
-    --radius: 14px;
-    --radius-sm: 8px;
-    --shadow: 0 4px 24px rgba(15,61,37,0.10);
-    --shadow-sm: 0 2px 8px rgba(15,61,37,0.08);
+    --green-dark: #0f3d25; --green-main: #1a5c3a; --green-mid: #2d7a52;
+    --green-light: #4a9e72; --green-pale: #e8f5ee; --green-ultra: #f2faf5;
+    --gold: #c8973a; --gold-light: #f0d98a; --text-dark: #0d1f15;
+    --text-mid: #3a5544; --text-soft: #6b8a78; --border: #cde0d6;
+    --white: #ffffff; --danger: #c0392b; --danger-light: #fdf2f1;
+    --radius: 14px; --radius-sm: 8px;
+    --shadow: 0 4px 24px rgba(15,61,37,0.10); --shadow-sm: 0 2px 8px rgba(15,61,37,0.08);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--green-ultra);
-    color: var(--text-dark);
-    min-height: 100vh;
-    font-size: 15px;
-  }
-
-  #loading-screen {
-    position: fixed; inset: 0;
-    background: var(--green-main);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.4s;
-  }
-  #loading-screen .logo-big {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2.8rem; color: white; letter-spacing: -1px;
-  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--green-ultra); color: var(--text-dark); min-height: 100vh; font-size: 15px; }
+  #loading-screen { position: fixed; inset: 0; background: var(--green-main); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
+  #loading-screen .logo-big { font-family: 'DM Serif Display', serif; font-size: 2.8rem; color: white; letter-spacing: -1px; }
   #loading-screen .logo-big span { color: var(--gold-light); }
   #loading-screen p { color: rgba(255,255,255,0.6); margin-top: 8px; font-size: 14px; }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid rgba(255,255,255,0.2);
-    border-top-color: white;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin-top: 32px;
-  }
+  .spinner { width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; margin-top: 32px; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  #login-screen {
-    display: none; min-height: 100vh;
-    background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-main) 60%, var(--green-mid) 100%);
-    align-items: center; justify-content: center; padding: 20px;
-  }
-  .login-card {
-    background: white; border-radius: 24px;
-    padding: 40px 36px; width: 100%; max-width: 400px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
-  }
+  #login-screen { display: none; min-height: 100vh; background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-main) 60%, var(--green-mid) 100%); align-items: center; justify-content: center; padding: 20px; }
+  .login-card { background: white; border-radius: 24px; padding: 40px 36px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
   .login-logo { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); margin-bottom: 4px; }
   .login-logo span { color: var(--gold); }
   .login-sub { color: var(--text-soft); font-size: 13px; margin-bottom: 32px; }
   .form-group { margin-bottom: 18px; }
   .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text-mid); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; }
-  .form-group input {
-    width: 100%; padding: 12px 14px;
-    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text-dark);
-    transition: border-color 0.2s; outline: none;
-  }
+  .form-group input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--text-dark); transition: border-color 0.2s; outline: none; }
   .form-group input:focus { border-color: var(--green-main); }
-  .btn-primary {
-    width: 100%; padding: 13px;
-    background: var(--green-main); color: white;
-    border: none; border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600;
-    cursor: pointer; transition: background 0.2s;
-  }
+  .btn-primary { width: 100%; padding: 13px; background: var(--green-main); color: white; border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
   .btn-primary:hover { background: var(--green-mid); }
   .login-err { color: var(--danger); font-size: 13px; margin-top: 10px; text-align: center; min-height: 18px; }
-
   #app { display: none; }
-
-  .topnav {
-    background: var(--green-main);
-    padding: 0 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 58px;
-    position: sticky; top: 0; z-index: 100;
-    box-shadow: 0 2px 12px rgba(15,61,37,0.18);
-  }
+  .topnav { background: var(--green-main); padding: 0 20px; display: flex; align-items: center; justify-content: space-between; height: 58px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(15,61,37,0.18); }
   .nav-logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: white; letter-spacing: -0.5px; }
   .nav-logo span { color: var(--gold-light); }
   .nav-right { display: flex; align-items: center; gap: 12px; }
   .nav-user { font-size: 13px; color: rgba(255,255,255,0.75); display: flex; align-items: center; gap: 8px; }
-  .nav-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; font-weight: 600; color: white;
-  }
-  .btn-logout {
-    background: rgba(255,255,255,0.15); border: none;
-    color: white; padding: 6px 12px; border-radius: 20px;
-    font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif;
-    transition: background 0.2s;
-  }
+  .nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: white; }
+  .btn-logout { background: rgba(255,255,255,0.15); border: none; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
   .btn-logout:hover { background: rgba(255,255,255,0.25); }
-
-  .tabs-bar {
-    background: white; border-bottom: 1px solid var(--border);
-    display: flex; padding: 0 20px; overflow-x: auto; scrollbar-width: none;
-  }
+  .tabs-bar { background: white; border-bottom: 1px solid var(--border); display: flex; padding: 0 20px; overflow-x: auto; scrollbar-width: none; }
   .tabs-bar::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    padding: 14px 18px; border: none; background: none;
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    color: var(--text-soft); cursor: pointer; white-space: nowrap;
-    border-bottom: 2.5px solid transparent; transition: all 0.2s; font-weight: 500;
-  }
+  .tab-btn { padding: 14px 18px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-soft); cursor: pointer; white-space: nowrap; border-bottom: 2.5px solid transparent; transition: all 0.2s; font-weight: 500; }
   .tab-btn.active { color: var(--green-main); border-bottom-color: var(--green-main); font-weight: 600; }
   .tab-btn:hover:not(.active) { color: var(--text-mid); }
-
   .content { padding: 20px; max-width: 860px; margin: 0 auto; }
   .panel { display: none; animation: fadeIn 0.2s; }
   .panel.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-  .card {
-    background: white; border-radius: var(--radius);
-    border: 1px solid var(--border); padding: 20px 22px;
-    margin-bottom: 16px; box-shadow: var(--shadow-sm);
-  }
-  .card-title {
-    font-size: 13px; font-weight: 600; color: var(--text-soft);
-    letter-spacing: 0.5px; margin-bottom: 16px;
-  }
-
-  .student-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 12px 0; border-bottom: 1px solid var(--green-ultra);
-    cursor: pointer; transition: background 0.15s; border-radius: 8px;
-  }
+  .card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 20px 22px; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text-soft); letter-spacing: 0.5px; margin-bottom: 16px; }
+  .student-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--green-ultra); cursor: pointer; transition: background 0.15s; border-radius: 8px; }
   .student-item:last-child { border-bottom: none; }
   .student-item:hover { background: var(--green-ultra); padding-left: 8px; }
-  .s-avatar {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: var(--green-pale); color: var(--green-main);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 600; flex-shrink: 0;
-  }
+  .s-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--green-pale); color: var(--green-main); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
   .s-name { flex: 1; font-weight: 500; }
   .s-klasa { font-size: 12px; color: var(--text-soft); }
   .grade-pill { padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-  .g5 { background: #e8f5ee; color: #1a5c3a; }
-  .g4 { background: #e8f0f5; color: #1a3c5c; }
-  .g3 { background: #faf5e8; color: #5c4a1a; }
-  .g2 { background: #fdf2f1; color: #c0392b; }
-  .g1 { background: #fdf2f1; color: #c0392b; }
-  .gx { background: #f5f5f5; color: #888; }
-
+  .g5 { background: #e8f5ee; color: #1a5c3a; } .g4 { background: #e8f0f5; color: #1a3c5c; }
+  .g3 { background: #faf5e8; color: #5c4a1a; } .g2 { background: #fdf2f1; color: #c0392b; }
+  .g1 { background: #fdf2f1; color: #c0392b; } .gx { background: #f5f5f5; color: #888; }
   .form-row { margin-bottom: 14px; }
   .form-row label { display: block; font-size: 12px; font-weight: 600; color: var(--text-mid); margin-bottom: 5px; letter-spacing: 0.4px; text-transform: uppercase; }
-  .form-row input, .form-row select, .form-row textarea {
-    width: 100%; padding: 10px 12px;
-    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    color: var(--text-dark); background: white; outline: none; transition: border-color 0.2s;
-  }
+  .form-row input, .form-row select, .form-row textarea { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text-dark); background: white; outline: none; transition: border-color 0.2s; }
   .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--green-main); }
   .form-row textarea { resize: vertical; min-height: 80px; }
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
-
-  .btn-green {
-    background: var(--green-main); color: white; border: none;
-    padding: 11px 20px; border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px;
-  }
+  .btn-green { background: var(--green-main); color: white; border: none; padding: 11px 20px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: inline-flex; align-items: center; gap: 6px; }
   .btn-green:hover { background: var(--green-mid); }
   .btn-green:disabled { background: var(--border); cursor: not-allowed; }
-  .btn-outline {
-    background: transparent; color: var(--green-main);
-    border: 1.5px solid var(--green-main); padding: 10px 18px; border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: all 0.2s;
-  }
+  .btn-outline { background: transparent; color: var(--green-main); border: 1.5px solid var(--green-main); padding: 10px 18px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
   .btn-outline:hover { background: var(--green-pale); }
-
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat-card { background: white; border-radius: var(--radius); padding: 16px 18px; border: 1px solid var(--border); text-align: center; }
   .stat-num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
   .stat-label { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
-
   .nota-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--green-ultra); }
   .nota-item:last-child { border-bottom: none; }
   .nota-lenda { flex: 1; }
   .nota-lenda strong { font-size: 14px; color: var(--text-dark); }
   .nota-lenda p { font-size: 13px; color: var(--text-soft); margin-top: 3px; }
   .nota-date { font-size: 11px; color: var(--text-soft); margin-top: 4px; }
-
-  .modal-overlay {
-    position: fixed; inset: 0; background: rgba(15,61,37,0.45);
-    z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px;
-  }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,61,37,0.45); z-index: 500; display: none; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.open { display: flex; }
-  .modal {
-    background: white; border-radius: 20px; padding: 28px 26px;
-    width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.25s;
-  }
+  .modal { background: white; border-radius: 20px; padding: 28px 26px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.25s; }
   @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
   .modal-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--green-dark); margin-bottom: 20px; }
   .modal-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; }
-
   .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
   .badge-admin { background: var(--green-pale); color: var(--green-dark); }
   .badge-aktive { background: #e8f5ee; color: #1a5c3a; }
   .badge-joaktive { background: #fdf2f1; color: #c0392b; }
-
-  .prind-header {
-    background: linear-gradient(135deg, var(--green-main), var(--green-mid));
-    border-radius: var(--radius); padding: 24px; margin-bottom: 16px; color: white;
-  }
+  .prind-header { background: linear-gradient(135deg, var(--green-main), var(--green-mid)); border-radius: var(--radius); padding: 24px; margin-bottom: 16px; color: white; }
   .prind-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
   .prind-header p { opacity: 0.75; font-size: 13px; margin-top: 4px; }
-
   .subject-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; }
   .subject-tile { background: white; border-radius: var(--radius-sm); border: 1px solid var(--border); padding: 14px 12px; text-align: center; }
   .subject-tile .s-name { font-size: 12px; color: var(--text-soft); margin-bottom: 6px; font-weight: 500; }
   .subject-tile .s-grade { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--green-main); }
-
-  .success-msg {
-    background: #fff3e0; border: 2px solid #ffb74d; border-radius: var(--radius-sm);
-    padding: 20px 22px; color: #e65100; font-size: 18px; font-weight: 700;
-    margin-top: 16px; display: none; letter-spacing: 0.3px; text-align: center;
-  }
-  .error-msg {
-    background: var(--danger-light); border: 1px solid #f0b4b0;
-    border-radius: var(--radius-sm); padding: 12px 14px;
-    color: var(--danger); font-size: 14px; margin-top: 12px; display: none;
-  }
-
+  .success-msg { background: #fff3e0; border: 2px solid #ffb74d; border-radius: var(--radius-sm); padding: 20px 22px; color: #e65100; font-size: 18px; font-weight: 700; margin-top: 16px; display: none; letter-spacing: 0.3px; text-align: center; }
+  .error-msg { background: var(--danger-light); border: 1px solid #f0b4b0; border-radius: var(--radius-sm); padding: 12px 14px; color: var(--danger); font-size: 14px; margin-top: 12px; display: none; }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--text-soft); }
   .empty-state p { font-size: 14px; }
-
-  .kodi-box {
-    background: var(--green-pale); border: 1.5px dashed var(--green-light);
-    border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 12px;
-  }
+  .kodi-box { background: var(--green-pale); border: 1.5px dashed var(--green-light); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 12px; }
   .kodi-box .kodi-label { font-size: 11px; font-weight: 600; color: var(--text-soft); letter-spacing: 0.5px; text-transform: uppercase; }
   .kodi-box .kodi-val { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--green-dark); letter-spacing: 2px; }
-
   .sep { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
-
-  /* FAQJA E DETAJEVE TE NXENESIT */
-  #nxenes-detail-page {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: var(--green-ultra);
-    z-index: 200;
-    overflow-y: auto;
-    animation: slideIn 0.25s;
-  }
+  #nxenes-detail-page { display: none; position: fixed; inset: 0; background: var(--green-ultra); z-index: 200; overflow-y: auto; animation: slideIn 0.25s; }
   #nxenes-detail-page.open { display: block; }
   @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-  .detail-header {
-    background: var(--green-main);
-    padding: 16px 20px;
-    display: flex; align-items: center; gap: 14px;
-    position: sticky; top: 0; z-index: 10;
-    box-shadow: 0 2px 12px rgba(15,61,37,0.18);
-  }
-  .detail-header button {
-    background: rgba(255,255,255,0.2); border: none; color: white;
-    padding: 8px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif;
-    font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px;
-  }
+  .detail-header { background: var(--green-main); padding: 16px 20px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 12px rgba(15,61,37,0.18); }
+  .detail-header button { background: rgba(255,255,255,0.2); border: none; color: white; padding: 8px 14px; border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
   .detail-header button:hover { background: rgba(255,255,255,0.3); }
   .detail-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: white; flex: 1; }
-
-  .detail-content { padding: 20px; max-width: 860px; margin: 0 auto; }
-
-  .nxenes-hero {
-    background: linear-gradient(135deg, var(--green-main), var(--green-mid));
-    border-radius: var(--radius); padding: 24px; margin-bottom: 20px; color: white;
-    display: flex; align-items: center; gap: 16px;
-  }
-  .nxenes-hero-avatar {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: white; flex-shrink: 0;
-  }
+  .detail-content { padding: 20px; max-width: 1100px; margin: 0 auto; }
+  .nxenes-hero { background: linear-gradient(135deg, var(--green-main), var(--green-mid)); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; color: white; display: flex; align-items: center; gap: 16px; }
+  .nxenes-hero-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: white; flex-shrink: 0; }
   .nxenes-hero h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
   .nxenes-hero p { opacity: 0.8; font-size: 13px; margin-top: 4px; }
-
   .notat-tabela { width: 100%; border-collapse: collapse; }
-  .notat-tabela th {
-    background: var(--green-pale); color: var(--green-dark);
-    font-size: 12px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: 0.5px; padding: 12px 14px; text-align: left;
-  }
-  .notat-tabela th.nota-perfundimtare {
-    text-transform: none;
-    font-size: 13px;
-  }
-  /* Hiq shigjetat e input[type=number] */
-  input[type=number]::-webkit-inner-spin-button,
-  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .notat-tabela th { background: var(--green-pale); color: var(--green-dark); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 12px 14px; text-align: left; }
+  .notat-tabela th.nota-perfundimtare { text-transform: none; font-size: 13px; }
+  input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number] { -moz-appearance: textfield; appearance: textfield; }
   .notat-tabela td { padding: 12px 14px; border-bottom: 1px solid var(--green-ultra); font-size: 14px; }
   .notat-tabela tr:last-child td { border-bottom: none; }
   .notat-tabela tr:hover td { background: var(--green-ultra); }
-
-  /* Auto-save input styling */
-  .nota-input-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    min-width: 80px;
-  }
-  .nota-input-cell input {
-    width: 52px;
-    padding: 8px 4px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--green-dark);
-    background: white;
-    transition: border-color 0.2s, background 0.2s;
-    outline: none;
-  }
-  .nota-input-cell input:focus {
-    border-color: var(--green-main);
-    background: var(--green-ultra);
-  }
-  .nota-input-cell input.saving {
-    border-color: var(--gold);
-    background: #fffbf0;
-  }
-  .nota-input-cell input.saved {
-    border-color: var(--green-light);
-    background: var(--green-pale);
-  }
-  .nota-input-cell .save-status {
-    font-size: 10px;
-    color: var(--text-soft);
-    height: 14px;
-    transition: color 0.2s;
-  }
+  .nota-input-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 80px; }
+  .nota-input-cell input { width: 52px; padding: 8px 4px; border: 2px solid var(--border); border-radius: 8px; font-size: 18px; font-weight: 700; text-align: center; font-family: 'DM Sans', sans-serif; color: var(--green-dark); background: white; transition: border-color 0.2s, background 0.2s; outline: none; }
+  .nota-input-cell input:focus { border-color: var(--green-main); background: var(--green-ultra); }
+  .nota-input-cell input.saving { border-color: var(--gold); background: #fffbf0; }
+  .nota-input-cell input.saved { border-color: var(--green-light); background: var(--green-pale); }
+  .nota-input-cell .save-status { font-size: 10px; color: var(--text-soft); height: 14px; transition: color 0.2s; }
   .nota-input-cell .save-status.ok { color: var(--green-main); font-weight: 600; }
   .nota-input-cell .save-status.duke-ruajtur { color: var(--gold); }
-
-  @media (max-width: 600px) {
-    .content { padding: 14px; }
-    .login-card { padding: 28px 22px; }
-    .detail-content { padding: 14px; }
-  }
+  /* Kolona e re input */
+  .new-col-input { width: 90px; padding: 5px 4px; border: 2px dashed var(--green-light); border-radius: 6px; font-size: 12px; text-align: center; font-family: 'DM Sans', sans-serif; outline: none; color: var(--text-mid); }
+  .new-col-input:focus { border-color: var(--green-main); border-style: solid; }
+  @media (max-width: 600px) { .content { padding: 14px; } .login-card { padding: 28px 22px; } .detail-content { padding: 14px; } }
 </style>
 </head>
 <body>
@@ -404,22 +169,13 @@
       <button onclick="switchLoginTab('prind')" id="ltab-prind" style="flex:1;padding:10px;border:none;background:transparent;color:var(--text-soft);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;">Prind / Kujdestar</button>
     </div>
     <div id="login-mesuese">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="inp-email" placeholder="emaili juaj personal">
-      </div>
-      <div class="form-group">
-        <label>Fjalekalimi</label>
-        <input type="password" id="inp-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginMesuese()">
-      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="inp-email" placeholder="emaili juaj personal"></div>
+      <div class="form-group"><label>Fjalekalimi</label><input type="password" id="inp-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginMesuese()"></div>
       <button class="btn-primary" onclick="loginMesuese()">Hyr si Mesuese</button>
       <div class="login-err" id="login-err"></div>
     </div>
     <div id="login-prind" style="display:none;">
-      <div class="form-group">
-        <label>Kodi i qasjes (nga mesuese)</label>
-        <input type="text" id="inp-kod" placeholder="p.sh. PR-3A-0912" style="font-size:1.1rem;letter-spacing:2px;text-transform:uppercase;" onkeydown="if(event.key==='Enter')loginPrind()">
-      </div>
+      <div class="form-group"><label>Kodi i qasjes (nga mesuese)</label><input type="text" id="inp-kod" placeholder="p.sh. PR-3A-0912" style="font-size:1.1rem;letter-spacing:2px;text-transform:uppercase;" onkeydown="if(event.key==='Enter')loginPrind()"></div>
       <button class="btn-primary" onclick="loginPrind()">Hyr si Prind</button>
       <div class="login-err" id="login-err-prind"></div>
     </div>
@@ -430,25 +186,16 @@
   <nav class="topnav">
     <div class="nav-logo">Ditari i <span>Mesueses</span></div>
     <div class="nav-right">
-      <div class="nav-user">
-        <div class="nav-avatar" id="nav-avatar">M</div>
-        <span id="nav-name" style="display:none;"></span>
-      </div>
+      <div class="nav-user"><div class="nav-avatar" id="nav-avatar">M</div><span id="nav-name" style="display:none;"></span></div>
       <button class="btn-logout" onclick="logout()">Dil</button>
     </div>
   </nav>
-
   <div class="tabs-bar" id="tabs-bar"></div>
-
   <div class="content">
     <div class="panel" id="panel-ballina">
       <div class="stats-grid" id="stats-grid"></div>
-      <div class="card">
-        <div class="card-title">Veprimet e fundit</div>
-        <div id="aktiviteti-list"><div class="empty-state"><p>Ende nuk ka shenime.</p></div></div>
-      </div>
+      <div class="card"><div class="card-title">Veprimet e fundit</div><div id="aktiviteti-list"><div class="empty-state"><p>Ende nuk ka shenime.</p></div></div></div>
     </div>
-
     <div class="panel" id="panel-nxenesit">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Nxenesit</h2>
@@ -459,86 +206,12 @@
           <input type="text" id="search-nxenes" placeholder="Kerko nxenes..." oninput="filtroNxenesit()" style="flex:1;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;">
           <select id="filter-klasa" onchange="filtroNxenesit()" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius-sm);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;background:white;">
             <option value="">Te gjitha klasat</option>
-            <option>Klasa 1</option><option>Klasa 2</option><option>Klasa 3</option>
-            <option>Klasa 4</option><option>Klasa 5</option>
+            <option>Klasa 1</option><option>Klasa 2</option><option>Klasa 3</option><option>Klasa 4</option><option>Klasa 5</option>
           </select>
         </div>
         <div id="nxenesit-list"></div>
       </div>
     </div>
-
-    <div class="panel" id="panel-notat">
-      <div style="margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Notat</h2>
-        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lenden per te shenuar nota</p>
-      </div>
-
-      <div id="notat-lendet-lista" class="card" style="padding:10px;margin-bottom:16px;">
-        <div id="notat-lendet-items"></div>
-      </div>
-
-      <div id="notat-forma" style="display:none;">
-        <div class="card">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-            <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-            <h3 id="notat-lenda-emri" style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);"></h3>
-          </div>
-          <div class="form-row">
-            <label>Nxenesi</label>
-            <select id="nota-nxenesi" onchange="ngarkoProfil()"><option value="">— Zgjedh nxenesin —</option></select>
-          </div>
-          <div id="nota-e-fundit" style="display:none; margin-top:8px; padding:10px 12px; background:#f5f5f5; border-radius:var(--radius-sm); color:#999; font-size:13px;"></div>
-          <div class="form-grid">
-            <div class="form-row">
-              <label>Periudha</label>
-              <select id="nota-periudha">
-                <option value="1">Periudha 1</option>
-                <option value="2">Periudha 2</option>
-                <option value="3">Periudha 3</option>
-                <option value="4">Periudha 4</option>
-              </select>
-            </div>
-            <div class="form-row">
-              <label>Nota (1–5)</label>
-              <select id="nota-nota">
-                <option value="">—</option>
-                <option value="5">5 — Shkelqyeshem</option>
-                <option value="4">4 — Mire</option>
-                <option value="3">3 — Mjaftueshem</option>
-                <option value="2">2 — Dobet</option>
-                <option value="1">1 — Shume dobet</option>
-              </select>
-            </div>
-            <div class="form-row">
-              <label>Data</label>
-              <input type="date" id="nota-data">
-            </div>
-          </div>
-          <div class="form-row">
-            <label>Koment per prindin (opsional)</label>
-            <textarea id="nota-koment" placeholder="p.sh. Beri progres te mire kete jave..."></textarea>
-          </div>
-          <input type="hidden" id="nota-lenda">
-          <button class="btn-green" onclick="ruajNoten()" id="btn-ruaj-noten">Ruaj dhe Njofto Prindin</button>
-          <div class="success-msg" id="nota-sukses">✓ Nota u ruajt me sukses!</div>
-          <div class="error-msg" id="nota-error"></div>
-        </div>
-        <div class="card" id="card-historiku" style="display:none;">
-          <div class="card-title">Historiku i notave — <span id="historiku-emri"></span></div>
-          <div id="historiku-list"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel" id="panel-lendet-notat">
-      <div style="margin-bottom:16px;">
-        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Lendet</h2>
-        <p style="font-size:13px;color:var(--text-soft);margin-top:4px;">Zgjedh lenden per te vendosur nota</p>
-      </div>
-      <div id="lendet-lista-card" class="card" style="padding:10px;"><div id="lendet-lista"></div></div>
-      <div id="lendet-nxenesit-list"></div>
-    </div>
-
     <div class="panel" id="panel-mesueset">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Mesueset</h2>
@@ -546,33 +219,20 @@
       </div>
       <div id="mesueset-list"></div>
     </div>
-
     <div class="panel" id="panel-femija">
-      <div class="prind-header" id="prind-header">
-        <h2 id="femija-emri">—</h2>
-        <p id="femija-klasa">—</p>
-      </div>
-      <div class="card">
-        <div class="card-title">Notat sipas lendes</div>
-        <div class="subject-grid" id="femija-notat"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Komentet e fundit</div>
-        <div id="femija-komentet"></div>
-      </div>
+      <div class="prind-header" id="prind-header"><h2 id="femija-emri">—</h2><p id="femija-klasa">—</p></div>
+      <div class="card"><div class="card-title">Notat sipas lendes</div><div class="subject-grid" id="femija-notat"></div></div>
+      <div class="card"><div class="card-title">Komentet e fundit</div><div id="femija-komentet"></div></div>
     </div>
   </div>
 </div>
 
-<!-- FAQJA E DETAJEVE TE NXENESIT (dritare e plote) -->
 <div id="nxenes-detail-page">
   <div class="detail-header">
     <button onclick="mbyllDetailPage()">← Kthehu</button>
     <h2 id="detail-page-title">Profili i Nxenesit</h2>
   </div>
-  <div class="detail-content">
-    <div id="detail-page-content"></div>
-  </div>
+  <div class="detail-content"><div id="detail-page-content"></div></div>
 </div>
 
 <!-- MODAL: SHTO NXENES -->
@@ -614,26 +274,9 @@
     <div class="form-row"><label>Emri i plote</label><input type="text" id="sm-emri" placeholder="Fatmire Krasniqi"></div>
     <div class="form-row"><label>Email</label><input type="email" id="sm-email" placeholder="emaili juaj personal"></div>
     <div class="form-row"><label>Fjalekalimi fillestar</label><input type="text" id="sm-pass" placeholder="min. 8 karaktere"></div>
-    <div class="form-row">
-      <label>Roli</label>
-      <select id="sm-roli">
-        <option value="admin">Admin (Mesuese Kryesore — 9 lende)</option>
-        <option value="mesuesja">Mesuese</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label>Klasa qe meson</label>
-      <select id="sm-klasa">
-        <option value="">— Zgjedh klasen —</option>
-        <option value="Klasa 1">Klasa 1</option><option value="Klasa 2">Klasa 2</option>
-        <option value="Klasa 3">Klasa 3</option><option value="Klasa 4">Klasa 4</option>
-        <option value="Klasa 5">Klasa 5</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label>IBAN Konfirmimi (transferta bankare)</label>
-      <input type="text" id="sm-iban" placeholder="Screenshot / ref. e transfertes">
-    </div>
+    <div class="form-row"><label>Roli</label><select id="sm-roli"><option value="admin">Admin (Mesuese Kryesore)</option><option value="mesuesja">Mesuese</option></select></div>
+    <div class="form-row"><label>Klasa qe meson</label><select id="sm-klasa"><option value="">— Zgjedh klasen —</option><option value="Klasa 1">Klasa 1</option><option value="Klasa 2">Klasa 2</option><option value="Klasa 3">Klasa 3</option><option value="Klasa 4">Klasa 4</option><option value="Klasa 5">Klasa 5</option></select></div>
+    <div class="form-row"><label>IBAN Konfirmimi</label><input type="text" id="sm-iban" placeholder="Screenshot / ref. e transfertes"></div>
     <div class="success-msg" id="sm-sukses"></div>
     <div class="error-msg" id="sm-error"></div>
     <div class="modal-actions">
@@ -649,10 +292,7 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
-let currentUser = null;
-let currentPrind = null;
-let allNxenesit = [];
-let allLendet = [];
+let currentUser = null, currentPrind = null, allNxenesit = [], allLendet = [];
 
 window.addEventListener('load', async () => {
   const sess = localStorage.getItem('dm_session');
@@ -727,7 +367,6 @@ async function showApp() {
   if (currentUser) {
     const initials = currentUser.emri.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     document.getElementById('nav-avatar').textContent = initials;
-    document.getElementById('nav-name').textContent = currentUser.emri;
     buildMesueseUI();
   } else if (currentPrind) {
     const initials = currentPrind.emri.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
@@ -738,195 +377,20 @@ async function showApp() {
 
 async function buildMesueseUI() {
   const isAdmin = currentUser.roli === 'admin';
-  const tabs = [];
-  tabs.push({ id: 'ballina', label: 'Ballina' });
-  tabs.push({ id: 'nxenesit', label: 'Nxenesit' });
-
-
-  if (isAdmin) tabs.push({ id: 'mesueset', label: 'Mesueset' });
+  const tabs = [{ id:'ballina', label:'Ballina' }, { id:'nxenesit', label:'Nxenesit' }];
+  if (isAdmin) tabs.push({ id:'mesueset', label:'Mesueset' });
   buildTabs(tabs, 'ballina');
   await loadLendet();
   await loadNxenesit();
   await loadBallina();
-  if (isAdmin) {
-    await loadMesueset();
-    document.getElementById('btn-shto-nxenes').style.display = 'none';
-  }
-
-
+  if (isAdmin) { await loadMesueset(); document.getElementById('btn-shto-nxenes').style.display = 'none'; }
   if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
 }
 
 function buildTabs(tabs, active) {
   const bar = document.getElementById('tabs-bar');
-  bar.innerHTML = tabs.map(t =>
-    `<button class="tab-btn ${t.id===active?'active':''}" onclick="switchTab('${t.id}'); ${t.onclick||''}">${t.label}</button>`
-  ).join('');
+  bar.innerHTML = tabs.map(t => `<button class="tab-btn ${t.id===active?'active':''}" onclick="switchTab('${t.id}')">${t.label}</button>`).join('');
   switchTab(active, false);
-}
-
-function hapPanelNotat() {
-  document.getElementById('notat-lendet-lista').style.display = 'block';
-  document.getElementById('notat-forma').style.display = 'none';
-  const el = document.getElementById('notat-lendet-items');
-  el.innerHTML = allLendet.map(l => `
-    <div onclick="zgjedhLendenPerNota('${l.id}', '${l.emri}')" style="
-      padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:500;
-      border-bottom:1px solid var(--green-ultra); display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
-    " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='white'">
-      <span>${l.emri}</span>
-      <span style="font-size:12px;color:var(--text-soft);">→</span>
-    </div>
-  `).join('') + `
-    <div onclick="shfaqTeGjihaLendet()" style="
-      padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:600;
-      display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
-      color:var(--green-main); background:var(--green-pale);
-    " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='var(--green-pale)'">
-      <span>📊 Te gjitha lendet</span>
-      <span style="font-size:12px;">→</span>
-    </div>
-  `;
-}
-
-function zgjedhLendenPerNota(lId, lEmri) {
-  document.getElementById('nota-lenda').value = lId;
-  document.getElementById('notat-lenda-emri').textContent = lEmri;
-  document.getElementById('notat-lendet-lista').style.display = 'none';
-  document.getElementById('notat-forma').style.display = 'block';
-  const selN = document.getElementById('nota-nxenesi');
-  selN.innerHTML = '<option value="">— Zgjedh nxenesin —</option>' +
-    allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri}</option>`).join('');
-  document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
-  document.getElementById('card-historiku').style.display = 'none';
-  document.getElementById('nota-sukses').style.display = 'none';
-  document.getElementById('nota-error').style.display = 'none';
-}
-
-function kthehuNeLendet() {
-  document.getElementById('notat-lendet-lista').style.display = 'block';
-  document.getElementById('notat-forma').style.display = 'none';
-  const tabelaDiv = document.getElementById('te-gjitha-tabela');
-  if (tabelaDiv) tabelaDiv.style.display = 'none';
-}
-
-async function shfaqPeriudhatPerLende(lId, lEmri) {
-  let tabelaDiv = document.getElementById('te-gjitha-tabela');
-  tabelaDiv.style.display = 'block';
-
-  const { data: notat } = await db.from('notat')
-    .select('nxenesi_id, nota, periudha')
-    .eq('lenda_id', lId)
-    .in('nxenesi_id', allNxenesit.map(n => n.id));
-
-  const byNxenes = {};
-  if (notat) {
-    notat.forEach(n => {
-      if (!byNxenes[n.nxenesi_id]) byNxenes[n.nxenesi_id] = {};
-      byNxenes[n.nxenesi_id][n.periudha || 1] = n.nota;
-    });
-  }
-
-  let html = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <button onclick="shfaqTeGjihaLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">${lEmri} — 4 Periudhat</h3>
-    </div>
-    <div class="card" style="overflow-x:auto;">
-      <table class="notat-tabela" style="min-width:400px;">
-        <thead>
-          <tr>
-            <th>Nxenesi</th>
-            <th style="text-align:center;">P1</th>
-            <th style="text-align:center;">P2</th>
-            <th style="text-align:center;">P3</th>
-            <th style="text-align:center;">P4</th>
-            <th class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;">Nota Perfundimtare</th>
-          </tr>
-        </thead>
-        <tbody>
-  `;
-
-  allNxenesit.forEach(n => {
-    const periudhat = byNxenes[n.id] || {};
-    const vlerat = [1,2,3,4].map(p => periudhat[p] || null);
-    const vleratNumerike = vlerat.filter(v => v !== null);
-    const mesatare = vleratNumerike.length > 0
-      ? (vleratNumerike.reduce((a,b) => a+b, 0) / vleratNumerike.length).toFixed(1)
-      : null;
-    const gcMes = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
-
-    html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
-    vlerat.forEach(v => {
-      const gc = v ? (['','g1','g2','g3','g4','g5'][v] || 'gx') : 'gx';
-      html += `<td style="text-align:center;"><span class="grade-pill ${v ? gc : 'gx'}">${v || '—'}</span></td>`;
-    });
-    html += `<td style="text-align:center;background:#f0faf5;"><span class="grade-pill ${gcMes}" style="font-weight:700;">${mesatare || '—'}</span></td></tr>`;
-  });
-
-  html += `</tbody></table></div>`;
-  tabelaDiv.innerHTML = html;
-}
-
-async function shfaqTeGjihaLendet() {
-  document.getElementById('notat-lendet-lista').style.display = 'none';
-  document.getElementById('notat-forma').style.display = 'none';
-
-  let tabelaDiv = document.getElementById('te-gjitha-tabela');
-  if (!tabelaDiv) {
-    tabelaDiv = document.createElement('div');
-    tabelaDiv.id = 'te-gjitha-tabela';
-    document.getElementById('panel-notat').appendChild(tabelaDiv);
-  }
-  tabelaDiv.style.display = 'block';
-
-  const { data: notat } = await db.from('notat')
-    .select('nxenesi_id, lenda_id, nota')
-    .in('nxenesi_id', allNxenesit.map(n => n.id));
-
-  const mesataret = {};
-  if (notat) {
-    const grouped = {};
-    notat.forEach(n => {
-      const key = n.nxenesi_id + '_' + n.lenda_id;
-      if (!grouped[key]) grouped[key] = [];
-      grouped[key].push(n.nota);
-    });
-    Object.entries(grouped).forEach(([key, vlerat]) => {
-      const [nxId, lId] = key.split('_');
-      if (!mesataret[nxId]) mesataret[nxId] = {};
-      mesataret[nxId][lId] = (vlerat.reduce((a,b) => a+b, 0) / vlerat.length).toFixed(1);
-    });
-  }
-
-  let html = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-      <button onclick="kthehuNeLendet()" style="background:var(--green-pale);border:none;color:var(--green-main);padding:8px 14px;border-radius:20px;font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;font-weight:600;">← Kthehu</button>
-      <h3 style="font-family:'DM Serif Display',serif;font-size:1.2rem;color:var(--green-dark);">Te gjitha lendet — Notat Perfundimtare</h3>
-    </div>
-    <div class="card" style="overflow-x:auto;">
-      <table class="notat-tabela" style="min-width:600px;">
-        <thead>
-          <tr>
-            <th>Nxenesi</th>
-            ${allLendet.map(l => `<th style="text-align:center;cursor:pointer;" onclick="shfaqPeriudhatPerLende('${l.id}', '${l.emri}')" title="Kliko per periudhat"><span style="border-bottom:1.5px dashed var(--green-light);">${l.emri}</span></th>`).join('')}
-          </tr>
-        </thead>
-        <tbody>
-  `;
-
-  allNxenesit.forEach(n => {
-    html += `<tr><td style="font-weight:500;">${n.emri} ${n.mbiemri}</td>`;
-    allLendet.forEach(l => {
-      const mes = mesataret[n.id] ? mesataret[n.id][l.id] : null;
-      const gc = mes ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mes))] || 'gx') : 'gx';
-      html += `<td style="text-align:center;"><span class="grade-pill ${gc}">${mes || '—'}</span></td>`;
-    });
-    html += `</tr>`;
-  });
-
-  html += `</tbody></table></div>`;
-  tabelaDiv.innerHTML = html;
 }
 
 function switchTab(id, scroll=true) {
@@ -947,12 +411,8 @@ async function loadLendet() {
 async function loadNxenesit() {
   if (currentUser.roli !== 'admin') {
     const { data: nxMine } = await db.from('nxenesit').select('*, klasat(emri)').eq('mesuese_id', currentUser.id).order('mbiemri');
-    if (nxMine && nxMine.length > 0) {
-      allNxenesit = nxMine;
-    } else {
-      const { data: nxAll } = await db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
-      allNxenesit = nxAll || [];
-    }
+    if (nxMine && nxMine.length > 0) { allNxenesit = nxMine; }
+    else { const { data: nxAll } = await db.from('nxenesit').select('*, klasat(emri)').order('mbiemri'); allNxenesit = nxAll || []; }
   } else {
     const { data } = await db.from('nxenesit').select('*, klasat(emri)').order('mbiemri');
     allNxenesit = data || [];
@@ -965,9 +425,7 @@ function filtroNxenesit() {
   const klasa = document.getElementById('filter-klasa').value;
   const filtered = allNxenesit.filter(n => {
     const emri = (n.emri + ' ' + n.mbiemri).toLowerCase();
-    const matchKerk = !kerk || emri.includes(kerk);
-    const matchKlasa = !klasa || (n.klasat && n.klasat.emri === klasa);
-    return matchKerk && matchKlasa;
+    return (!kerk || emri.includes(kerk)) && (!klasa || (n.klasat && n.klasat.emri === klasa));
   });
   renderNxenesitList(filtered);
 }
@@ -981,14 +439,10 @@ function renderNxenesitList(list) {
       <div class="s-name">${n.emri} ${n.mbiemri}</div>
       <div class="s-klasa">${n.klasat ? n.klasat.emri : '—'}</div>
       <span class="grade-pill gx">→</span>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// Gjendja e periudhave te hapura: { lendaId_periudha: true/false }
 let periudhatHapura = {};
-
-// Debounce timers per input: { inputKey: timerId }
 let _debounceTimers = {};
 
 async function shfaqDetailNxenes(id) {
@@ -997,12 +451,12 @@ async function shfaqDetailNxenes(id) {
   const nxenesi = allNxenesit.find(n => n.id === id);
   if (!nxenesi) return;
 
-  const { data: notat } = await db.from('notat')
-    .select('*, lendet(emri)')
-    .eq('nxenesi_id', id)
-    .order('data_shenimit', { ascending: true });
-
+  const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', id).order('data_shenimit', { ascending: true });
   const { data: prinderit } = await db.from('prinderit').select('*').eq('nxenesi_id', id);
+
+  // Ngarko kolonat e mesueses nga DB
+  const { data: kolonatDB } = await db.from('kolonat_lendeve').select('*').eq('mesuese_id', currentUser.id).order('renditja', { ascending: true });
+  window._kolonatDB = kolonatDB || [];
 
   const byLende = {};
   if (notat) {
@@ -1019,17 +473,21 @@ async function shfaqDetailNxenes(id) {
   window._detailByLende = byLende;
   window._detailNxenesi = nxenesi;
   window._detailPrinderit = prinderit;
-
   document.getElementById('detail-page-title').textContent = nxenesi.emri + ' ' + nxenesi.mbiemri;
   renderDetailPage();
 }
 
-function mesatarePeriudhes(notatArr) {
-  if (!notatArr || notatArr.length === 0) return 0;
-  return notatArr.reduce((a,b) => a + b.nota, 0) / notatArr.length;
+// Merr kolonat per nje lende dhe periudhe (fikse + dinamike)
+function getKolonatPerLende(lendaId, periudha) {
+  const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
+  const dinamike = (window._kolonatDB || [])
+    .filter(k => k.lenda_id === lendaId && k.periudha === periudha)
+    .map(k => k.emri);
+  // Bashko: fikse + dinamike (pa dyfishime)
+  const te_gjitha = [...fikse];
+  dinamike.forEach(k => { if (!te_gjitha.includes(k)) te_gjitha.push(k); });
+  return te_gjitha;
 }
-
-const KOLONAT_FIKSE = ['Test', 'Ushtrime', 'Projekt', 'Vleresim_me_goje'];
 
 function renderDetailPage() {
   const nxenesi = window._detailNxenesi;
@@ -1039,12 +497,8 @@ function renderDetailPage() {
   let html = `
     <div class="nxenes-hero">
       <div class="nxenes-hero-avatar">${nxenesi.emri[0]}${nxenesi.mbiemri[0]}</div>
-      <div>
-        <h2>${nxenesi.emri} ${nxenesi.mbiemri}</h2>
-        <p>${nxenesi.klasat ? nxenesi.klasat.emri : '—'} &nbsp;•&nbsp; Kodi: <strong>${nxenesi.kodi_unik}</strong></p>
-      </div>
+      <div><h2>${nxenesi.emri} ${nxenesi.mbiemri}</h2><p>${nxenesi.klasat ? nxenesi.klasat.emri : '—'} &nbsp;•&nbsp; Kodi: <strong>${nxenesi.kodi_unik}</strong></p></div>
     </div>
-
     <div class="card" style="overflow-x:auto;">
       <div class="card-title">Notat sipas lendeve dhe periudhave</div>
       <table class="notat-tabela" style="min-width:700px;border-collapse:collapse;">
@@ -1058,40 +512,21 @@ function renderDetailPage() {
             <th rowspan="2" class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;vertical-align:middle;">Nota Perfundimtare</th>
           </tr>
         </thead>
-        <tbody>
-  `;
+        <tbody>`;
 
   allLendet.forEach(l => {
     const lData = byLende[l.id];
     const periudhat = lData ? lData.periudhat : {};
 
-    const byKolone = {};
-    [1,2,3,4].forEach(p => {
-      byKolone[p] = {};
-      KOLONAT_FIKSE.forEach(k => { byKolone[p][k] = null; });
-      const arr = periudhat[p] || [];
-      arr.forEach(n => {
-        if (n.lloji && KOLONAT_FIKSE.includes(n.lloji)) {
-          byKolone[p][n.lloji] = n.nota;
-        }
-      });
-      const paLloji = arr.filter(n => !n.lloji || !KOLONAT_FIKSE.includes(n.lloji));
-      paLloji.forEach((n, idx) => {
-        if (idx < KOLONAT_FIKSE.length && byKolone[p][KOLONAT_FIKSE[idx]] === null) {
-          byKolone[p][KOLONAT_FIKSE[idx]] = n.nota;
-        }
-      });
-    });
-
     const mesPerPeriudhe = [1,2,3,4].map(p => {
-      const notatP = KOLONAT_FIKSE.filter(k => byKolone[p][k] !== null).map(k => byKolone[p][k]);
+      const arr = periudhat[p] || [];
+      const notatP = arr.filter(n => n.nota !== null && n.nota !== undefined).map(n => n.nota);
       if (notatP.length === 0) return null;
       return notatP.reduce((a,b) => a+b, 0) / notatP.length;
     });
 
-    const kaMeseNjePeriudhe = mesPerPeriudhe.some(m => m !== null);
     const periudhatMeNote = mesPerPeriudhe.filter(m => m !== null);
-    const notaPerfundimtare = kaMeseNjePeriudhe
+    const notaPerfundimtare = periudhatMeNote.length > 0
       ? (periudhatMeNote.reduce((a,b) => a+b, 0) / periudhatMeNote.length).toFixed(1)
       : null;
     const gcFinal = notaPerfundimtare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(notaPerfundimtare))] || 'gx') : 'gx';
@@ -1106,37 +541,43 @@ function renderDetailPage() {
       const gc = mes !== null ? (['','g1','g2','g3','g4','g5'][Math.round(mes)] || 'gx') : 'gx';
 
       if (hapur) {
-        // Periudha e zgjeruar — inputet gjithmone te dukshme, me auto-save
-        let kolonatHTML = KOLONAT_FIKSE.map(k => {
-          const nota = byKolone[p][k];
-          const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
-          const safeKey = k.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+        const kolonat = getKolonatPerLende(l.id, p);
+        const arr = periudhat[p] || [];
+
+        let kolonatHTML = kolonat.map(k => {
+          const notaObj = arr.find(n => n.lloji === k);
+          const nota = notaObj ? notaObj.nota : null;
+          const safeKey = k.replace(/[^a-zA-Z0-9]/g,'_');
           const inputId = `inp_${l.id}_${p}_${safeKey}`;
           const timerKey = `${l.id}_${p}_${k}`;
           return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:100px;vertical-align:top;">
-            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k === 'Vleresim_me_goje' ? 'Vleresim me goje' : k}</div>
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}</div>
             <div class="nota-input-cell">
-              <input
-                id="${inputId}"
-                type="number" min="1" max="5"
-                value="${nota !== null ? nota : ''}"
-                placeholder="—"
+              <input id="${inputId}" type="number" min="1" max="5" value="${nota !== null ? nota : ''}" placeholder="—"
                 oninput="this.value=this.value.replace(/[^1-5]/g,'').slice(0,1); autoSaveNota('${l.id}',${p},'${k}','${inputId}','${timerKey}')"
-                onkeydown="if(event.key==='Enter'){clearTimeout(_debounceTimers['${timerKey}']); autoSaveNota('${l.id}',${p},'${k}','${inputId}','${timerKey}',true)}"
-              >
+                onkeydown="if(event.key==='Enter'){clearTimeout(_debounceTimers['${timerKey}']); autoSaveNota('${l.id}',${p},'${k}','${inputId}','${timerKey}',true)}">
               <div class="save-status" id="status_${inputId}">${nota !== null ? '✓ e ruajtur' : ''}</div>
             </div>
           </td>`;
         }).join('');
 
+        // Butoni + Shto kolone te re
+        const newId = `new_${l.id}_${p}`;
+        kolonatHTML += `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:2px dashed var(--green-light);min-width:110px;vertical-align:top;">
+          <div style="font-size:10px;color:var(--green-main);margin-bottom:6px;font-weight:600;">+ Kolone e re</div>
+          <input id="${newId}" class="new-col-input" type="text" placeholder="Emri i detytes..." maxlength="30"
+            onkeydown="if(event.key==='Enter')shtoKolone('${l.id}',${p},'${newId}')">
+          <div style="font-size:9px;color:var(--text-soft);margin-top:3px;">shtyp Enter</div>
+        </td>`;
+
         html += `<td style="padding:0;border-left:2px solid var(--green-main);vertical-align:top;background:#f0faf5;">
           <div onclick="togglePeriudhe('${l.id}', ${p})" style="cursor:pointer;text-align:center;padding:6px;border-bottom:1px solid var(--border);background:var(--green-pale);">
-            <span style="font-size:11px;font-weight:600;color:var(--green-main);">P${p}: ${mesStr} ▲</span>
+            <span id="header_${l.id}_${p}" style="font-size:11px;font-weight:600;color:var(--green-main);">P${p}: ${mesStr} ▲</span>
           </div>
           <table style="width:100%;border-collapse:collapse;"><tr>${kolonatHTML}</tr></table>
         </td>`;
       } else {
-        html += `<td style="text-align:center;cursor:pointer;border-left:2px solid var(--border);padding:12px 8px;" onclick="togglePeriudhe('${l.id}', ${p})" title="Kliko per te pare notat">
+        html += `<td style="text-align:center;cursor:pointer;border-left:2px solid var(--border);padding:12px 8px;" onclick="togglePeriudhe('${l.id}', ${p})">
           <span class="grade-pill ${gc}">${mesStr}</span>
           <div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>
         </td>`;
@@ -1147,38 +588,25 @@ function renderDetailPage() {
   });
 
   html += `</tbody></table></div>
-
-    <div class="card">
-      <div class="card-title">Prinderit / Kujdestaret</div>
-  `;
+    <div class="card"><div class="card-title">Prinderit / Kujdestaret</div>`;
 
   if (prinderit && prinderit.length) {
     prinderit.forEach(p => {
-      html += `
-        <div style="background:var(--green-ultra);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:10px;">
-          <div style="font-weight:600;font-size:15px;">${p.emri}</div>
-          <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
-          <div class="kodi-box" style="margin-top:10px;">
-            <div class="kodi-label">Kodi i qasjes</div>
-            <div class="kodi-val">${p.kodi_qasjes}</div>
-          </div>
-        </div>
-      `;
+      html += `<div style="background:var(--green-ultra);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:10px;">
+        <div style="font-weight:600;font-size:15px;">${p.emri}</div>
+        <div style="font-size:13px;color:var(--text-soft);margin-top:4px;">📱 ${p.nr_telefoni || '—'} &nbsp;|&nbsp; ✉️ ${p.email || '—'}</div>
+        <div class="kodi-box" style="margin-top:10px;"><div class="kodi-label">Kodi i qasjes</div><div class="kodi-val">${p.kodi_qasjes}</div></div>
+      </div>`;
     });
-  } else {
-    html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk jane shtuar prinderit.</div>';
-  }
+  } else { html += '<div style="font-size:13px;color:var(--text-soft);">Ende nuk jane shtuar prinderit.</div>'; }
 
   html += `</div>`;
-
   document.getElementById('detail-page-content').innerHTML = html;
   document.getElementById('nxenes-detail-page').classList.add('open');
   document.getElementById('nxenes-detail-page').scrollTop = 0;
 }
 
-function mbyllDetailPage() {
-  document.getElementById('nxenes-detail-page').classList.remove('open');
-}
+function mbyllDetailPage() { document.getElementById('nxenes-detail-page').classList.remove('open'); }
 
 function togglePeriudhe(lendaId, periudha) {
   const key = lendaId + '_' + periudha;
@@ -1192,40 +620,57 @@ function togglePeriudhe(lendaId, periudha) {
 function toggleTePeriudhat(idx) {
   const periudha = idx + 1;
   const hapur = allLendet.some(l => periudhatHapura[l.id + '_' + periudha]);
-  allLendet.forEach(l => {
-    periudhatHapura[l.id + '_' + periudha] = !hapur;
-  });
+  allLendet.forEach(l => { periudhatHapura[l.id + '_' + periudha] = !hapur; });
   renderDetailPage();
 }
 
-// AUTO-SAVE me debounce — thirret me çdo taste
+// Shto kolone te re per nje lende dhe periudhe
+async function shtoKolone(lendaId, periudha, inputId) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  const emri = inp.value.trim();
+  if (!emri) return;
+
+  // Kontrollo nese ekziston
+  const ekziston = (window._kolonatDB || []).find(k => k.lenda_id === lendaId && k.periudha === periudha && k.emri === emri);
+  const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
+  if (ekziston || fikse.includes(emri)) { inp.value = ''; return; }
+
+  const renditja = (window._kolonatDB || []).filter(k => k.lenda_id === lendaId && k.periudha === periudha).length;
+
+  const { data, error } = await db.from('kolonat_lendeve').insert({
+    lenda_id: lendaId,
+    mesuese_id: currentUser.id,
+    emri: emri,
+    periudha: periudha,
+    renditja: renditja
+  }).select().single();
+
+  if (error) { console.error('Gabim shto kolone:', error); return; }
+
+  window._kolonatDB = [...(window._kolonatDB || []), data];
+  inp.value = '';
+
+  const page = document.getElementById('nxenes-detail-page');
+  const scrollY = page.scrollTop;
+  periudhatHapura[lendaId + '_' + periudha] = true;
+  renderDetailPage();
+  requestAnimationFrame(() => { page.scrollTop = scrollY; });
+}
+
 function autoSaveNota(lendaId, periudha, kolona, inputId, timerKey, immediate) {
   const inp = document.getElementById(inputId);
   const statusEl = document.getElementById('status_' + inputId);
   if (!inp) return;
-
   const vlere = inp.value;
-  if (!vlere) {
-    if (statusEl) { statusEl.textContent = ''; statusEl.className = 'save-status'; }
-    inp.classList.remove('saving','saved');
-    return;
-  }
-
+  if (!vlere) { if (statusEl) { statusEl.textContent = ''; statusEl.className = 'save-status'; } inp.classList.remove('saving','saved'); return; }
   const nota = parseInt(vlere);
   if (!nota || nota < 1 || nota > 5) return;
-
-  // Trego "duke ruajtur..."
-  inp.classList.add('saving');
-  inp.classList.remove('saved');
+  inp.classList.add('saving'); inp.classList.remove('saved');
   if (statusEl) { statusEl.textContent = 'duke ruajtur...'; statusEl.className = 'save-status duke-ruajtur'; }
-
-  // Fshij timer-in e meparshem
   if (_debounceTimers[timerKey]) clearTimeout(_debounceTimers[timerKey]);
-
-  const delay = immediate ? 0 : 900; // 900ms pas tastit te fundit
-  _debounceTimers[timerKey] = setTimeout(async () => {
-    await _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timerKey);
-  }, delay);
+  const delay = immediate ? 0 : 900;
+  _debounceTimers[timerKey] = setTimeout(async () => { await _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timerKey); }, delay);
 }
 
 let _ruajtjeNeProcees = {};
@@ -1233,57 +678,22 @@ let _ruajtjeNeProcees = {};
 async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timerKey) {
   if (_ruajtjeNeProcees[timerKey]) return;
   _ruajtjeNeProcees[timerKey] = true;
-
   const nxenesId = window._detailNxenesId;
   const statusEl = document.getElementById('status_' + inputId);
   const inp = document.getElementById(inputId);
-
   try {
-    // Kontrollo nese ekziston nota e njejte tashme
-    const byLende = window._detailByLende || {};
-    const lData = byLende[lendaId];
-    if (lData && lData.periudhat[periudha]) {
-      const ekziston = lData.periudhat[periudha].find(n => n.lloji === kolona);
-      if (ekziston && ekziston.nota === nota) {
-        // E njejta note — mos bej asgje, trego si e ruajtur
-        if (inp) { inp.classList.remove('saving'); inp.classList.add('saved'); }
-        if (statusEl) { statusEl.textContent = '✓ e ruajtur'; statusEl.className = 'save-status ok'; }
-        _ruajtjeNeProcees[timerKey] = false;
-        return;
-      }
-    }
+    // Fshij noten e vjeter
+    const { data: notatEkz } = await db.from('notat').select('id').eq('nxenesi_id', nxenesId).eq('lenda_id', lendaId).eq('periudha', periudha).eq('lloji', kolona);
+    if (notatEkz && notatEkz.length > 0) await db.from('notat').delete().eq('id', notatEkz[0].id);
 
-    // Fshij noten e vjeter nese ekziston
-    const { data: notatEkz } = await db.from('notat')
-      .select('id')
-      .eq('nxenesi_id', nxenesId)
-      .eq('lenda_id', lendaId)
-      .eq('periudha', periudha)
-      .eq('lloji', kolona);
-
-    if (notatEkz && notatEkz.length > 0) {
-      await db.from('notat').delete().eq('id', notatEkz[0].id);
-    }
-
-    // Shto noten e re
     const { error } = await db.from('notat').insert({
-      nxenesi_id: nxenesId,
-      lenda_id: lendaId,
-      mesuese_id: currentUser.id,
-      nota: nota,
-      periudha: periudha,
-      lloji: kolona,
-      data_shenimit: new Date().toISOString()
+      nxenesi_id: nxenesId, lenda_id: lendaId, mesuese_id: currentUser.id,
+      nota: nota, periudha: periudha, lloji: kolona, data_shenimit: new Date().toISOString()
     });
-
     if (error) throw error;
 
     // Fresko te dhenat lokale
-    const { data: notatRe } = await db.from('notat')
-      .select('*, lendet(emri)')
-      .eq('nxenesi_id', nxenesId)
-      .order('data_shenimit', { ascending: true });
-
+    const { data: notatRe } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxenesId).order('data_shenimit', { ascending: true });
     const byLendeRe = {};
     if (notatRe) {
       notatRe.forEach(n => {
@@ -1295,71 +705,24 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
       });
     }
     window._detailByLende = byLendeRe;
+    periudhatHapura[lendaId + '_' + periudha] = true;
 
-    // Ruaj scroll dhe periudhat e hapura
-    const periudhatMbajtura = { ...periudhatHapura };
-    periudhatMbajtura[lendaId + '_' + periudha] = true;
-    periudhatHapura = periudhatMbajtura;
+    if (inp) { inp.classList.remove('saving'); inp.classList.add('saved'); }
+    if (statusEl) { statusEl.textContent = '✓ e ruajtur'; statusEl.className = 'save-status ok'; }
 
-    // Fresko vetem qelizen e mesatares — pa ri-render te gjithe faqen
-    _rifresko_mesataret(lendaId, periudha, byLendeRe);
-
-    // Trego sukses ne input-in aktual (pa re-render)
-    const inpAkt = document.getElementById(inputId);
-    const statusAkt = document.getElementById('status_' + inputId);
-    if (inpAkt) { inpAkt.classList.remove('saving'); inpAkt.classList.add('saved'); }
-    if (statusAkt) { statusAkt.textContent = '✓ e ruajtur'; statusAkt.className = 'save-status ok'; }
+    // Perditeso mesataren ne header
+    const arr = (byLendeRe[lendaId] && byLendeRe[lendaId].periudhat[periudha]) || [];
+    const notatP = arr.filter(n => n.nota !== null).map(n => n.nota);
+    const mesP = notatP.length > 0 ? (notatP.reduce((a,b)=>a+b,0)/notatP.length).toFixed(1) : '—';
+    const headerEl = document.getElementById(`header_${lendaId}_${periudha}`);
+    if (headerEl) headerEl.textContent = `P${periudha}: ${mesP} ▲`;
 
   } catch(e) {
     console.error('Gabim gjate ruajtjes:', e);
-    const inpAkt = document.getElementById(inputId);
-    const statusAkt = document.getElementById('status_' + inputId);
-    if (inpAkt) { inpAkt.classList.remove('saving'); inpAkt.style.borderColor = 'var(--danger)'; }
-    if (statusAkt) { statusAkt.textContent = '✗ gabim'; statusAkt.style.color = 'var(--danger)'; }
+    if (inp) { inp.classList.remove('saving'); inp.style.borderColor = 'var(--danger)'; }
+    if (statusEl) { statusEl.textContent = '✗ gabim'; statusEl.style.color = 'var(--danger)'; }
   }
-
   _ruajtjeNeProcees[timerKey] = false;
-}
-
-// Rifresko mesataret ne tabele pa ri-renderuar gjithçka
-function _rifresko_mesataret(lendaId, periudha, byLendeRe) {
-  // Gjej te gjitha rreshtat e tabeles dhe rifresko Noten Perfundimtare
-  // Kjo behet duke lexuar te dhenat nga byLendeRe dhe duke perditesuar DOM
-  const lData = byLendeRe[lendaId];
-  if (!lData) return;
-
-  allLendet.forEach(l => {
-    if (l.id !== lendaId) return;
-    const periudhat = lData ? lData.periudhat : {};
-
-    const byKolone = {};
-    [1,2,3,4].forEach(p => {
-      byKolone[p] = {};
-      KOLONAT_FIKSE.forEach(k => { byKolone[p][k] = null; });
-      const arr = periudhat[p] || [];
-      arr.forEach(n => {
-        if (n.lloji && KOLONAT_FIKSE.includes(n.lloji)) byKolone[p][n.lloji] = n.nota;
-      });
-      const paLloji = arr.filter(n => !n.lloji || !KOLONAT_FIKSE.includes(n.lloji));
-      paLloji.forEach((n, idx) => {
-        if (idx < KOLONAT_FIKSE.length && byKolone[p][KOLONAT_FIKSE[idx]] === null)
-          byKolone[p][KOLONAT_FIKSE[idx]] = n.nota;
-      });
-    });
-
-    const mesPerPeriudhe = [1,2,3,4].map(p => {
-      const notatP = KOLONAT_FIKSE.filter(k => byKolone[p][k] !== null).map(k => byKolone[p][k]);
-      if (notatP.length === 0) return null;
-      return notatP.reduce((a,b) => a+b, 0) / notatP.length;
-    });
-
-    // Perditeso titullin e periudhes se hapur (mesatarja)
-    const mesP = mesPerPeriudhe[periudha - 1];
-    const mesPStr = mesP !== null ? mesP.toFixed(1) : '—';
-    // Gjej butonin e periudhes
-    const periudhaHeader = document.querySelector(`[onclick="togglePeriudhe('${lendaId}', ${periudha})"] span`);
-    if (periudhaHeader) periudhaHeader.textContent = `P${periudha}: ${mesPStr} ▲`;
-  });
 }
 
 async function loadBallina() {
@@ -1371,8 +734,7 @@ async function loadBallina() {
     noQuery = db.from('notat').select('*', { count: 'exact', head: true }).eq('mesuese_id', currentUser.id);
     const { data: nxIds } = await db.from('nxenesit').select('id').eq('mesuese_id', currentUser.id);
     if (nxIds && nxIds.length > 0) {
-      const ids = nxIds.map(n => n.id);
-      const { count: pc } = await db.from('prinderit').select('*', { count: 'exact', head: true }).in('nxenesi_id', ids);
+      const { count: pc } = await db.from('prinderit').select('*', { count: 'exact', head: true }).in('nxenesi_id', nxIds.map(n => n.id));
       prCount = pc || 0;
     }
   } else {
@@ -1382,10 +744,9 @@ async function loadBallina() {
   const { count: nxCount } = await nxQuery;
   const { count: noCount } = await noQuery;
   document.getElementById('stats-grid').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${nxCount || 0}</div><div class="stat-label">Nxenes</div></div>
-    <div class="stat-card"><div class="stat-num">${prCount || 0}</div><div class="stat-label">Prinder</div></div>
-    <div class="stat-card"><div class="stat-num">${noCount || 0}</div><div class="stat-label">Nota te shenuara</div></div>
-  `;
+    <div class="stat-card"><div class="stat-num">${nxCount||0}</div><div class="stat-label">Nxenes</div></div>
+    <div class="stat-card"><div class="stat-num">${prCount||0}</div><div class="stat-label">Prinder</div></div>
+    <div class="stat-card"><div class="stat-num">${noCount||0}</div><div class="stat-label">Nota te shenuara</div></div>`;
   let fundQuery = db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
   if (currentUser.roli !== 'admin') fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
   const { data: fund } = await fundQuery;
@@ -1395,100 +756,15 @@ async function loadBallina() {
     const d = new Date(n.data_shenimit);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
     const gc = ['','g1','g2','g3','g4','g5'][n.nota] || 'gx';
-    return `
-      <div class="nota-item">
-        <span class="grade-pill ${gc}">${n.nota}</span>
-        <div class="nota-lenda">
-          <strong>${n.nxenesit ? n.nxenesit.emri + ' ' + n.nxenesit.mbiemri : '—'}</strong> — ${n.lendet ? n.lendet.emri : '—'}
-          <div class="nota-date">📅 ${ds}</div>
-        </div>
-      </div>
-    `;
+    return `<div class="nota-item"><span class="grade-pill ${gc}">${n.nota}</span><div class="nota-lenda"><strong>${n.nxenesit ? n.nxenesit.emri+' '+n.nxenesit.mbiemri : '—'}</strong> — ${n.lendet ? n.lendet.emri : '—'}<div class="nota-date">📅 ${ds}</div></div></div>`;
   }).join('');
-}
-
-function populateLendetSelect() {
-  const el = document.getElementById('lendet-lista');
-  if (!el) return;
-  el.innerHTML = allLendet.map(l => `
-    <div onclick="zgjedhLenden('${l.id}')" id="lenda-item-${l.id}" style="
-      padding:14px 16px; border-radius:var(--radius-sm); cursor:pointer; font-size:15px; font-weight:500;
-      border-bottom:1px solid var(--green-ultra); display:flex; align-items:center; justify-content:space-between; transition: background 0.15s;
-    " onmouseover="this.style.background='var(--green-ultra)'" onmouseout="this.style.background='white'">
-      <span>${l.emri}</span>
-      <span style="font-size:12px;color:var(--text-soft);">→</span>
-    </div>
-  `).join('');
-}
-
-function zgjedhLenden(lId) {
-  document.querySelectorAll('[id^="lenda-item-"]').forEach(el => {
-    el.style.background = 'white'; el.style.fontWeight = '500'; el.style.color = 'inherit';
-  });
-  const selected = document.getElementById('lenda-item-' + lId);
-  if (selected) { selected.style.background = 'var(--green-pale)'; selected.style.fontWeight = '700'; selected.style.color = 'var(--green-main)'; }
-  ngarkoPanelLendet(lId);
-}
-
-function populateNotaForm() {
-  const selN = document.getElementById('nota-nxenesi');
-  const selL = document.getElementById('nota-lenda');
-  selN.innerHTML = '<option value="">— Zgjedh nxenesin —</option>' +
-    allNxenesit.map(n => `<option value="${n.id}">${n.emri} ${n.mbiemri} (${n.klasat ? n.klasat.emri : '—'})</option>`).join('');
-  selL.innerHTML = '<option value="">— Zgjedh lenden —</option>' +
-    allLendet.map(l => `<option value="${l.id}">${l.emri}</option>`).join('');
-  document.getElementById('nota-data').value = new Date().toISOString().split('T')[0];
-}
-
-async function ngarkoProfil() {
-  const id = document.getElementById('nota-nxenesi').value;
-  const hCard = document.getElementById('card-historiku');
-  if (!id) { hCard.style.display = 'none'; return; }
-  const nxenesi = allNxenesit.find(n => n.id === id);
-  document.getElementById('historiku-emri').textContent = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '';
-  const { data } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', id).order('data_shenimit', { ascending: false }).limit(10);
-  const list = document.getElementById('historiku-list');
-  if (!data || !data.length) {
-    list.innerHTML = '<div class="empty-state"><p>Ende nuk ka nota.</p></div>';
-  } else {
-    list.innerHTML = data.map(n => {
-      const d = new Date(n.data_shenimit);
-      const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' });
-      const gc = ['','g1','g2','g3','g4','g5'][n.nota] || 'gx';
-      return `<div class="nota-item"><span class="grade-pill ${gc}">${n.nota}</span><div class="nota-lenda"><strong>${n.lendet ? n.lendet.emri : '—'}</strong>${n.koment ? `<p>${n.koment}</p>` : ''}<div class="nota-date">📅 ${ds}</div></div></div>`;
-    }).join('');
-  }
-  hCard.style.display = 'block';
-}
-
-async function ruajNoten() {
-  const nxId = document.getElementById('nota-nxenesi').value;
-  const lId = document.getElementById('nota-lenda').value;
-  const nota = document.getElementById('nota-nota').value;
-  const data = document.getElementById('nota-data').value;
-  const koment = document.getElementById('nota-koment').value.trim();
-  const sukEl = document.getElementById('nota-sukses');
-  const errEl = document.getElementById('nota-error');
-  sukEl.style.display = 'none'; errEl.style.display = 'none';
-  if (!nxId || !lId || !nota || !data) { errEl.textContent = 'Ploteso nxenesin, lenden, noten dhe daten.'; errEl.style.display = 'block'; return; }
-  const periudha = parseInt(document.getElementById('nota-periudha').value) || 1;
-  const { error } = await db.from('notat').insert({ nxenesi_id: nxId, lenda_id: lId, mesuese_id: currentUser.id, nota: parseInt(nota), periudha: periudha, koment: koment || null, data_shenimit: new Date(data).toISOString() });
-  if (error) { errEl.textContent = 'Gabim gjate ruajtjes.'; errEl.style.display = 'block'; return; }
-  const nxenesi = allNxenesit.find(n => n.id === nxId);
-  sukEl.textContent = '✓ Nota e ' + (nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '') + ' u ruajt!';
-  sukEl.style.display = 'block';
-  document.getElementById('nota-koment').value = '';
-  document.getElementById('nota-nota').value = '';
-  await ngarkoProfil();
-  await loadBallina();
 }
 
 async function shtoNxenes() {
   const emri = document.getElementById('sn-emri').value.trim();
   const mbiemri = document.getElementById('sn-mbiemri').value.trim();
   const p1emri = document.getElementById('sn-p1-emri').value.trim();
-  const sukEl = document.getElementById('sn-sukses');
-  const errEl = document.getElementById('sn-error');
+  const sukEl = document.getElementById('sn-sukses'); const errEl = document.getElementById('sn-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
   if (!emri || !mbiemri || !p1emri) { errEl.textContent = 'Emri, mbiemri dhe prindi 1 jane te detyrueshem.'; errEl.style.display = 'block'; return; }
   const kodiNx = 'NX-' + Math.random().toString(36).substring(2,6).toUpperCase();
@@ -1501,10 +777,9 @@ async function shtoNxenes() {
     const kod2 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
     await db.from('prinderit').insert({ nxenesi_id: nx.id, emri: p2emri, nr_telefoni: document.getElementById('sn-p2-tel').value.trim() || null, email: document.getElementById('sn-p2-email').value.trim() || null, kodi_qasjes: kod2 });
   }
-  sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi: ${kod1}`;
-  sukEl.style.display = 'block';
+  sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi: ${kod1}`; sukEl.style.display = 'block';
   ['sn-emri','sn-mbiemri','sn-p1-emri','sn-p1-tel','sn-p1-email','sn-p2-emri','sn-p2-tel','sn-p2-email'].forEach(id => document.getElementById(id).value = '');
-  await loadNxenesit(); populateNotaForm(); await loadBallina();
+  await loadNxenesit(); await loadBallina();
 }
 
 async function loadMesueset() {
@@ -1514,32 +789,23 @@ async function loadMesueset() {
   el.innerHTML = data.map(m => `
     <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:10px;">
       <div style="width:42px;height:42px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:600;">${m.emri.split(' ').map(w=>w[0]).join('').substring(0,2)}</div>
-      <div style="flex:1;">
-        <div style="font-weight:500;">${m.emri}</div>
-        <div style="font-size:13px;color:var(--text-soft);">${m.email}</div>
+      <div style="flex:1;"><div style="font-weight:500;">${m.emri}</div><div style="font-size:13px;color:var(--text-soft);">${m.email}</div>
         <div style="margin-top:4px;display:flex;gap:6px;">
-          <span class="badge ${m.roli === 'admin' ? 'badge-admin' : ''}">${m.roli === 'admin' ? 'Admin' : 'Mesuese'}</span>
-          <span class="badge ${m.aktive ? 'badge-aktive' : 'badge-joaktive'}">${m.aktive ? 'Aktive' : 'Jo aktive'}</span>
+          <span class="badge ${m.roli==='admin'?'badge-admin':''}">${m.roli==='admin'?'Admin':'Mesuese'}</span>
+          <span class="badge ${m.aktive?'badge-aktive':'badge-joaktive'}">${m.aktive?'Aktive':'Jo aktive'}</span>
         </div>
       </div>
       ${!m.aktive ? `<button class="btn-green" style="padding:7px 14px;font-size:13px;" onclick="aktivizoMesuese('${m.id}')">Aktivizo</button>` : ''}
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-async function aktivizoMesuese(id) {
-  await db.from('mesueset').update({ aktive: true }).eq('id', id);
-  await loadMesueset();
-}
+async function aktivizoMesuese(id) { await db.from('mesueset').update({ aktive: true }).eq('id', id); await loadMesueset(); }
 
 async function shtoMesuese() {
-  const emri = document.getElementById('sm-emri').value.trim();
-  const email = document.getElementById('sm-email').value.trim();
-  const pass = document.getElementById('sm-pass').value;
-  const roli = document.getElementById('sm-roli').value;
+  const emri = document.getElementById('sm-emri').value.trim(); const email = document.getElementById('sm-email').value.trim();
+  const pass = document.getElementById('sm-pass').value; const roli = document.getElementById('sm-roli').value;
   const iban = document.getElementById('sm-iban').value.trim();
-  const sukEl = document.getElementById('sm-sukses');
-  const errEl = document.getElementById('sm-error');
+  const sukEl = document.getElementById('sm-sukses'); const errEl = document.getElementById('sm-error');
   sukEl.style.display = 'none'; errEl.style.display = 'none';
   if (!emri || !email || !pass || !roli) { errEl.textContent = 'Ploteso te gjitha fushat.'; errEl.style.display = 'block'; return; }
   const klasa = document.getElementById('sm-klasa').value;
@@ -1551,8 +817,7 @@ async function shtoMesuese() {
 }
 
 async function buildPrindUI() {
-  const tabs = [{ id: 'femija', label: 'Femija im' }];
-  buildTabs(tabs, 'femija');
+  buildTabs([{ id:'femija', label:'Femija im' }], 'femija');
   await loadFemijaData();
 }
 
@@ -1568,93 +833,16 @@ async function loadFemijaData() {
   const notaEl = document.getElementById('femija-notat');
   const vals = Object.values(byLende);
   if (!vals.length) { notaEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka nota.</p></div>'; }
-  else {
-    notaEl.innerHTML = vals.map(n => `
-      <div class="subject-tile">
-        <div class="s-name">${n.lendet ? n.lendet.emri : '—'}</div>
-        <div class="s-grade">${n.nota}</div>
-        <div style="height:4px;background:var(--border);border-radius:99px;margin-top:6px;">
-          <div style="height:4px;border-radius:99px;background:var(--green-main);width:${n.nota*20}%;"></div>
-        </div>
-      </div>
-    `).join('');
-  }
+  else { notaEl.innerHTML = vals.map(n => `<div class="subject-tile"><div class="s-name">${n.lendet ? n.lendet.emri : '—'}</div><div class="s-grade">${n.nota}</div><div style="height:4px;background:var(--border);border-radius:99px;margin-top:6px;"><div style="height:4px;border-radius:99px;background:var(--green-main);width:${n.nota*20}%;"></div></div></div>`).join(''); }
   const komentEl = document.getElementById('femija-komentet');
-  const meKoment = notat ? notat.filter(n => n.koment).slice(0, 5) : [];
+  const meKoment = notat ? notat.filter(n => n.koment).slice(0,5) : [];
   if (!meKoment.length) { komentEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente.</p></div>'; }
-  else {
-    komentEl.innerHTML = meKoment.map(n => {
-      const d = new Date(n.data_shenimit);
-      const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
-      return `<div style="background:var(--green-ultra);border-left:3px solid var(--green-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--green-main);">${n.lendet ? n.lendet.emri : ''} — Nota ${n.nota}</div><div style="font-size:14px;color:var(--text-dark);margin-top:4px;">${n.koment}</div><div style="font-size:11px;color:var(--text-soft);margin-top:4px;">📅 ${ds}</div></div>`;
-    }).join('');
-  }
-}
-
-async function ngarkoPanelLendet(lId) {
-  if (!lId) return;
-  currentLendaId = lId;
-  const el = document.getElementById('lendet-nxenesit-list');
-  const lenda = allLendet.find(l => l.id === lId);
-  if (!allNxenesit.length) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka nxenes.</p></div></div>'; return; }
-  const { data: notat } = await db.from('notat').select('nxenesi_id, nota, data_shenimit').eq('lenda_id', lId).order('data_shenimit', { ascending: false });
-  const lastGrades = {}; const lastDates = {};
-  if (notat) notat.forEach(n => { if (!lastGrades[n.nxenesi_id]) { lastGrades[n.nxenesi_id] = n.nota; lastDates[n.nxenesi_id] = n.data_shenimit; } });
-  el.innerHTML = '<div class="card">' +
-    '<div class="card-title">' + (lenda ? lenda.emri : '') + ' — Notat e nxenesve</div>' +
-    allNxenesit.map(n => {
-      const lastGrade = lastGrades[n.id];
-      const lastDate = lastDates[n.id] ? new Date(lastDates[n.id]).toLocaleDateString('sq-AL', {day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
-      const lastDateText = lastDate ? 'Nota e fundit: ' + lastDate : 'Pa note ende';
-      return '<div style="display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--green-ultra);flex-wrap:wrap;">' +
-        '<div class="s-avatar">' + n.emri[0] + n.mbiemri[0] + '</div>' +
-        '<div style="flex:1;font-weight:500;">' + n.emri + ' ' + n.mbiemri + '</div>' +
-        '<input type="number" id="nota-l-' + n.id + '" min="1" max="5" placeholder="' + (lastGrade ? lastGrade : '—') + '" style="padding:8px 10px;border:1.5px solid #ddd;border-radius:var(--radius-sm);font-family:DM Sans,sans-serif;font-size:20px;font-weight:700;width:72px;text-align:center;color:#bbb;" oninput="ngjyroNoten(this)" onkeypress="return[\'1\',\'2\',\'3\',\'4\',\'5\'].includes(event.key)">' +
-        '<div style="font-size:12px;color:#aaa;background:#f9f9f9;border:1px solid #eee;border-radius:var(--radius-sm);padding:7px 12px;">' + lastDateText + '</div></div>';
-    }).join('') +
-    '<div style="margin-top:16px;"><button class="btn-green" onclick="ruajNotatLendes()">Ruaj te gjitha notat</button><div class="success-msg" id="lendet-sukses" style="margin-top:10px;"></div></div></div>';
-}
-
-function ngjyroNoten(inp) {
-  const v = parseInt(inp.value);
-  if (inp.value && v >= 1 && v <= 5) { inp.style.background = '#e3f2fd'; inp.style.borderColor = '#1976d2'; inp.style.color = '#1976d2'; inp.style.fontWeight = '700'; }
-  else if (inp.value && (v < 1 || v > 5)) { inp.value = ''; inp.style.background = 'white'; inp.style.borderColor = '#e74c3c'; inp.style.color = 'inherit'; }
-  else { inp.style.background = 'white'; inp.style.borderColor = 'var(--border)'; inp.style.color = 'inherit'; inp.style.fontWeight = 'normal'; }
-}
-
-let currentLendaId = null;
-
-async function ruajNotatLendes() {
-  const lId = currentLendaId;
-  const sukEl = document.getElementById('lendet-sukses');
-  if (!lId) return;
-  let saved = 0;
-  for (const n of allNxenesit) {
-    const nota = document.getElementById('nota-l-' + n.id)?.value;
-    if (!nota) continue;
-    await db.from('notat').insert({ nxenesi_id: n.id, lenda_id: lId, mesuese_id: currentUser.id, nota: parseInt(nota), data_shenimit: new Date().toISOString() });
-    saved++;
-  }
-  if (saved > 0) { sukEl.textContent = '✓ U ruajten ' + saved + ' nota!'; sukEl.style.display = 'block'; await ngarkoPanelLendet(lId); await loadBallina(); }
-}
-
-async function shfaqNotEnFundit() {
-  const nxId = document.getElementById('nota-nxenesi').value;
-  const lId = document.getElementById('nota-lenda').value;
-  const el = document.getElementById('nota-e-fundit');
-  if (!nxId || !lId) { el.style.display = 'none'; return; }
-  const { data } = await db.from('notat').select('nota, data_shenimit').eq('nxenesi_id', nxId).eq('lenda_id', lId).order('data_shenimit', { ascending: false }).limit(1);
-  if (data && data.length > 0) {
-    const ds = new Date(data[0].data_shenimit).toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' });
-    el.textContent = 'Nota e fundit: ' + data[0].nota + ' — ' + ds; el.style.display = 'block';
-  } else { el.textContent = 'Ende nuk ka note per kete lende'; el.style.display = 'block'; }
+  else { komentEl.innerHTML = meKoment.map(n => { const d = new Date(n.data_shenimit); const ds = d.toLocaleDateString('sq-AL', {day:'2-digit',month:'long',year:'numeric'}); return `<div style="background:var(--green-ultra);border-left:3px solid var(--green-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--green-main);">${n.lendet?n.lendet.emri:''} — Nota ${n.nota}</div><div style="font-size:14px;color:var(--text-dark);margin-top:4px;">${n.koment}</div><div style="font-size:11px;color:var(--text-soft);margin-top:4px;">📅 ${ds}</div></div>`; }).join(''); }
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
-});
+document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); }); });
 </script>
 </body>
 </html>
