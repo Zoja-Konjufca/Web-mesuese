@@ -1004,6 +1004,13 @@ async function shfaqDetailNxenes(id) {
 
   const { data: prinderit } = await db.from('prinderit').select('*').eq('nxenesi_id', id);
 
+  // Ngarko kolonat per kete mesuese
+  const { data: kolonatDB } = await db.from('kolonat_lendeve')
+    .select('*')
+    .eq('mesuese_id', currentUser.id)
+    .order('renditja', { ascending: true });
+  window._kolonatDB = kolonatDB || [];
+
   const byLende = {};
   if (notat) {
     notat.forEach(n => {
@@ -1029,7 +1036,11 @@ function mesatarePeriudhes(notatArr) {
   return notatArr.reduce((a,b) => a + b.nota, 0) / notatArr.length;
 }
 
-const KOLONAT_FIKSE = ['Test', 'Ushtrime', 'Projekt', 'Vleresim_me_goje'];
+// Merr kolonat per nje lende dhe periudhe specifike
+function getKolonatPerLende(lendaId, periudha) {
+  const kolonat = (window._kolonatDB || []).filter(k => k.lenda_id === lendaId && k.periudha === periudha);
+  return kolonat.map(k => k.emri);
+}
 
 function renderDetailPage() {
   const nxenesi = window._detailNxenesi;
@@ -1068,25 +1079,23 @@ function renderDetailPage() {
     const byKolone = {};
     [1,2,3,4].forEach(p => {
       byKolone[p] = {};
-      KOLONAT_FIKSE.forEach(k => { byKolone[p][k] = null; });
+      const kolonatP = getKolonatPerLende(l.id, p);
+      kolonatP.forEach(k => { byKolone[p][k] = null; });
       const arr = periudhat[p] || [];
       arr.forEach(n => {
-        if (n.lloji && KOLONAT_FIKSE.includes(n.lloji)) {
-          byKolone[p][n.lloji] = n.nota;
-        }
-      });
-      const paLloji = arr.filter(n => !n.lloji || !KOLONAT_FIKSE.includes(n.lloji));
-      paLloji.forEach((n, idx) => {
-        if (idx < KOLONAT_FIKSE.length && byKolone[p][KOLONAT_FIKSE[idx]] === null) {
-          byKolone[p][KOLONAT_FIKSE[idx]] = n.nota;
-        }
+        if (n.lloji) byKolone[p][n.lloji] = n.nota;
       });
     });
 
     const mesPerPeriudhe = [1,2,3,4].map(p => {
-      const notatP = KOLONAT_FIKSE.filter(k => byKolone[p][k] !== null).map(k => byKolone[p][k]);
-      if (notatP.length === 0) return null;
-      return notatP.reduce((a,b) => a+b, 0) / notatP.length;
+      const kolonatP = getKolonatPerLende(l.id, p);
+      const notatP = kolonatP.filter(k => byKolone[p][k] !== null).map(k => byKolone[p][k]);
+      // Edhe notat pa kolone te caktuar
+      const arr = periudhat[p] || [];
+      const paKolone = arr.filter(n => !n.lloji).map(n => n.nota);
+      const teGjitha = [...notatP, ...paKolone];
+      if (teGjitha.length === 0) return null;
+      return teGjitha.reduce((a,b) => a+b, 0) / teGjitha.length;
     });
 
     const kaMeseNjePeriudhe = mesPerPeriudhe.some(m => m !== null);
@@ -1107,14 +1116,15 @@ function renderDetailPage() {
 
       if (hapur) {
         // Periudha e zgjeruar — inputet gjithmone te dukshme, me auto-save
-        let kolonatHTML = KOLONAT_FIKSE.map(k => {
-          const nota = byKolone[p][k];
+        const kolonatP = getKolonatPerLende(l.id, p);
+        let kolonatHTML = kolonatP.map(k => {
+          const nota = byKolone[p][k] !== undefined ? byKolone[p][k] : null;
           const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
-          const safeKey = k.replace(/\s/g,'_').replace(/[^a-zA-Z0-9_]/g,'');
+          const safeKey = k.replace(/[^a-zA-Z0-9]/g,'_');
           const inputId = `inp_${l.id}_${p}_${safeKey}`;
           const timerKey = `${l.id}_${p}_${k}`;
           return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:100px;vertical-align:top;">
-            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k === 'Vleresim_me_goje' ? 'Vleresim me goje' : k}</div>
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:4px;font-weight:600;">${k}</div>
             <div class="nota-input-cell">
               <input
                 id="${inputId}"
@@ -1128,6 +1138,15 @@ function renderDetailPage() {
             </div>
           </td>`;
         }).join('');
+        // Butoni + Shto kolone
+        kolonatHTML += `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:110px;vertical-align:top;">
+          <div style="font-size:10px;color:var(--text-soft);margin-bottom:4px;font-weight:600;">+ Kolone e re</div>
+          <input id="inp_new_${l.id}_${p}" type="text" placeholder="Titulli i detyre..." maxlength="30"
+            style="width:90px;padding:5px;border:2px dashed var(--green-light);border-radius:6px;font-size:12px;text-align:center;font-family:'DM Sans',sans-serif;outline:none;"
+            onkeydown="if(event.key==='Enter')shtoKolone('${l.id}',${p},'inp_new_${l.id}_${p}')"
+          >
+          <div style="font-size:9px;color:var(--text-soft);margin-top:3px;">Enter per te shtuar</div>
+        </td>`;
 
         html += `<td style="padding:0;border-left:2px solid var(--green-main);vertical-align:top;background:#f0faf5;">
           <div onclick="togglePeriudhe('${l.id}', ${p})" style="cursor:pointer;text-align:center;padding:6px;border-bottom:1px solid var(--border);background:var(--green-pale);">
@@ -1226,6 +1245,43 @@ function autoSaveNota(lendaId, periudha, kolona, inputId, timerKey, immediate) {
   _debounceTimers[timerKey] = setTimeout(async () => {
     await _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timerKey);
   }, delay);
+}
+
+
+async function shtoKolone(lendaId, periudha, inputId) {
+  const inp = document.getElementById(inputId);
+  if (!inp) return;
+  const emri = inp.value.trim();
+  if (!emri) return;
+
+  // Kontrollo nese ekziston tashmë
+  const ekziston = (window._kolonatDB || []).find(k => k.lenda_id === lendaId && k.periudha === periudha && k.emri === emri);
+  if (ekziston) { inp.value = ''; return; }
+
+  const renditja = (window._kolonatDB || []).filter(k => k.lenda_id === lendaId && k.periudha === periudha).length;
+
+  const { data, error } = await db.from('kolonat_lendeve').insert({
+    lenda_id: lendaId,
+    mesuese_id: currentUser.id,
+    emri: emri,
+    periudha: periudha,
+    renditja: renditja
+  }).select().single();
+
+  if (error) { console.error('Gabim shto kolone:', error); return; }
+
+  // Shto ne cache lokal
+  window._kolonatDB = [...(window._kolonatDB || []), data];
+  inp.value = '';
+
+  // Ruaj scroll dhe periudhat e hapura
+  const page = document.getElementById('nxenes-detail-page');
+  const scrollY = page.scrollTop;
+  const periudhatMbajtura = { ...periudhatHapura };
+  periudhatMbajtura[lendaId + '_' + periudha] = true;
+  periudhatHapura = periudhatMbajtura;
+  renderDetailPage();
+  requestAnimationFrame(() => { page.scrollTop = scrollY; });
 }
 
 let _ruajtjeNeProcees = {};
