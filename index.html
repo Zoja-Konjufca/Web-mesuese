@@ -710,6 +710,9 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
     if (inp) { inp.classList.remove('saving'); inp.classList.add('saved'); }
     if (statusEl) { statusEl.textContent = '✓ e ruajtur'; statusEl.className = 'save-status ok'; }
 
+    // Dergo email njoftim te prinderi
+    dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona);
+
     // Perditeso mesataren ne header
     const arr = (byLendeRe[lendaId] && byLendeRe[lendaId].periudhat[periudha]) || [];
     const notatP = arr.filter(n => n.nota !== null).map(n => n.nota);
@@ -723,6 +726,67 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
     if (statusEl) { statusEl.textContent = '✗ gabim'; statusEl.style.color = 'var(--danger)'; }
   }
   _ruajtjeNeProcees[timerKey] = false;
+}
+
+
+async function dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona) {
+  try {
+    // Merr te dhenat e nxenesit
+    const nxenesi = allNxenesit.find(n => n.id === nxenesId);
+    if (!nxenesi) return;
+
+    // Merr lenden
+    const lenda = allLendet.find(l => l.id === lendaId);
+    if (!lenda) return;
+
+    // Merr prinderit me email
+    const { data: prinderit } = await db.from('prinderit')
+      .select('emri, email')
+      .eq('nxenesi_id', nxenesId)
+      .not('email', 'is', null);
+
+    if (!prinderit || prinderit.length === 0) return;
+
+    const nxenesEmri = nxenesi.emri + ' ' + nxenesi.mbiemri;
+    const mesuesesEmri = currentUser.emri;
+    const notaShkronja = ['', 'Shume dobet', 'Dobet', 'Mjaftueshem', 'Mire', 'Shkelqyeshem'][nota] || nota;
+
+    for (const prind of prinderit) {
+      if (!prind.email) continue;
+
+      await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer re_C7DsbLRD_B78BEcS29GgiadA54kDi8SbB',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'Ditari i Mesueses <njoftimet@zoja.life>',
+          to: [prind.email],
+          subject: 'Nota e re per ' + nxenesEmri,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
+              <div style="background: #1a5c3a; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+                <h1 style="color: white; margin: 0; font-size: 1.5rem;">Ditari i Mesueses</h1>
+              </div>
+              <p>Pershendetje <strong>${prind.emri}</strong>,</p>
+              <p>Mesuese <strong>${mesuesesEmri}</strong> ka vendosur nje note te re per femijen tuaj:</p>
+              <div style="background: #e8f5ee; border-radius: 10px; padding: 20px; margin: 20px 0; text-align: center;">
+                <p style="margin: 0; font-size: 14px; color: #6b8a78;">Nxenesi</p>
+                <p style="margin: 5px 0; font-size: 1.2rem; font-weight: bold;">${nxenesEmri}</p>
+                <p style="margin: 10px 0; font-size: 14px; color: #6b8a78;">Lenda: ${lenda.emri} | Periudha ${periudha} | ${kolona}</p>
+                <div style="background: #1a5c3a; color: white; border-radius: 50%; width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 10px auto;">${nota}</div>
+                <p style="margin: 5px 0; color: #1a5c3a; font-weight: bold;">${notaShkronja}</p>
+              </div>
+              <p style="color: #6b8a78; font-size: 12px; text-align: center;">Ky eshte nje njoftim automatik nga platforma Ditari i Mesueses</p>
+            </div>
+          `
+        })
+      });
+    }
+  } catch(e) {
+    console.error('Gabim dergimi email:', e);
+  }
 }
 
 async function loadBallina() {
