@@ -857,6 +857,8 @@ async function buildPrindUI() {
   await loadFemijaData();
 }
 
+let periudhatHapuraPrind = {};
+
 async function loadFemijaData() {
   const nxId = currentPrind.nxenesi_id;
   const { data: nx } = await db.from('nxenesit').select('*, klasat(emri)').eq('id', nxId).single();
@@ -866,33 +868,45 @@ async function loadFemijaData() {
 
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: true });
   const { data: lendet } = await db.from('lendet').select('*').order('emri');
+  const { data: kolonatDB } = await db.from('kolonat_lendeve').select('*').order('renditja', { ascending: true });
+
+  window._prindNotat = notat || [];
+  window._prindLendet = lendet || [];
+  window._prindKolonat = kolonatDB || [];
+  window._prindNxId = nxId;
+
+  renderFemijaTabela();
+}
+
+function renderFemijaTabela() {
+  const notat = window._prindNotat || [];
+  const lendet = window._prindLendet || [];
+  const kolonatDB = window._prindKolonat || [];
 
   const byLende = {};
-  if (notat) {
-    notat.forEach(n => {
-      if (!n.lendet) return;
-      if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
-      const p = n.periudha || 1;
-      if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
-      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji });
-    });
-  }
+  notat.forEach(n => {
+    if (!n.lendet) return;
+    if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
+    const p = n.periudha || 1;
+    if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
+    byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji });
+  });
 
   let html = `<div style="overflow-x:auto;">
     <table class="notat-tabela" style="min-width:600px;border-collapse:collapse;width:100%;">
       <thead>
         <tr>
           <th style="vertical-align:middle;padding:12px 14px;">Lenda</th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P1</th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P2</th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P3</th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P4</th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(1)">P1 <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(2)">P2 <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(3)">P3 <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(4)">P4 <span style="font-size:10px;">▼</span></th>
           <th style="text-align:center;background:var(--green-mid);color:white;padding:12px 8px;">Mesatare</th>
         </tr>
       </thead>
       <tbody>`;
 
-  (lendet || []).forEach(l => {
+  lendet.forEach(l => {
     const lData = byLende[l.id];
     const periudhat = lData ? lData.periudhat : {};
 
@@ -909,19 +923,43 @@ async function loadFemijaData() {
       : null;
     const gcFinal = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
 
-    html += `<tr><td style="font-weight:500;padding:12px 14px;">${l.emri}</td>`;
+    html += `<tr><td style="font-weight:500;padding:12px 14px;vertical-align:middle;">${l.emri}</td>`;
 
     [1,2,3,4].forEach((p, idx) => {
       const mes = mesPerPeriudhe[idx];
       const mesStr = mes !== null ? mes.toFixed(1) : '—';
       const gc = mes !== null ? (['','g1','g2','g3','g4','g5'][Math.round(mes)] || 'gx') : 'gx';
       const arr = periudhat[p] || [];
-      const detaje = arr.map(n => n.lloji + ': ' + n.nota).join(' | ');
+      const hapur = periudhatHapuraPrind[p];
 
-      html += `<td style="text-align:center;border-left:2px solid var(--border);padding:10px 8px;">
-        <span class="grade-pill ${gc}">${mesStr}</span>
-        ${detaje ? '<div style="font-size:9px;color:var(--text-soft);margin-top:4px;">' + detaje + '</div>' : ''}
-      </td>`;
+      if (hapur) {
+        const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
+        const dinamike = kolonatDB.filter(k => k.lenda_id === l.id && k.periudha === p).map(k => k.emri);
+        const kolonat = [...fikse];
+        dinamike.forEach(k => { if (!kolonat.includes(k)) kolonat.push(k); });
+
+        let kolonatHTML = kolonat.map(k => {
+          const notaObj = arr.find(n => n.lloji === k);
+          const nota = notaObj ? notaObj.nota : null;
+          const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
+          return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:90px;vertical-align:top;">
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}</div>
+            <span class="grade-pill ${gc2}" style="font-size:16px;font-weight:700;">${nota !== null ? nota : '—'}</span>
+          </td>`;
+        }).join('');
+
+        html += `<td style="padding:0;border-left:2px solid var(--green-main);vertical-align:top;background:#f0faf5;">
+          <div onclick="togglePeriudhePrind(${p})" style="cursor:pointer;text-align:center;padding:6px;border-bottom:1px solid var(--border);background:var(--green-pale);">
+            <span style="font-size:11px;font-weight:600;color:var(--green-main);">P${p}: ${mesStr} ▲</span>
+          </div>
+          <table style="width:100%;border-collapse:collapse;"><tr>${kolonatHTML}</tr></table>
+        </td>`;
+      } else {
+        html += `<td style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(${p})">
+          <span class="grade-pill ${gc}">${mesStr}</span>
+          <div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>
+        </td>`;
+      }
     });
 
     html += `<td style="text-align:center;background:#f0faf5;padding:10px;">
@@ -934,6 +972,11 @@ async function loadFemijaData() {
   document.getElementById('femija-notat').innerHTML = html;
   document.getElementById('femija-notat').style.display = 'block';
   document.getElementById('femija-komentet').innerHTML = '';
+}
+
+function togglePeriudhePrind(p) {
+  periudhatHapuraPrind[p] = !periudhatHapuraPrind[p];
+  renderFemijaTabela();
 }
 
 function editoEmrinKolones(el, lendaId, periudha, emriAktual) {
