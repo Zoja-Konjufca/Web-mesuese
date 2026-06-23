@@ -794,28 +794,33 @@ async function loadKomentet() {
   window._komNotatMia = notatMia;
   const notaIds = notatMia.map(n => n.id);
 
+  const { data: prinderit } = await db.from('prinderit').select('*').in('nxenesi_id', nxenesIds);
+  const prindMap = {};
+  (prinderit || []).forEach(p => { prindMap[p.id] = p; });
+
   const { data: komentet } = await db.from('komentet_notave').select('*').in('nota_id', notaIds).order('krijuar_me', { ascending: true });
   if (!komentet || komentet.length === 0) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente nga prinderit.</p></div>'; return; }
 
-  // Merr te gjithe prinderit per keto nxenes
-  const { data: prinderit } = await db.from('prinderit').select('*').in('nxenesi_id', nxenesIds);
-
-  // Grupo komentet sipas prind_id
+  // Gjej cift prind-mesuese per secilen note me koment nga prindi
   const byPrind = {};
   komentet.forEach(k => {
-    const prindId = k.autori_lloji === 'prind' ? k.autori_id : null;
-    // Gjej prindin duke pare nota_id
     const nota = notaMap[k.nota_id];
     if (!nota) return;
     const nxenesi = allNxenesit.find(n => n.id === nota.nxenesi_id);
     if (!nxenesi) return;
-    // Gjej prinderit e ketij nxenesi
     const prindEtij = (prinderit || []).filter(p => p.nxenesi_id === nota.nxenesi_id);
-    const prindi = prindEtij[0]; // perdor prindin e pare si identifikues per kete nxenes
-    if (!prindi) return;
-    const key = nxenesi.id; // nje bisede per cdo nxenes
-    if (!byPrind[key]) byPrind[key] = { nxenesi, prindEtij, komentet: [] };
-    byPrind[key].komentet.push({ ...k, nota });
+
+    if (k.autori_lloji === 'prind') {
+      const prindi = prindMap[k.autori_id];
+      if (!prindi) return;
+      if (!byPrind[prindi.id]) byPrind[prindi.id] = { prindi, nxenesi, komentet: [], notaIdRef: nota.id };
+      byPrind[prindi.id].komentet.push({ ...k, nota });
+    } else {
+      // Koment i mesueses — shto te bisedat aktive me prinderit e ketij nxenesi
+      prindEtij.forEach(p => {
+        if (byPrind[p.id]) byPrind[p.id].komentet.push({ ...k, nota });
+      });
+    }
   });
 
   // Radho sipas mesazhit me te ri
@@ -826,49 +831,46 @@ async function loadKomentet() {
   });
 
   let html = '';
-  for (const [nxId, grup] of grupetRadhitura) {
-    const { nxenesi, prindEtij, komentet: komList } = grup;
+  for (const [prindId, grup] of grupetRadhitura) {
+    const { prindi, nxenesi, komentet: komList, notaIdRef } = grup;
     const fundit = komList[komList.length-1];
     const dataFundit = new Date(fundit.krijuar_me);
     const dataStr = dataFundit.toLocaleDateString('sq-AL', { day:'2-digit', month:'short' }) + ' ' + dataFundit.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
-    const chatId = 'chat_nx_' + nxId.replace(/-/g,'');
-    const kaPaLexuar = komList.some(k => k.autori_lloji === 'prind');
+    const pid = prindId.replace(/-/g,'');
+    const chatId = 'chat_pr_' + pid;
 
     html += `<div class="card" style="margin-bottom:10px;padding:0;overflow:hidden;">
-      <!-- Header i bisedes -->
-      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:white;" onclick="toggleChat('${chatId}','${nxId}')">
-        <div style="width:46px;height:46px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;">${nxenesi.emri[0]}${nxenesi.mbiemri[0]}</div>
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;" onclick="toggleChatPrind('${chatId}','${pid}')">
+        <div style="width:46px;height:46px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;flex-shrink:0;">${prindi.emri[0]}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;font-size:14px;">${nxenesi.emri} ${nxenesi.mbiemri} ${kaPaLexuar ? '<span style="background:#e65100;color:white;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px;">E re</span>' : ''}</div>
-          <div style="font-size:12px;color:var(--text-soft);margin-top:1px;">${prindEtij.map(p=>p.emri).join(', ')}</div>
+          <div style="font-weight:600;font-size:14px;">${prindi.emri}</div>
+          <div style="font-size:12px;color:var(--text-soft);margin-top:1px;">Prind i ${nxenesi.emri} ${nxenesi.mbiemri}</div>
           <div style="font-size:12px;color:var(--text-mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fundit.autori_lloji === 'prind' ? '👨‍👩‍👧' : '👩‍🏫 Une:'} ${fundit.teksti.substring(0,50)}${fundit.teksti.length>50?'...':''}</div>
         </div>
-        <div style="font-size:11px;color:var(--text-soft);flex-shrink:0;text-align:right;">${dataStr}</div>
+        <div style="font-size:11px;color:var(--text-soft);flex-shrink:0;">${dataStr}</div>
       </div>
 
-      <!-- Biseda e plote - chat style -->
       <div id="${chatId}" style="display:none;border-top:1px solid var(--border);">
-        <div id="mesazhet_${nxId.replace(/-/g,'')}" style="padding:14px 16px;max-height:350px;overflow-y:auto;background:#f7f9f5;display:flex;flex-direction:column;gap:8px;">
+        <div id="mesazhet_${pid}" style="padding:14px 16px;max-height:350px;overflow-y:auto;background:#f7f9f5;display:flex;flex-direction:column;gap:8px;">
           ${komList.map(k => {
             const d = new Date(k.krijuar_me);
-            const ds = d.toLocaleDateString('sq-AL', {day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'});
+            const ds = d.toLocaleDateString('sq-AL',{day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'});
             const isMesuese = k.autori_lloji === 'mesuese';
-            const konteksti = k.nota ? `<div style="font-size:10px;opacity:0.6;margin-bottom:3px;">${k.nota.lendet ? k.nota.lendet.emri : ''} · P${k.nota.periudha} · ${k.nota.lloji} · Nota ${k.nota.nota}</div>` : '';
+            const konteksti = (!isMesuese && k.nota) ? `<div style="font-size:10px;opacity:0.6;margin-bottom:3px;">${k.nota.lendet ? k.nota.lendet.emri : ''} · P${k.nota.periudha} · ${k.nota.lloji} · Nota ${k.nota.nota}</div>` : '';
             return `<div style="display:flex;justify-content:${isMesuese ? 'flex-end' : 'flex-start'};">
               <div style="max-width:78%;padding:9px 13px;border-radius:${isMesuese ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};background:${isMesuese ? 'var(--green-main)' : 'white'};color:${isMesuese ? 'white' : 'var(--text-dark)'};box-shadow:0 1px 4px rgba(0,0,0,0.08);">
-                ${!isMesuese ? konteksti : ''}
+                ${konteksti}
                 <div style="font-size:13px;">${k.teksti}</div>
                 <div style="font-size:10px;opacity:0.6;margin-top:4px;text-align:right;">${ds}</div>
               </div>
             </div>`;
           }).join('')}
         </div>
-        <!-- Input pergjigje -->
         <div style="padding:10px 14px;background:white;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);">
-          <input id="pergjigje_${nxId.replace(/-/g,'')}" type="text" placeholder="Shkruaj mesazh..." maxlength="200"
+          <input id="inp_pr_${pid}" type="text" placeholder="Shkruaj mesazh..." maxlength="200"
             style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:22px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:#f7f9f5;"
-            onkeydown="if(event.key==='Enter')pergjigjeKomentit('${nxId}','${nxId.replace(/-/g,'')}')">
-          <button onclick="pergjigjeKomentit('${nxId}','${nxId.replace(/-/g,'')}')" style="background:var(--green-main);color:white;border:none;border-radius:50%;width:40px;height:40px;min-width:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);">→</button>
+            onkeydown="if(event.key==='Enter')pergjigjeKomentit('${notaIdRef}','${pid}','${chatId}')">
+          <button onclick="pergjigjeKomentit('${notaIdRef}','${pid}','${chatId}')" style="background:var(--green-main);color:white;border:none;border-radius:50%;width:40px;height:40px;min-width:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">→</button>
         </div>
       </div>
     </div>`;
@@ -877,30 +879,24 @@ async function loadKomentet() {
   el.innerHTML = html || '<div class="empty-state"><p>Ende nuk ka komente.</p></div>';
 }
 
-function toggleChat(chatId, nxId) {
+function toggleChatPrind(chatId, pid) {
   const el = document.getElementById(chatId);
   if (!el) return;
   const isOpen = el.style.display !== 'none';
-  document.querySelectorAll('[id^="chat_nx_"]').forEach(c => c.style.display = 'none');
+  document.querySelectorAll('[id^="chat_pr_"]').forEach(c => c.style.display = 'none');
   if (!isOpen) {
     el.style.display = 'block';
-    const mesazhet = document.getElementById('mesazhet_' + nxId.replace(/-/g,''));
+    const mesazhet = document.getElementById('mesazhet_' + pid);
     if (mesazhet) setTimeout(() => { mesazhet.scrollTop = mesazhet.scrollHeight; }, 50);
   }
 }
 
-async function pergjigjeKomentit(nxId, nxIdClean) {
-  const inp = document.getElementById('pergjigje_' + nxIdClean);
+async function pergjigjeKomentit(notaId, pid, chatId) {
+  const inp = document.getElementById('inp_pr_' + pid);
   if (!inp) return;
   const teksti = inp.value.trim();
   if (!teksti) return;
   inp.value = '';
-
-  // Gjej notat e fundit te ketij nxenesi per te lidhur komentin
-  const notatNx = (window._komNotatMia || []).filter(n => n.nxenesi_id === nxId);
-  if (notatNx.length === 0) return;
-  const notaId = notatNx[0].id;
-
   await db.from('komentet_notave').insert({
     nota_id: notaId,
     autori_lloji: 'mesuese',
@@ -908,14 +904,11 @@ async function pergjigjeKomentit(nxId, nxIdClean) {
     teksti: teksti
   });
   await loadKomentet();
-  // Rihap biseden
   setTimeout(() => {
-    const chatEl = document.getElementById('chat_nx_' + nxIdClean);
-    if (chatEl) {
-      chatEl.style.display = 'block';
-      const mesazhet = document.getElementById('mesazhet_' + nxIdClean);
-      if (mesazhet) mesazhet.scrollTop = mesazhet.scrollHeight;
-    }
+    const el = document.getElementById(chatId);
+    if (el) { el.style.display = 'block'; }
+    const mesazhet = document.getElementById('mesazhet_' + pid);
+    if (mesazhet) mesazhet.scrollTop = mesazhet.scrollHeight;
   }, 300);
 }
 
