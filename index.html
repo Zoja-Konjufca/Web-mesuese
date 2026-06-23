@@ -974,8 +974,8 @@ function renderFemijaTabela() {
             <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}${eRe ? ' <span style="color:#e65100;font-size:9px;">● E RE</span>' : ''}</div>
             <span class="grade-pill ${gc2}" style="font-size:16px;font-weight:700;${eRe ? 'background:#ffb74d;color:#5d2c00;' : ''}">${nota !== null ? nota : '—'}</span>
             ${notaId && nota !== null ? `
-            <div style="margin-top:6px;position:relative;display:inline-block;">
-              <span onclick="togglePanelPrind('${panelId}','${notaId}')" style="cursor:pointer;font-size:13px;" title="Detaje & Komente">ℹ️</span>
+            <div style="margin-top:6px;">
+              <span onclick="togglePanelPrind('${panelId}','${notaId}')" style="cursor:pointer;font-size:13px;display:block;text-align:center;" title="Detaje & Komente">ℹ️</span>
             </div>
             <div id="${panelId}" style="display:none;margin-top:8px;text-align:left;background:white;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;">
               <div style="color:var(--text-soft);margin-bottom:6px;">📅 ${dataStr} &nbsp; 🕐 ${oraStr}</div>
