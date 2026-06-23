@@ -875,6 +875,7 @@ async function loadFemijaData() {
   const { data: lexuara } = await db.from('notat_te_lexuara').select('nota_id').eq('prind_id', currentPrind.id);
   notatELexuara = new Set((lexuara || []).map(l => l.nota_id));
 
+
   window._prindNotat = notat || [];
   window._prindLendet = lendet || [];
   window._prindKolonat = kolonatDB || [];
@@ -894,7 +895,7 @@ function renderFemijaTabela() {
     if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
     const p = n.periudha || 1;
     if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
-    byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji, id: n.id });
+    byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji, id: n.id, data: n.data_shenimit });
   });
 
   let html = `<div style="overflow-x:auto;">
@@ -950,12 +951,16 @@ function renderFemijaTabela() {
           const notaObj = arr.find(n => n.lloji === k);
           const nota = notaObj ? notaObj.nota : null;
           const notaId = notaObj ? notaObj.id : null;
+          const notaData = notaObj && notaObj.data ? new Date(notaObj.data) : null;
+          const dataStr = notaData ? notaData.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', year:'numeric' }) : '';
+          const oraStr = notaData ? notaData.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' }) : '';
           const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
           const eRe = notaId && !notatELexuara.has(notaId) && nota !== null;
 
           return `<td style="text-align:center;padding:8px 6px;background:${eRe ? '#fff8e1' : '#f8fffe'};border-left:1px solid var(--green-ultra);min-width:90px;vertical-align:top;${eRe ? 'border-top:2px solid #ffb74d;' : ''}">
             <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}${eRe ? ' <span style="color:#e65100;font-size:9px;">● E RE</span>' : ''}</div>
             <span class="grade-pill ${gc2}" style="font-size:16px;font-weight:700;${eRe ? 'background:#ffb74d;color:#5d2c00;' : ''}">${nota !== null ? nota : '—'}</span>
+            ${notaData ? `<div style="font-size:9px;color:var(--text-soft);margin-top:5px;">📅 ${dataStr}</div><div style="font-size:9px;color:var(--text-soft);">🕐 ${oraStr}</div>` : ''}
           </td>`;
         }).join('');
 
