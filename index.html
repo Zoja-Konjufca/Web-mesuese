@@ -218,6 +218,12 @@
       </div>
       <div id="mesueset-list"></div>
     </div>
+    <div class="panel" id="panel-komentet">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Komentet me Prinderit</h2>
+      </div>
+      <div id="komentet-list"><div class="empty-state"><p>Duke ngarkuar...</p></div></div>
+    </div>
     <div class="panel" id="panel-femija">
       <div class="prind-header" id="prind-header"><h2 id="femija-emri">—</h2><p id="femija-klasa">—</p></div>
       <div class="card"><div class="card-title">Notat sipas lendes</div><div class="subject-grid" id="femija-notat"></div></div>
@@ -377,7 +383,7 @@ async function showApp() {
 
 async function buildMesueseUI() {
   const isAdmin = currentUser.roli === 'admin';
-  const tabs = [{ id:'ballina', label:'Ballina' }, { id:'nxenesit', label:'Nxenesit' }];
+  const tabs = [{ id:'ballina', label:'Ballina' }, { id:'nxenesit', label:'Nxenesit' }, { id:'komentet', label:'💬 Komentet' }];
   if (isAdmin) tabs.push({ id:'mesueset', label:'Mesueset' });
   buildTabs(tabs, 'ballina');
   await loadLendet();
@@ -385,6 +391,7 @@ async function buildMesueseUI() {
   await loadBallina();
   if (isAdmin) { await loadMesueset(); document.getElementById('btn-shto-nxenes').style.display = 'none'; }
   if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
+  await loadKomentet();
 }
 
 function buildTabs(tabs, active) {
@@ -772,7 +779,95 @@ async function dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona)
   }
 }
 
-async function loadBallina() {
+async function loadKomentet() {
+  const el = document.getElementById('komentet-list');
+  if (!el) return;
+
+  // Merr te gjitha komentet e prindërve per nxenesit e kesaj mesuese
+  let nxenesIds = allNxenesit.map(n => n.id);
+  if (nxenesIds.length === 0) {
+    el.innerHTML = '<div class="empty-state"><p>Nuk ka nxenes.</p></div>';
+    return;
+  }
+
+  const { data: notatMia } = await db.from('notat').select('id, nxenesi_id, lenda_id, lloji, periudha, lendet(emri)').in('nxenesi_id', nxenesIds);
+  if (!notatMia || notatMia.length === 0) {
+    el.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente.</p></div>';
+    return;
+  }
+
+  const notaMap = {};
+  notatMia.forEach(n => { notaMap[n.id] = n; });
+  const notaIds = notatMia.map(n => n.id);
+
+  const { data: komentet } = await db.from('komentet_notave').select('*').in('nota_id', notaIds).order('krijuar_me', { ascending: false });
+
+  if (!komentet || komentet.length === 0) {
+    el.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente nga prinderit.</p></div>';
+    return;
+  }
+
+  // Grupo komentet sipas notes
+  const grouped = {};
+  komentet.forEach(k => {
+    if (!grouped[k.nota_id]) grouped[k.nota_id] = [];
+    grouped[k.nota_id].push(k);
+  });
+
+  let html = '';
+  for (const [notaId, komList] of Object.entries(grouped)) {
+    const nota = notaMap[notaId];
+    if (!nota) continue;
+    const nxenesi = allNxenesit.find(n => n.id === nota.nxenesi_id);
+    const emri = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '—';
+    const lenda = nota.lendet ? nota.lendet.emri : '—';
+
+    html += `<div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;">${nxenesi ? nxenesi.emri[0]+nxenesi.mbiemri[0] : '?'}</div>
+        <div>
+          <div style="font-weight:600;font-size:14px;">${emri}</div>
+          <div style="font-size:12px;color:var(--text-soft);">${lenda} · P${nota.periudha} · ${nota.lloji}</div>
+        </div>
+      </div>`;
+
+    komList.forEach(k => {
+      const d = new Date(k.krijuar_me);
+      const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', year:'numeric' }) + ' ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+      const isMesuese = k.autori_lloji === 'mesuese';
+      html += `<div style="margin-bottom:8px;padding:8px 10px;border-radius:8px;background:${isMesuese ? 'var(--green-pale)' : '#f0f4ff'};border-left:3px solid ${isMesuese ? 'var(--green-main)' : '#4a72b8'};">
+        <div style="font-size:11px;font-weight:600;color:${isMesuese ? 'var(--green-main)' : '#4a72b8'};margin-bottom:3px;">${isMesuese ? '👩‍🏫 Une' : '👨‍👩‍👧 Prindi'} · ${ds}</div>
+        <div style="font-size:13px;color:var(--text-dark);">${k.teksti}</div>
+      </div>`;
+    });
+
+    // Input per pergjigje nga mesuese
+    html += `<div style="display:flex;gap:6px;margin-top:8px;">
+      <input id="pergjigje_${notaId}" type="text" placeholder="Shkruaj pergjigje..." maxlength="200"
+        style="flex:1;padding:8px 10px;border:1.5px solid var(--border);border-radius:6px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"
+        onkeydown="if(event.key==='Enter')pergjigjeKomentit('${notaId}')">
+      <button onclick="pergjigjeKomentit('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:6px;padding:8px 14px;cursor:pointer;font-size:13px;font-weight:600;">→</button>
+    </div>
+    </div>`;
+  }
+
+  el.innerHTML = html || '<div class="empty-state"><p>Ende nuk ka komente nga prinderit.</p></div>';
+}
+
+async function pergjigjeKomentit(notaId) {
+  const inp = document.getElementById('pergjigje_' + notaId);
+  if (!inp) return;
+  const teksti = inp.value.trim();
+  if (!teksti) return;
+  inp.value = '';
+  await db.from('komentet_notave').insert({
+    nota_id: notaId,
+    autori_lloji: 'mesuese',
+    autori_id: currentUser.id,
+    teksti: teksti
+  });
+  await loadKomentet();
+}
   let nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true });
   let noQuery = db.from('notat').select('*', { count: 'exact', head: true });
   let prCount = 0;
