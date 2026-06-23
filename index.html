@@ -146,7 +146,6 @@
   .nota-input-cell .save-status { font-size: 10px; color: var(--text-soft); height: 14px; transition: color 0.2s; }
   .nota-input-cell .save-status.ok { color: var(--green-main); font-weight: 600; }
   .nota-input-cell .save-status.duke-ruajtur { color: var(--gold); }
-  /* Kolona e re input */
   .new-col-input { width: 90px; padding: 5px 4px; border: 2px dashed var(--green-light); border-radius: 6px; font-size: 12px; text-align: center; font-family: 'DM Sans', sans-serif; outline: none; color: var(--text-mid); }
   .new-col-input:focus { border-color: var(--green-main); border-style: solid; }
   @media (max-width: 600px) { .content { padding: 14px; } .login-card { padding: 28px 22px; } .detail-content { padding: 14px; } }
@@ -289,6 +288,7 @@
 <script>
 const SUPA_URL = 'https://ntbxxsqcfzwpgblysfkw.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im50Ynh4c3FjZnp3cGdibHlzZmt3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc5MDM5NjksImV4cCI6MjA5MzQ3OTk2OX0.Dl4pXIFiP23gcYndjgBVL0kdjPBjRLsxsO2o8uhezgk';
+const EDGE_URL = 'https://ntbxxsqcfzwpgblysfkw.supabase.co/functions/v1/dergo-email';
 const { createClient } = supabase;
 const db = createClient(SUPA_URL, SUPA_KEY);
 
@@ -454,7 +454,6 @@ async function shfaqDetailNxenes(id) {
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', id).order('data_shenimit', { ascending: true });
   const { data: prinderit } = await db.from('prinderit').select('*').eq('nxenesi_id', id);
 
-  // Ngarko kolonat e mesueses nga DB
   const { data: kolonatDB } = await db.from('kolonat_lendeve').select('*').eq('mesuese_id', currentUser.id).order('renditja', { ascending: true });
   window._kolonatDB = kolonatDB || [];
 
@@ -477,13 +476,11 @@ async function shfaqDetailNxenes(id) {
   renderDetailPage();
 }
 
-// Merr kolonat per nje lende dhe periudhe (fikse + dinamike)
 function getKolonatPerLende(lendaId, periudha) {
   const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
   const dinamike = (window._kolonatDB || [])
     .filter(k => k.lenda_id === lendaId && k.periudha === periudha)
     .map(k => k.emri);
-  // Bashko: fikse + dinamike (pa dyfishime)
   const te_gjitha = [...fikse];
   dinamike.forEach(k => { if (!te_gjitha.includes(k)) te_gjitha.push(k); });
   return te_gjitha;
@@ -561,7 +558,6 @@ function renderDetailPage() {
           </td>`;
         }).join('');
 
-        // Butoni + Shto kolone te re
         const newId = `new_${l.id}_${p}`;
         kolonatHTML += `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:2px dashed var(--green-light);min-width:110px;vertical-align:top;">
           <div style="font-size:10px;color:var(--green-main);margin-bottom:6px;font-weight:600;">+ Kolone e re</div>
@@ -624,14 +620,12 @@ function toggleTePeriudhat(idx) {
   renderDetailPage();
 }
 
-// Shto kolone te re per nje lende dhe periudhe
 async function shtoKolone(lendaId, periudha, inputId) {
   const inp = document.getElementById(inputId);
   if (!inp) return;
   const emri = inp.value.trim();
   if (!emri) return;
 
-  // Kontrollo nese ekziston
   const ekziston = (window._kolonatDB || []).find(k => k.lenda_id === lendaId && k.periudha === periudha && k.emri === emri);
   const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
   if (ekziston || fikse.includes(emri)) { inp.value = ''; return; }
@@ -682,7 +676,6 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
   const statusEl = document.getElementById('status_' + inputId);
   const inp = document.getElementById(inputId);
   try {
-    // Fshij noten e vjeter
     const { data: notatEkz } = await db.from('notat').select('id').eq('nxenesi_id', nxenesId).eq('lenda_id', lendaId).eq('periudha', periudha).eq('lloji', kolona);
     if (notatEkz && notatEkz.length > 0) await db.from('notat').delete().eq('id', notatEkz[0].id);
 
@@ -692,7 +685,6 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
     });
     if (error) throw error;
 
-    // Fresko te dhenat lokale
     const { data: notatRe } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxenesId).order('data_shenimit', { ascending: true });
     const byLendeRe = {};
     if (notatRe) {
@@ -710,10 +702,9 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
     if (inp) { inp.classList.remove('saving'); inp.classList.add('saved'); }
     if (statusEl) { statusEl.textContent = '✓ e ruajtur'; statusEl.className = 'save-status ok'; }
 
-    // Dergo email njoftim te prinderi
+    // Dergo email njoftim te prinderi — perdor Edge Function
     dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona);
 
-    // Perditeso mesataren ne header
     const arr = (byLendeRe[lendaId] && byLendeRe[lendaId].periudhat[periudha]) || [];
     const notatP = arr.filter(n => n.nota !== null).map(n => n.nota);
     const mesP = notatP.length > 0 ? (notatP.reduce((a,b)=>a+b,0)/notatP.length).toFixed(1) : '—';
@@ -728,18 +719,14 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
   _ruajtjeNeProcees[timerKey] = false;
 }
 
-
 async function dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona) {
   try {
-    // Merr te dhenat e nxenesit
     const nxenesi = allNxenesit.find(n => n.id === nxenesId);
     if (!nxenesi) return;
 
-    // Merr lenden
     const lenda = allLendet.find(l => l.id === lendaId);
     if (!lenda) return;
 
-    // Merr prinderit me email
     const { data: prinderit } = await db.from('prinderit')
       .select('emri, email')
       .eq('nxenesi_id', nxenesId)
@@ -748,39 +735,24 @@ async function dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona)
     if (!prinderit || prinderit.length === 0) return;
 
     const nxenesEmri = nxenesi.emri + ' ' + nxenesi.mbiemri;
-    const mesuesesEmri = currentUser.emri;
-    const notaShkronja = ['', 'Shume dobet', 'Dobet', 'Mjaftueshem', 'Mire', 'Shkelqyeshem'][nota] || nota;
 
     for (const prind of prinderit) {
       if (!prind.email) continue;
 
-      await fetch('https://api.resend.com/emails', {
+      // Thjerr Edge Function (jo Resend direkt — shmang CORS)
+      await fetch(EDGE_URL, {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer re_C7DsbLRD_B78BEcS29GgiadA54kDi8SbB',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + SUPA_KEY
         },
         body: JSON.stringify({
-          from: 'Ditari i Mesueses <njoftimet@zoja.life>',
-          to: [prind.email],
-          subject: 'Nota e re per ' + nxenesEmri,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-              <div style="background: #1a5c3a; padding: 20px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
-                <h1 style="color: white; margin: 0; font-size: 1.5rem;">Ditari i Mesueses</h1>
-              </div>
-              <p>Pershendetje <strong>${prind.emri}</strong>,</p>
-              <p>Mesuese <strong>${mesuesesEmri}</strong> ka vendosur nje note te re per femijen tuaj:</p>
-              <div style="background: #e8f5ee; border-radius: 10px; padding: 20px; margin: 20px 0; text-align: center;">
-                <p style="margin: 0; font-size: 14px; color: #6b8a78;">Nxenesi</p>
-                <p style="margin: 5px 0; font-size: 1.2rem; font-weight: bold;">${nxenesEmri}</p>
-                <p style="margin: 10px 0; font-size: 14px; color: #6b8a78;">Lenda: ${lenda.emri} | Periudha ${periudha} | ${kolona}</p>
-                <div style="background: #1a5c3a; color: white; border-radius: 50%; width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; margin: 10px auto;">${nota}</div>
-                <p style="margin: 5px 0; color: #1a5c3a; font-weight: bold;">${notaShkronja}</p>
-              </div>
-              <p style="color: #6b8a78; font-size: 12px; text-align: center;">Ky eshte nje njoftim automatik nga platforma Ditari i Mesueses</p>
-            </div>
-          `
+          email_prindi: prind.email,
+          emri_nxenesit: nxenesEmri,
+          lenda: lenda.emri,
+          nota: nota,
+          kategoria: kolona,
+          periudha: 'P' + periudha
         })
       });
     }
