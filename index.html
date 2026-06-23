@@ -544,6 +544,7 @@ function renderDetailPage() {
         let kolonatHTML = kolonat.map(k => {
           const notaObj = arr.find(n => n.lloji === k);
           const nota = notaObj ? notaObj.nota : null;
+          const notaId = notaObj ? notaObj.id : null;
           const safeKey = k.replace(/[^a-zA-Z0-9]/g,'_');
           const inputId = `inp_${l.id}_${p}_${safeKey}`;
           const timerKey = `${l.id}_${p}_${k}`;
@@ -555,6 +556,16 @@ function renderDetailPage() {
                 onkeydown="if(event.key==='Enter'){clearTimeout(_debounceTimers['${timerKey}']); autoSaveNota('${l.id}',${p},'${k}','${inputId}','${timerKey}',true)}">
               <div class="save-status" id="status_${inputId}">${nota !== null ? '✓ e ruajtur' : ''}</div>
             </div>
+            ${nota !== null && notaId ? `<div style="margin-top:4px;"><span onclick="togglePanelMesuese('panel_m_${notaId}',' ${notaId}')" style="cursor:pointer;font-size:11px;color:var(--green-main);">💬 Koment</span></div>
+            <div id="panel_m_${notaId}" style="display:none;margin-top:6px;text-align:left;">
+              <div id="komentet_m_${notaId}" style="margin-bottom:4px;"></div>
+              <div style="display:flex;gap:4px;">
+                <input id="inp_km_${notaId}" type="text" placeholder="Koment..." maxlength="200"
+                  style="flex:1;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;"
+                  onkeydown="if(event.key==='Enter')shtoKomentMesuese('${notaId}')">
+                <button onclick="shtoKomentMesuese('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;">→</button>
+              </div>
+            </div>` : ''}
           </td>`;
         }).join('');
 
@@ -957,16 +968,23 @@ function renderFemijaTabela() {
           const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
           const eRe = notaId && !notatELexuara.has(notaId) && nota !== null;
           const tooltipId = 'tip_' + (notaId || Math.random().toString(36).slice(2));
+          const panelId = 'panel_' + (notaId || Math.random().toString(36).slice(2));
 
           return `<td style="text-align:center;padding:8px 6px;background:${eRe ? '#fff8e1' : '#f8fffe'};border-left:1px solid var(--green-ultra);min-width:90px;vertical-align:top;${eRe ? 'border-top:2px solid #ffb74d;' : ''}">
             <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}${eRe ? ' <span style="color:#e65100;font-size:9px;">● E RE</span>' : ''}</div>
             <span class="grade-pill ${gc2}" style="font-size:16px;font-weight:700;${eRe ? 'background:#ffb74d;color:#5d2c00;' : ''}">${nota !== null ? nota : '—'}</span>
-            ${notaData ? `
+            ${notaId && nota !== null ? `
             <div style="margin-top:6px;position:relative;display:inline-block;">
-              <span onclick="toggleTooltip('${tooltipId}')" style="cursor:pointer;font-size:13px;color:var(--green-main);" title="Detaje">ℹ️</span>
-              <div id="${tooltipId}" style="display:none;position:absolute;bottom:24px;left:50%;transform:translateX(-50%);background:#1a5c3a;color:white;border-radius:8px;padding:6px 10px;font-size:11px;white-space:nowrap;z-index:99;box-shadow:0 4px 12px rgba(0,0,0,0.2);">
-                📅 ${dataStr}<br>🕐 ${oraStr}
-                <div style="position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:5px solid #1a5c3a;"></div>
+              <span onclick="togglePanelPrind('${panelId}','${notaId}')" style="cursor:pointer;font-size:13px;" title="Detaje & Komente">ℹ️</span>
+            </div>
+            <div id="${panelId}" style="display:none;margin-top:8px;text-align:left;background:white;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;">
+              <div style="color:var(--text-soft);margin-bottom:6px;">📅 ${dataStr} &nbsp; 🕐 ${oraStr}</div>
+              <div id="komentet_${notaId}" style="margin-bottom:8px;"></div>
+              <div style="display:flex;gap:6px;">
+                <input id="inp_koment_${notaId}" type="text" placeholder="Shkruaj koment..." maxlength="200"
+                  style="flex:1;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;"
+                  onkeydown="if(event.key==='Enter')shtoKomentPrind('${notaId}')">
+                <button onclick="shtoKomentPrind('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px;">→</button>
               </div>
             </div>` : ''}
           </td>`;
@@ -1050,21 +1068,84 @@ function editoEmrinKolones(el, lendaId, periudha, emriAktual) {
   inp.onkeydown = e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') { inp.value = emriAktual; inp.blur(); } };
 }
 
-function toggleTooltip(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  const isOpen = el.style.display !== 'none';
-  // Mbyll te gjitha tooltip-et e hapura
-  document.querySelectorAll('[id^="tip_"]').forEach(t => t.style.display = 'none');
-  if (!isOpen) el.style.display = 'block';
+async function togglePanelMesuese(panelId, notaId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    const el = document.getElementById('komentet_m_' + notaId);
+    if (!el) return;
+    const { data: komentet } = await db.from('komentet_notave').select('*').eq('nota_id', notaId).order('krijuar_me', { ascending: true });
+    if (!komentet || komentet.length === 0) { el.innerHTML = ''; return; }
+    el.innerHTML = komentet.map(k => {
+      const isMesuese = k.autori_lloji === 'mesuese';
+      return `<div style="margin-bottom:4px;padding:4px 6px;border-radius:4px;background:${isMesuese ? 'var(--green-pale)' : '#f0f4ff'};font-size:11px;">
+        <span style="font-weight:600;color:${isMesuese ? 'var(--green-main)' : '#4a72b8'};">${isMesuese ? '👩‍🏫' : '👨‍👩‍👧'}</span> ${k.teksti}
+      </div>`;
+    }).join('');
+  }
 }
 
-// Mbyll tooltip kur klikohet jashte
-document.addEventListener('click', e => {
-  if (!e.target.closest('[id^="tip_"]') && e.target.textContent !== 'ℹ️') {
-    document.querySelectorAll('[id^="tip_"]').forEach(t => t.style.display = 'none');
+async function shtoKomentMesuese(notaId) {
+  const inp = document.getElementById('inp_km_' + notaId);
+  if (!inp) return;
+  const teksti = inp.value.trim();
+  if (!teksti) return;
+  inp.value = '';
+  await db.from('komentet_notave').insert({
+    nota_id: notaId,
+    autori_lloji: 'mesuese',
+    autori_id: currentUser.id,
+    teksti: teksti
+  });
+  await togglePanelMesuese('panel_m_' + notaId, notaId);
+  await togglePanelMesuese('panel_m_' + notaId, notaId);
+}
+
+async function togglePanelPrind(panelId, notaId) {
+  const panel = document.getElementById(panelId);
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) {
+    await ngarkoKomentetPrind(notaId);
   }
-});
+}
+
+async function ngarkoKomentetPrind(notaId) {
+  const el = document.getElementById('komentet_' + notaId);
+  if (!el) return;
+  const { data: komentet } = await db.from('komentet_notave').select('*').eq('nota_id', notaId).order('krijuar_me', { ascending: true });
+  if (!komentet || komentet.length === 0) {
+    el.innerHTML = '<div style="font-size:11px;color:var(--text-soft);font-style:italic;">Ende nuk ka komente.</div>';
+    return;
+  }
+  el.innerHTML = komentet.map(k => {
+    const d = new Date(k.krijuar_me);
+    const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short' }) + ' ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+    const isMesuese = k.autori_lloji === 'mesuese';
+    return `<div style="margin-bottom:6px;padding:6px 8px;border-radius:6px;background:${isMesuese ? 'var(--green-pale)' : '#f0f4ff'};border-left:3px solid ${isMesuese ? 'var(--green-main)' : '#4a72b8'};">
+      <div style="font-size:10px;font-weight:600;color:${isMesuese ? 'var(--green-main)' : '#4a72b8'};">${isMesuese ? '👩‍🏫 Mesuese' : '👨‍👩‍👧 Prind'} · ${ds}</div>
+      <div style="font-size:12px;color:var(--text-dark);margin-top:2px;">${k.teksti}</div>
+    </div>`;
+  }).join('');
+}
+
+async function shtoKomentPrind(notaId) {
+  const inp = document.getElementById('inp_koment_' + notaId);
+  if (!inp) return;
+  const teksti = inp.value.trim();
+  if (!teksti) return;
+  inp.value = '';
+  await db.from('komentet_notave').insert({
+    nota_id: notaId,
+    autori_lloji: 'prind',
+    autori_id: currentPrind.id,
+    teksti: teksti
+  });
+  await ngarkoKomentetPrind(notaId);
+}
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
