@@ -845,7 +845,7 @@ async function shtoMesuese() {
   sukEl.style.display = 'none'; errEl.style.display = 'none';
   if (!emri || !email || !pass || !roli) { errEl.textContent = 'Ploteso te gjitha fushat.'; errEl.style.display = 'block'; return; }
   const klasa = document.getElementById('sm-klasa').value;
-  const { error } = await db.from('mesueset').insert({ emri, email, fjalekalimi: pass, roli, aktive: false, paguar: false, iban_konfirmim: iban || null, klasa: klasa || null });
+  const { error } = await db.from('mesueset').insert({ emri, email, fjalekalimi: pass, roli, aktive: true, paguar: false, iban_konfirmim: iban || null, klasa: klasa || null });
   if (error) { errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashme.' : 'Gabim gjate shtimit.'; errEl.style.display = 'block'; return; }
   sukEl.textContent = '✓ Mesuese u shtua!'; sukEl.style.display = 'block';
   ['sm-emri','sm-email','sm-pass','sm-iban'].forEach(id => document.getElementById(id).value = '');
