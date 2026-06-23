@@ -813,7 +813,7 @@ async function shtoNxenes() {
     const kod2 = 'PR-' + Math.random().toString(36).substring(2,8).toUpperCase();
     await db.from('prinderit').insert({ nxenesi_id: nx.id, emri: p2emri, nr_telefoni: document.getElementById('sn-p2-tel').value.trim() || null, email: document.getElementById('sn-p2-email').value.trim() || null, kodi_qasjes: kod2 });
   }
-  sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi: ${kod1}`; sukEl.style.display = 'block';
+  sukEl.textContent = `✓ ${emri} ${mbiemri} u shtua! Kodi Prindi 1: ${kod1}${p2emri ? ' | Kodi Prindi 2: ' + kod2 : ''}`; sukEl.style.display = 'block';
   ['sn-emri','sn-mbiemri','sn-p1-emri','sn-p1-tel','sn-p1-email','sn-p2-emri','sn-p2-tel','sn-p2-email'].forEach(id => document.getElementById(id).value = '');
   await loadNxenesit(); await loadBallina();
 }
@@ -845,7 +845,7 @@ async function shtoMesuese() {
   sukEl.style.display = 'none'; errEl.style.display = 'none';
   if (!emri || !email || !pass || !roli) { errEl.textContent = 'Ploteso te gjitha fushat.'; errEl.style.display = 'block'; return; }
   const klasa = document.getElementById('sm-klasa').value;
-  const { error } = await db.from('mesueset').insert({ emri, email, fjalekalimi: pass, roli, aktive: true, paguar: false, iban_konfirmim: iban || null, klasa: klasa || null });
+  const { error } = await db.from('mesueset').insert({ emri, email, fjalekalimi: pass, roli, aktive: false, paguar: false, iban_konfirmim: iban || null, klasa: klasa || null });
   if (error) { errEl.textContent = error.code === '23505' ? 'Ky email ekziston tashme.' : 'Gabim gjate shtimit.'; errEl.style.display = 'block'; return; }
   sukEl.textContent = '✓ Mesuese u shtua!'; sukEl.style.display = 'block';
   ['sm-emri','sm-email','sm-pass','sm-iban'].forEach(id => document.getElementById(id).value = '');
@@ -863,17 +863,77 @@ async function loadFemijaData() {
   if (!nx) return;
   document.getElementById('femija-emri').textContent = nx.emri + ' ' + nx.mbiemri;
   document.getElementById('femija-klasa').textContent = nx.klasat ? nx.klasat.emri : '';
-  const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: false });
+
+  const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: true });
+  const { data: lendet } = await db.from('lendet').select('*').order('emri');
+
   const byLende = {};
-  if (notat) notat.forEach(n => { if (!byLende[n.lenda_id]) byLende[n.lenda_id] = n; });
-  const notaEl = document.getElementById('femija-notat');
-  const vals = Object.values(byLende);
-  if (!vals.length) { notaEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka nota.</p></div>'; }
-  else { notaEl.innerHTML = vals.map(n => `<div class="subject-tile"><div class="s-name">${n.lendet ? n.lendet.emri : '—'}</div><div class="s-grade">${n.nota}</div><div style="height:4px;background:var(--border);border-radius:99px;margin-top:6px;"><div style="height:4px;border-radius:99px;background:var(--green-main);width:${n.nota*20}%;"></div></div></div>`).join(''); }
-  const komentEl = document.getElementById('femija-komentet');
-  const meKoment = notat ? notat.filter(n => n.koment).slice(0,5) : [];
-  if (!meKoment.length) { komentEl.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente.</p></div>'; }
-  else { komentEl.innerHTML = meKoment.map(n => { const d = new Date(n.data_shenimit); const ds = d.toLocaleDateString('sq-AL', {day:'2-digit',month:'long',year:'numeric'}); return `<div style="background:var(--green-ultra);border-left:3px solid var(--green-light);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 14px;margin-bottom:10px;"><div style="font-size:12px;font-weight:600;color:var(--green-main);">${n.lendet?n.lendet.emri:''} — Nota ${n.nota}</div><div style="font-size:14px;color:var(--text-dark);margin-top:4px;">${n.koment}</div><div style="font-size:11px;color:var(--text-soft);margin-top:4px;">📅 ${ds}</div></div>`; }).join(''); }
+  if (notat) {
+    notat.forEach(n => {
+      if (!n.lendet) return;
+      if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
+      const p = n.periudha || 1;
+      if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
+      byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji });
+    });
+  }
+
+  let html = `<div style="overflow-x:auto;">
+    <table class="notat-tabela" style="min-width:600px;border-collapse:collapse;width:100%;">
+      <thead>
+        <tr>
+          <th style="vertical-align:middle;padding:12px 14px;">Lenda</th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P1</th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P2</th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P3</th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;">P4</th>
+          <th style="text-align:center;background:var(--green-mid);color:white;padding:12px 8px;">Mesatare</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+  (lendet || []).forEach(l => {
+    const lData = byLende[l.id];
+    const periudhat = lData ? lData.periudhat : {};
+
+    const mesPerPeriudhe = [1,2,3,4].map(p => {
+      const arr = periudhat[p] || [];
+      const notatP = arr.filter(n => n.nota !== null).map(n => n.nota);
+      if (notatP.length === 0) return null;
+      return notatP.reduce((a,b) => a+b, 0) / notatP.length;
+    });
+
+    const periudhatMeNote = mesPerPeriudhe.filter(m => m !== null);
+    const mesatare = periudhatMeNote.length > 0
+      ? (periudhatMeNote.reduce((a,b) => a+b, 0) / periudhatMeNote.length).toFixed(1)
+      : null;
+    const gcFinal = mesatare ? (['','g1','g2','g3','g4','g5'][Math.round(parseFloat(mesatare))] || 'gx') : 'gx';
+
+    html += `<tr><td style="font-weight:500;padding:12px 14px;">${l.emri}</td>`;
+
+    [1,2,3,4].forEach((p, idx) => {
+      const mes = mesPerPeriudhe[idx];
+      const mesStr = mes !== null ? mes.toFixed(1) : '—';
+      const gc = mes !== null ? (['','g1','g2','g3','g4','g5'][Math.round(mes)] || 'gx') : 'gx';
+      const arr = periudhat[p] || [];
+      const detaje = arr.map(n => n.lloji + ': ' + n.nota).join(' | ');
+
+      html += `<td style="text-align:center;border-left:2px solid var(--border);padding:10px 8px;">
+        <span class="grade-pill ${gc}">${mesStr}</span>
+        ${detaje ? '<div style="font-size:9px;color:var(--text-soft);margin-top:4px;">' + detaje + '</div>' : ''}
+      </td>`;
+    });
+
+    html += `<td style="text-align:center;background:#f0faf5;padding:10px;">
+      <span class="grade-pill ${gcFinal}" style="font-weight:700;">${mesatare || '—'}</span>
+    </td></tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  document.getElementById('femija-notat').innerHTML = html;
+  document.getElementById('femija-notat').style.display = 'block';
+  document.getElementById('femija-komentet').innerHTML = '';
 }
 
 function editoEmrinKolones(el, lendaId, periudha, emriAktual) {
