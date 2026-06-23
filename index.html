@@ -868,6 +868,8 @@ async function pergjigjeKomentit(notaId) {
   });
   await loadKomentet();
 }
+
+async function loadBallina() {
   let nxQuery = db.from('nxenesit').select('*', { count: 'exact', head: true });
   let noQuery = db.from('notat').select('*', { count: 'exact', head: true });
   let prCount = 0;
