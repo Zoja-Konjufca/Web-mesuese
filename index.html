@@ -1253,12 +1253,46 @@ async function shtoKomentPrind(notaId) {
   const teksti = inp.value.trim();
   if (!teksti) return;
   inp.value = '';
+
   await db.from('komentet_notave').insert({
     nota_id: notaId,
     autori_lloji: 'prind',
     autori_id: currentPrind.id,
     teksti: teksti
   });
+
+  // Dergo email njoftim te mesuese
+  try {
+    const notat = window._prindNotat || [];
+    const notaObj = notat.find(n => n.id === notaId);
+    const lendet = window._prindLendet || [];
+    const nxId = window._prindNxId;
+
+    if (notaObj) {
+      const lenda = lendet.find(l => l.id === notaObj.lenda_id);
+      const { data: nxenesi } = await db.from('nxenesit').select('emri, mbiemri, mesuese_id').eq('id', nxId).single();
+      if (nxenesi) {
+        const { data: mesuese } = await db.from('mesueset').select('email, emri').eq('id', nxenesi.mesuese_id).single();
+        if (mesuese && mesuese.email) {
+          await fetch(EDGE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPA_KEY },
+            body: JSON.stringify({
+              email_prindi: mesuese.email,
+              emri_nxenesit: nxenesi.emri + ' ' + nxenesi.mbiemri,
+              lenda: lenda ? lenda.emri : '—',
+              nota: notaObj.nota,
+              kategoria: notaObj.lloji + ' | Koment nga prindi: ' + teksti,
+              periudha: 'P' + notaObj.periudha
+            })
+          });
+        }
+      }
+    }
+  } catch(e) {
+    console.error('Gabim njoftim mesuese:', e);
+  }
+
   await ngarkoKomentetPrind(notaId);
 }
 
