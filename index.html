@@ -858,6 +858,7 @@ async function buildPrindUI() {
 }
 
 let periudhatHapuraPrind = {};
+let notatELexuara = new Set();
 
 async function loadFemijaData() {
   const nxId = currentPrind.nxenesi_id;
@@ -869,6 +870,10 @@ async function loadFemijaData() {
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: true });
   const { data: lendet } = await db.from('lendet').select('*').order('emri');
   const { data: kolonatDB } = await db.from('kolonat_lendeve').select('*').order('renditja', { ascending: true });
+
+  // Ngarko notat e lexuara me heret
+  const { data: lexuara } = await db.from('notat_te_lexuara').select('nota_id').eq('prind_id', currentPrind.id);
+  notatELexuara = new Set((lexuara || []).map(l => l.nota_id));
 
   window._prindNotat = notat || [];
   window._prindLendet = lendet || [];
@@ -889,7 +894,7 @@ function renderFemijaTabela() {
     if (!byLende[n.lenda_id]) byLende[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
     const p = n.periudha || 1;
     if (!byLende[n.lenda_id].periudhat[p]) byLende[n.lenda_id].periudhat[p] = [];
-    byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji });
+    byLende[n.lenda_id].periudhat[p].push({ nota: n.nota, lloji: n.lloji, id: n.id });
   });
 
   let html = `<div style="overflow-x:auto;">
@@ -932,6 +937,9 @@ function renderFemijaTabela() {
       const arr = periudhat[p] || [];
       const hapur = periudhatHapuraPrind[p];
 
+      // Kontrollo nese ka nota te palexuara ne kete periudhe
+      const kaPatexuara = arr.some(n => n.id && !notatELexuara.has(n.id) && n.nota !== null);
+
       if (hapur) {
         const fikse = ['Test', 'Ushtrime', 'Projekt', 'Vleresim me goje'];
         const dinamike = kolonatDB.filter(k => k.lenda_id === l.id && k.periudha === p).map(k => k.emri);
@@ -941,10 +949,13 @@ function renderFemijaTabela() {
         let kolonatHTML = kolonat.map(k => {
           const notaObj = arr.find(n => n.lloji === k);
           const nota = notaObj ? notaObj.nota : null;
+          const notaId = notaObj ? notaObj.id : null;
           const gc2 = nota !== null ? (['','g1','g2','g3','g4','g5'][nota] || 'gx') : 'gx';
-          return `<td style="text-align:center;padding:8px 6px;background:#f8fffe;border-left:1px solid var(--green-ultra);min-width:90px;vertical-align:top;">
-            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}</div>
-            <span class="grade-pill ${gc2}" style="font-size:16px;font-weight:700;">${nota !== null ? nota : '—'}</span>
+          const eRe = notaId && !notatELexuara.has(notaId) && nota !== null;
+
+          return `<td style="text-align:center;padding:8px 6px;background:${eRe ? '#fff8e1' : '#f8fffe'};border-left:1px solid var(--green-ultra);min-width:90px;vertical-align:top;${eRe ? 'border-top:2px solid #ffb74d;' : ''}">
+            <div style="font-size:10px;color:var(--text-soft);margin-bottom:6px;font-weight:600;">${k}${eRe ? ' <span style="color:#e65100;font-size:9px;">● E RE</span>' : ''}</div>
+            <span class="grade-pill ${gc2}" style="font-size:16px;font-weight:700;${eRe ? 'background:#ffb74d;color:#5d2c00;' : ''}">${nota !== null ? nota : '—'}</span>
           </td>`;
         }).join('');
 
@@ -955,9 +966,9 @@ function renderFemijaTabela() {
           <table style="width:100%;border-collapse:collapse;"><tr>${kolonatHTML}</tr></table>
         </td>`;
       } else {
-        html += `<td style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(${p})">
+        html += `<td style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;${kaPatexuara ? 'background:#fff8e1;' : ''}" onclick="togglePeriudhePrind(${p})">
           <span class="grade-pill ${gc}">${mesStr}</span>
-          <div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>
+          ${kaPatexuara ? '<div style="font-size:9px;color:#e65100;margin-top:3px;font-weight:600;">● Nota te reja</div>' : '<div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>'}
         </td>`;
       }
     });
@@ -977,6 +988,22 @@ function renderFemijaTabela() {
 function togglePeriudhePrind(p) {
   periudhatHapuraPrind[p] = !periudhatHapuraPrind[p];
   renderFemijaTabela();
+
+  // Nese hapet periudha, sheno notat si te lexuara pas 4 sekondash
+  if (periudhatHapuraPrind[p]) {
+    setTimeout(async () => {
+      const notat = window._prindNotat || [];
+      const notatEPeriudhes = notat.filter(n => n.periudha === p && n.id && !notatELexuara.has(n.id) && n.nota !== null);
+      if (notatEPeriudhes.length === 0) return;
+
+      const inserts = notatEPeriudhes.map(n => ({ prind_id: currentPrind.id, nota_id: n.id }));
+      await db.from('notat_te_lexuara').upsert(inserts, { onConflict: 'prind_id,nota_id' });
+
+      // Perditeso seten lokal
+      notatEPeriudhes.forEach(n => notatELexuara.add(n.id));
+      renderFemijaTabela();
+    }, 4000);
+  }
 }
 
 function editoEmrinKolones(el, lendaId, periudha, emriAktual) {
