@@ -791,67 +791,84 @@ async function loadKomentet() {
 
   const notaMap = {};
   notatMia.forEach(n => { notaMap[n.id] = n; });
+  window._komNotatMia = notatMia;
   const notaIds = notatMia.map(n => n.id);
 
   const { data: komentet } = await db.from('komentet_notave').select('*').in('nota_id', notaIds).order('krijuar_me', { ascending: true });
-
   if (!komentet || komentet.length === 0) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka komente nga prinderit.</p></div>'; return; }
 
-  const grouped = {};
+  // Merr te gjithe prinderit per keto nxenes
+  const { data: prinderit } = await db.from('prinderit').select('*').in('nxenesi_id', nxenesIds);
+
+  // Grupo komentet sipas prind_id
+  const byPrind = {};
   komentet.forEach(k => {
-    if (!grouped[k.nota_id]) grouped[k.nota_id] = [];
-    grouped[k.nota_id].push(k);
+    const prindId = k.autori_lloji === 'prind' ? k.autori_id : null;
+    // Gjej prindin duke pare nota_id
+    const nota = notaMap[k.nota_id];
+    if (!nota) return;
+    const nxenesi = allNxenesit.find(n => n.id === nota.nxenesi_id);
+    if (!nxenesi) return;
+    // Gjej prinderit e ketij nxenesi
+    const prindEtij = (prinderit || []).filter(p => p.nxenesi_id === nota.nxenesi_id);
+    const prindi = prindEtij[0]; // perdor prindin e pare si identifikues per kete nxenes
+    if (!prindi) return;
+    const key = nxenesi.id; // nje bisede per cdo nxenes
+    if (!byPrind[key]) byPrind[key] = { nxenesi, prindEtij, komentet: [] };
+    byPrind[key].komentet.push({ ...k, nota });
   });
 
-  // Radho sipas komentit me te ri
-  const grupetRadhitura = Object.entries(grouped).sort((a, b) => {
-    const dataA = new Date(a[1][a[1].length-1].krijuar_me);
-    const dataB = new Date(b[1][b[1].length-1].krijuar_me);
-    return dataB - dataA;
+  // Radho sipas mesazhit me te ri
+  const grupetRadhitura = Object.entries(byPrind).sort((a, b) => {
+    const ka = a[1].komentet;
+    const kb = b[1].komentet;
+    return new Date(kb[kb.length-1].krijuar_me) - new Date(ka[ka.length-1].krijuar_me);
   });
 
   let html = '';
-  for (const [notaId, komList] of grupetRadhitura) {
-    const nota = notaMap[notaId];
-    if (!nota) continue;
-    const nxenesi = allNxenesit.find(n => n.id === nota.nxenesi_id);
-    const emri = nxenesi ? nxenesi.emri + ' ' + nxenesi.mbiemri : '—';
-    const lenda = nota.lendet ? nota.lendet.emri : '—';
-    const komentiFundit = komList[komList.length-1];
-    const dataFundit = new Date(komentiFundit.krijuar_me);
+  for (const [nxId, grup] of grupetRadhitura) {
+    const { nxenesi, prindEtij, komentet: komList } = grup;
+    const fundit = komList[komList.length-1];
+    const dataFundit = new Date(fundit.krijuar_me);
     const dataStr = dataFundit.toLocaleDateString('sq-AL', { day:'2-digit', month:'short' }) + ' ' + dataFundit.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
-    const chatId = 'chat_' + notaId;
+    const chatId = 'chat_nx_' + nxId.replace(/-/g,'');
+    const kaPaLexuar = komList.some(k => k.autori_lloji === 'prind');
 
-    html += `<div class="card" style="margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="toggleChat('${chatId}','${notaId}')">
-        <div style="width:42px;height:42px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;flex-shrink:0;">${nxenesi ? nxenesi.emri[0]+nxenesi.mbiemri[0] : '?'}</div>
+    html += `<div class="card" style="margin-bottom:10px;padding:0;overflow:hidden;">
+      <!-- Header i bisedes -->
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;background:white;" onclick="toggleChat('${chatId}','${nxId}')">
+        <div style="width:46px;height:46px;border-radius:50%;background:var(--green-pale);color:var(--green-main);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;">${nxenesi.emri[0]}${nxenesi.mbiemri[0]}</div>
         <div style="flex:1;min-width:0;">
-          <div style="font-weight:600;font-size:14px;">${emri}</div>
-          <div style="font-size:12px;color:var(--text-soft);">${lenda} · P${nota.periudha} · ${nota.lloji} · Nota: ${nota.nota}</div>
-          <div style="font-size:12px;color:var(--text-mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${komentiFundit.autori_lloji === 'prind' ? '👨‍👩‍👧' : '👩‍🏫'} ${komentiFundit.teksti.substring(0,60)}${komentiFundit.teksti.length > 60 ? '...' : ''}</div>
+          <div style="font-weight:600;font-size:14px;">${nxenesi.emri} ${nxenesi.mbiemri} ${kaPaLexuar ? '<span style="background:#e65100;color:white;font-size:10px;padding:2px 7px;border-radius:10px;margin-left:4px;">E re</span>' : ''}</div>
+          <div style="font-size:12px;color:var(--text-soft);margin-top:1px;">${prindEtij.map(p=>p.emri).join(', ')}</div>
+          <div style="font-size:12px;color:var(--text-mid);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${fundit.autori_lloji === 'prind' ? '👨‍👩‍👧' : '👩‍🏫 Une:'} ${fundit.teksti.substring(0,50)}${fundit.teksti.length>50?'...':''}</div>
         </div>
-        <div style="font-size:11px;color:var(--text-soft);flex-shrink:0;">${dataStr}</div>
+        <div style="font-size:11px;color:var(--text-soft);flex-shrink:0;text-align:right;">${dataStr}</div>
       </div>
 
-      <div id="${chatId}" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px;">
-        <div id="mesazhet_${notaId}" style="margin-bottom:10px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;">
+      <!-- Biseda e plote - chat style -->
+      <div id="${chatId}" style="display:none;border-top:1px solid var(--border);">
+        <div id="mesazhet_${nxId.replace(/-/g,'')}" style="padding:14px 16px;max-height:350px;overflow-y:auto;background:#f7f9f5;display:flex;flex-direction:column;gap:8px;">
           ${komList.map(k => {
             const d = new Date(k.krijuar_me);
-            const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short' }) + ' ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+            const ds = d.toLocaleDateString('sq-AL', {day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('sq-AL',{hour:'2-digit',minute:'2-digit'});
             const isMesuese = k.autori_lloji === 'mesuese';
+            const konteksti = k.nota ? `<div style="font-size:10px;opacity:0.6;margin-bottom:3px;">${k.nota.lendet ? k.nota.lendet.emri : ''} · P${k.nota.periudha} · ${k.nota.lloji} · Nota ${k.nota.nota}</div>` : '';
             return `<div style="display:flex;justify-content:${isMesuese ? 'flex-end' : 'flex-start'};">
-              <div style="max-width:78%;padding:8px 12px;border-radius:${isMesuese ? '14px 14px 4px 14px' : '14px 14px 14px 4px'};background:${isMesuese ? 'var(--green-main)' : '#eef0ff'};color:${isMesuese ? 'white' : 'var(--text-dark)'};">
+              <div style="max-width:78%;padding:9px 13px;border-radius:${isMesuese ? '16px 16px 4px 16px' : '16px 16px 16px 4px'};background:${isMesuese ? 'var(--green-main)' : 'white'};color:${isMesuese ? 'white' : 'var(--text-dark)'};box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+                ${!isMesuese ? konteksti : ''}
                 <div style="font-size:13px;">${k.teksti}</div>
-                <div style="font-size:10px;opacity:0.65;margin-top:3px;text-align:right;">${ds}</div>
+                <div style="font-size:10px;opacity:0.6;margin-top:4px;text-align:right;">${ds}</div>
               </div>
             </div>`;
           }).join('')}
         </div>
-        <div style="display:flex;gap:8px;">
-          <input id="pergjigje_${notaId}" type="text" placeholder="Shkruaj mesazh..." maxlength="200"
-            style="flex:1;padding:9px 14px;border:1.5px solid var(--border);border-radius:20px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;"
-            onkeydown="if(event.key==='Enter')pergjigjeKomentit('${notaId}')">
-          <button onclick="pergjigjeKomentit('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:50%;width:38px;height:38px;min-width:38px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;">→</button>
+        <!-- Input pergjigje -->
+        <div style="padding:10px 14px;background:white;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border);">
+          <input id="pergjigje_${nxId.replace(/-/g,'')}" type="text" placeholder="Shkruaj mesazh..." maxlength="200"
+            style="flex:1;padding:10px 14px;border:1.5px solid var(--border);border-radius:22px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;background:#f7f9f5;"
+            onkeydown="if(event.key==='Enter')pergjigjeKomentit('${nxId}','${nxId.replace(/-/g,'')}')">
+          <button onclick="pergjigjeKomentit('${nxId}','${nxId.replace(/-/g,'')}')" style="background:var(--green-main);color:white;border:none;border-radius:50%;width:40px;height:40px;min-width:40px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);">→</button>
         </div>
       </div>
     </div>`;
@@ -860,24 +877,30 @@ async function loadKomentet() {
   el.innerHTML = html || '<div class="empty-state"><p>Ende nuk ka komente.</p></div>';
 }
 
-function toggleChat(chatId, notaId) {
+function toggleChat(chatId, nxId) {
   const el = document.getElementById(chatId);
   if (!el) return;
   const isOpen = el.style.display !== 'none';
-  document.querySelectorAll('[id^="chat_"]').forEach(c => c.style.display = 'none');
+  document.querySelectorAll('[id^="chat_nx_"]').forEach(c => c.style.display = 'none');
   if (!isOpen) {
     el.style.display = 'block';
-    const mesazhet = document.getElementById('mesazhet_' + notaId);
-    if (mesazhet) mesazhet.scrollTop = mesazhet.scrollHeight;
+    const mesazhet = document.getElementById('mesazhet_' + nxId.replace(/-/g,''));
+    if (mesazhet) setTimeout(() => { mesazhet.scrollTop = mesazhet.scrollHeight; }, 50);
   }
 }
 
-async function pergjigjeKomentit(notaId) {
-  const inp = document.getElementById('pergjigje_' + notaId);
+async function pergjigjeKomentit(nxId, nxIdClean) {
+  const inp = document.getElementById('pergjigje_' + nxIdClean);
   if (!inp) return;
   const teksti = inp.value.trim();
   if (!teksti) return;
   inp.value = '';
+
+  // Gjej notat e fundit te ketij nxenesi per te lidhur komentin
+  const notatNx = (window._komNotatMia || []).filter(n => n.nxenesi_id === nxId);
+  if (notatNx.length === 0) return;
+  const notaId = notatNx[0].id;
+
   await db.from('komentet_notave').insert({
     nota_id: notaId,
     autori_lloji: 'mesuese',
@@ -885,6 +908,15 @@ async function pergjigjeKomentit(notaId) {
     teksti: teksti
   });
   await loadKomentet();
+  // Rihap biseden
+  setTimeout(() => {
+    const chatEl = document.getElementById('chat_nx_' + nxIdClean);
+    if (chatEl) {
+      chatEl.style.display = 'block';
+      const mesazhet = document.getElementById('mesazhet_' + nxIdClean);
+      if (mesazhet) mesazhet.scrollTop = mesazhet.scrollHeight;
+    }
+  }, 300);
 }
 
 async function loadBallina() {
@@ -1260,38 +1292,6 @@ async function shtoKomentPrind(notaId) {
     autori_id: currentPrind.id,
     teksti: teksti
   });
-
-  // Dergo email njoftim te mesuese
-  try {
-    const notat = window._prindNotat || [];
-    const notaObj = notat.find(n => n.id === notaId);
-    const lendet = window._prindLendet || [];
-    const nxId = window._prindNxId;
-
-    if (notaObj) {
-      const lenda = lendet.find(l => l.id === notaObj.lenda_id);
-      const { data: nxenesi } = await db.from('nxenesit').select('emri, mbiemri, mesuese_id').eq('id', nxId).single();
-      if (nxenesi) {
-        const { data: mesuese } = await db.from('mesueset').select('email, emri').eq('id', nxenesi.mesuese_id).single();
-        if (mesuese && mesuese.email) {
-          await fetch(EDGE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPA_KEY },
-            body: JSON.stringify({
-              email_prindi: mesuese.email,
-              emri_nxenesit: nxenesi.emri + ' ' + nxenesi.mbiemri,
-              lenda: lenda ? lenda.emri : '—',
-              nota: notaObj.nota,
-              kategoria: notaObj.lloji + ' | Koment nga prindi: ' + teksti,
-              periudha: 'P' + notaObj.periudha
-            })
-          });
-        }
-      }
-    }
-  } catch(e) {
-    console.error('Gabim njoftim mesuese:', e);
-  }
 
   await ngarkoKomentetPrind(notaId);
 }
