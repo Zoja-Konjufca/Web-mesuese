@@ -1215,6 +1215,7 @@ async function buildPrindUI() {
 
 let periudhatHapuraPrind = {};
 let notatELexuara = new Set();
+let njoftimetELexuara = new Set();
 
 async function loadFemijaData() {
   const nxId = currentPrind.nxenesi_id;
@@ -1229,6 +1230,9 @@ async function loadFemijaData() {
     const { data: mesuesja } = await db.from('mesueset').select('komentet_aktive, komentet_ora_fillim, komentet_ora_mbarim').eq('id', nx.mesuese_id).single();
     window._prindKomentCilesimet = mesuesja || null;
   }
+  // Njoftimet e lexuara me heret nga prindi (per te dalluar te rejat)
+  const { data: njoftLex } = await db.from('njoftimet_te_lexuara').select('njoftim_id').eq('prind_id', currentPrind.id);
+  njoftimetELexuara = new Set((njoftLex || []).map(l => l.njoftim_id));
   ngarkoNjoftimetPrind(nx.mesuese_id);
 
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: true });
