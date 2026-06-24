@@ -1146,10 +1146,10 @@ async function ngarkoNjoftimetPrind(mesueseId) {
     const d = new Date(n.krijuar_me);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' }) + ' · ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
     const iRi = !njoftimetELexuara.has(n.id);
-    return `<div style="border:1px solid ${iRi ? '#ffb74d' : 'var(--border)'};border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:${iRi ? '#fff8e1' : 'var(--green-ultra)'};${iRi ? 'border-left:4px solid #ffb74d;' : ''}">
+    return `<div style="border:1.5px solid ${iRi ? '#fb923c' : 'var(--border)'};border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:${iRi ? '#ffedd5' : 'var(--green-ultra)'};${iRi ? 'border-left:5px solid #f97316;' : ''}">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-        <div style="font-size:11px;color:var(--text-soft);font-weight:600;">📢 ${ds}</div>
-        ${iRi ? '<span style="font-size:10px;font-weight:700;color:#e65100;background:#ffe0a3;padding:2px 8px;border-radius:10px;">● I RI</span>' : ''}
+        <div style="font-size:11px;color:${iRi ? '#c2410c' : 'var(--text-soft)'};font-weight:600;">📢 ${ds}</div>
+        ${iRi ? '<span style="font-size:10px;font-weight:700;color:white;background:#f97316;padding:3px 10px;border-radius:10px;letter-spacing:0.3px;white-space:nowrap;">NJOFTIM I RI</span>' : ''}
       </div>
       <div style="font-size:14px;color:var(--text-dark);margin-top:6px;white-space:pre-wrap;">${n.teksti}</div>
     </div>`;
