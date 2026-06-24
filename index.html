@@ -1137,14 +1137,13 @@ async function ngarkoNjoftimetPrind(mesueseId) {
   const el = document.getElementById('femija-njoftimet');
   if (!el) return;
   if (!mesueseId) { el.innerHTML = '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka njoftime.</div>'; return; }
-  const { data: njoftimet } = await db.from('njoftimet').select('*').eq('mesuese_id', mesueseId).order('krijuar_me', { ascending: true });
+  const { data: njoftimet } = await db.from('njoftimet').select('*').eq('mesuese_id', mesueseId).order('krijuar_me', { ascending: false });
   if (!njoftimet || njoftimet.length === 0) {
     el.innerHTML = '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka njoftime.</div>';
     return;
   }
 
-  let html = `<div id="njoftimet-hint" style="display:none;font-size:11px;color:var(--text-soft);text-align:center;margin-bottom:8px;">↑ Leviz lart per te pare njoftimet e meparshme</div>`;
-  html += `<div id="njoftimet-chat" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;padding:12px;background:#f7f9f5;border-radius:var(--radius-sm);">`;
+  let html = `<div id="njoftimet-chat" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;padding:12px;background:#f7f9f5;border-radius:var(--radius-sm);">`;
   njoftimet.forEach(n => {
     const d = new Date(n.krijuar_me);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', year:'numeric' }) + ' · ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
@@ -1161,13 +1160,14 @@ async function ngarkoNjoftimetPrind(mesueseId) {
     </div>`;
   });
   html += `</div>`;
+  html += `<div id="njoftimet-hint" style="display:none;font-size:11px;color:var(--text-soft);text-align:center;margin-top:8px;">↓ Leviz poshte per te pare njoftimet e meparshme</div>`;
   el.innerHTML = html;
 
   const teReja = njoftimet.filter(n => !njoftimetELexuara.has(n.id));
   const cont = document.getElementById('njoftimet-chat');
   const hint = document.getElementById('njoftimet-hint');
 
-  // Trego vetem 3 njoftimet e fundit (ose te gjitha te rejat nese jane me shume se 3); pjesa tjeter me scroll
+  // Trego vetem 3 njoftimet me te reja lart (ose te gjitha te rejat nese jane me shume se 3); te vjetrat me scroll poshte
   if (cont) {
     requestAnimationFrame(() => {
       const items = cont.children;
@@ -1177,12 +1177,12 @@ async function ngarkoNjoftimetPrind(mesueseId) {
       if (total > visibleCount) {
         const gap = 10, padV = 24, buffer = 2;
         let h = 0;
-        for (let i = total - visibleCount; i < total; i++) h += items[i].offsetHeight;
+        for (let i = 0; i < visibleCount; i++) h += items[i].offsetHeight;
         h += gap * (visibleCount - 1) + padV + buffer;
         cont.style.maxHeight = Math.min(h, 500) + 'px';
         if (hint) hint.style.display = 'block';
       }
-      cont.scrollTop = cont.scrollHeight;
+      cont.scrollTop = 0;
     });
   }
 
