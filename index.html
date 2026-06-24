@@ -1072,6 +1072,7 @@ async function loadFemijaData() {
   window._prindNxId = nxId;
 
   renderFemijaTabela();
+  ngarkoBisedatPrind();
 }
 
 function renderFemijaTabela() {
@@ -1192,7 +1193,69 @@ function renderFemijaTabela() {
 
   document.getElementById('femija-notat').innerHTML = html;
   document.getElementById('femija-notat').style.display = 'block';
-  document.getElementById('femija-komentet').innerHTML = '';
+}
+
+// Ngarkon bisedat prind <-> mesuese te seksioni "Komentet e fundit", grupuar sipas notes
+async function ngarkoBisedatPrind() {
+  const el = document.getElementById('femija-komentet');
+  if (!el) return;
+  const notat = window._prindNotat || [];
+  if (notat.length === 0) { el.innerHTML = '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka komente.</div>'; return; }
+
+  const notaMap = {};
+  notat.forEach(n => { notaMap[n.id] = n; });
+  const notaIds = notat.map(n => n.id);
+
+  const { data: komentet } = await db.from('komentet_notave').select('*').in('nota_id', notaIds).order('krijuar_me', { ascending: true });
+  if (!komentet || komentet.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka komente. Hapni nje note dhe shkruani mesuesen.</div>';
+    return;
+  }
+
+  // Grupo komentet sipas notes
+  const byNota = {};
+  komentet.forEach(k => {
+    if (!notaMap[k.nota_id]) return;
+    if (!byNota[k.nota_id]) byNota[k.nota_id] = [];
+    byNota[k.nota_id].push(k);
+  });
+
+  // Radhit bisedat sipas mesazhit me te ri
+  const threads = Object.entries(byNota).sort((a, b) => {
+    const la = a[1][a[1].length - 1].krijuar_me;
+    const lb = b[1][b[1].length - 1].krijuar_me;
+    return new Date(lb) - new Date(la);
+  });
+
+  let html = '';
+  threads.forEach(([notaId, msgs]) => {
+    const nota = notaMap[notaId];
+    const lenda = nota.lendet ? nota.lendet.emri : '—';
+    const gc = ['','g1','g2','g3','g4','g5'][nota.nota] || 'gx';
+    html += `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;background:var(--green-ultra);">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <span style="font-weight:600;font-size:13px;color:var(--green-dark);">${lenda}</span>
+        <span style="font-size:11px;color:var(--text-soft);">P${nota.periudha} · ${nota.lloji}</span>
+        <span class="grade-pill ${gc}" style="font-size:12px;">Nota ${nota.nota}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        ${msgs.map(k => {
+          const d = new Date(k.krijuar_me);
+          const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', year:'numeric' }) + ' ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+          const isMesuese = k.autori_lloji === 'mesuese';
+          return `<div style="display:flex;justify-content:${isMesuese ? 'flex-start' : 'flex-end'};">
+            <div style="max-width:80%;padding:8px 12px;border-radius:${isMesuese ? '14px 14px 14px 4px' : '14px 14px 4px 14px'};background:${isMesuese ? 'white' : 'var(--green-main)'};color:${isMesuese ? 'var(--text-dark)' : 'white'};box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+              <div style="font-size:10px;font-weight:600;opacity:0.75;margin-bottom:2px;">${isMesuese ? '👩‍🏫 Mesuesja' : '👨‍👩‍👧 Ju'}</div>
+              <div style="font-size:13px;">${k.teksti}</div>
+              <div style="font-size:10px;opacity:0.6;margin-top:4px;text-align:right;">${ds}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  });
+
+  el.innerHTML = html;
 }
 
 function togglePeriudhePrind(p) {
@@ -1327,6 +1390,7 @@ async function shtoKomentPrind(notaId) {
   });
 
   await ngarkoKomentetPrind(notaId);
+  ngarkoBisedatPrind();
 }
 
 function openModal(id) { document.getElementById(id).classList.add('open'); }
