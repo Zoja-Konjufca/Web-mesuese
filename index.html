@@ -1132,7 +1132,7 @@ async function fshijNjoftim(id) {
   await ngarkoNjoftimet();
 }
 
-// Njoftimet ne anen e prindit (vetem per lexim)
+// Njoftimet ne anen e prindit (vetem per lexim) — me dallim te te rejave
 async function ngarkoNjoftimetPrind(mesueseId) {
   const el = document.getElementById('femija-njoftimet');
   if (!el) return;
@@ -1145,11 +1145,25 @@ async function ngarkoNjoftimetPrind(mesueseId) {
   el.innerHTML = njoftimet.map(n => {
     const d = new Date(n.krijuar_me);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' }) + ' · ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
-    return `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--green-ultra);">
-      <div style="font-size:11px;color:var(--text-soft);font-weight:600;">📢 ${ds}</div>
+    const iRi = !njoftimetELexuara.has(n.id);
+    return `<div style="border:1px solid ${iRi ? '#ffb74d' : 'var(--border)'};border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:${iRi ? '#fff8e1' : 'var(--green-ultra)'};${iRi ? 'border-left:4px solid #ffb74d;' : ''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+        <div style="font-size:11px;color:var(--text-soft);font-weight:600;">📢 ${ds}</div>
+        ${iRi ? '<span style="font-size:10px;font-weight:700;color:#e65100;background:#ffe0a3;padding:2px 8px;border-radius:10px;">● I RI</span>' : ''}
+      </div>
       <div style="font-size:14px;color:var(--text-dark);margin-top:6px;white-space:pre-wrap;">${n.teksti}</div>
     </div>`;
   }).join('');
+
+  // Sheno njoftimet e reja si te lexuara pas 4 sekondash (pa ri-render; shenja mbetet kete sesion, zhduket heren tjeter)
+  const teReja = njoftimet.filter(n => !njoftimetELexuara.has(n.id));
+  if (teReja.length > 0) {
+    setTimeout(async () => {
+      const inserts = teReja.map(n => ({ prind_id: currentPrind.id, njoftim_id: n.id }));
+      await db.from('njoftimet_te_lexuara').upsert(inserts, { onConflict: 'prind_id,njoftim_id' });
+      teReja.forEach(n => njoftimetELexuara.add(n.id));
+    }, 4000);
+  }
 }
 
 async function shtoNxenes() {
