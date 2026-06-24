@@ -222,6 +222,7 @@
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
         <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">Komentet me Prinderit</h2>
       </div>
+      <div id="komentet-cilesimet"></div>
       <div id="komentet-list"><div class="empty-state"><p>Duke ngarkuar...</p></div></div>
     </div>
     <div class="panel" id="panel-femija">
@@ -391,6 +392,7 @@ async function buildMesueseUI() {
   await loadBallina();
   if (isAdmin) { await loadMesueset(); document.getElementById('btn-shto-nxenes').style.display = 'none'; }
   if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
+  renderCilesimetKomenteve();
   await loadKomentet();
 }
 
