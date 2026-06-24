@@ -493,6 +493,11 @@ function getKolonatPerLende(lendaId, periudha) {
   return te_gjitha;
 }
 
+// Emri i plote i periudhes (P1 -> Perioda e pare, etj.)
+function emriPeriudhes(p) {
+  return ['', 'Perioda e pare', 'Perioda e dyte', 'Perioda e trete', 'Perioda e katert'][p] || ('Perioda ' + p);
+}
+
 // HTML-i i butonit te komentit + paneli (perdoret ne render dhe pas ruajtjes se notes)
 function komentButtonHTML(notaId) {
   return `<span onclick="togglePanelMesuese('panel_m_${notaId}','${notaId}')" style="cursor:pointer;font-size:11px;color:var(--green-main);">💬 Koment</span>
@@ -532,10 +537,10 @@ function renderDetailPage() {
         <thead>
           <tr>
             <th rowspan="2" style="vertical-align:middle;">Lenda</th>
-            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(0)">P1 <span style="font-size:10px;">▼</span></th>
-            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(1)">P2 <span style="font-size:10px;">▼</span></th>
-            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(2)">P3 <span style="font-size:10px;">▼</span></th>
-            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(3)">P4 <span style="font-size:10px;">▼</span></th>
+            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(0)">${emriPeriudhes(1)} <span style="font-size:10px;">▼</span></th>
+            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(1)">${emriPeriudhes(2)} <span style="font-size:10px;">▼</span></th>
+            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(2)">${emriPeriudhes(3)} <span style="font-size:10px;">▼</span></th>
+            <th colspan="1" style="text-align:center;cursor:pointer;border-left:2px solid var(--border);" onclick="toggleTePeriudhat(3)">${emriPeriudhes(4)} <span style="font-size:10px;">▼</span></th>
             <th rowspan="2" class="nota-perfundimtare" style="text-align:center;background:var(--green-mid);color:white;vertical-align:middle;">Nota Perfundimtare</th>
           </tr>
         </thead>
@@ -602,7 +607,7 @@ function renderDetailPage() {
 
         html += `<td style="padding:0;border-left:2px solid var(--green-main);vertical-align:top;background:#f0faf5;">
           <div onclick="togglePeriudhe('${l.id}', ${p})" style="cursor:pointer;text-align:center;padding:6px;border-bottom:1px solid var(--border);background:var(--green-pale);">
-            <span id="header_${l.id}_${p}" style="font-size:11px;font-weight:600;color:var(--green-main);">P${p}: ${mesStr} ▲</span>
+            <span id="header_${l.id}_${p}" style="font-size:11px;font-weight:600;color:var(--green-main);">${emriPeriudhes(p)}: ${mesStr} ▲</span>
           </div>
           <table style="width:100%;border-collapse:collapse;"><tr>${kolonatHTML}</tr></table>
         </td>`;
@@ -766,7 +771,7 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
     const notatP = arr.filter(n => n.nota !== null && n.nota !== undefined).map(n => n.nota);
     const mesP = notatP.length > 0 ? (notatP.reduce((a,b)=>a+b,0)/notatP.length).toFixed(1) : '—';
     const headerEl = document.getElementById(`header_${lendaId}_${periudha}`);
-    if (headerEl) headerEl.textContent = `P${periudha}: ${mesP} ▲`;
+    if (headerEl) headerEl.textContent = `${emriPeriudhes(periudha)}: ${mesP} ▲`;
 
   } catch(e) {
     console.error('Gabim gjate ruajtjes:', e);
@@ -1094,10 +1099,10 @@ function renderFemijaTabela() {
       <thead>
         <tr>
           <th style="vertical-align:middle;padding:12px 14px;">Lenda</th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(1)">P1 <span style="font-size:10px;">▼</span></th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(2)">P2 <span style="font-size:10px;">▼</span></th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(3)">P3 <span style="font-size:10px;">▼</span></th>
-          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(4)">P4 <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(1)">${emriPeriudhes(1)} <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(2)">${emriPeriudhes(2)} <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(3)">${emriPeriudhes(3)} <span style="font-size:10px;">▼</span></th>
+          <th style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;" onclick="togglePeriudhePrind(4)">${emriPeriudhes(4)} <span style="font-size:10px;">▼</span></th>
           <th style="text-align:center;background:var(--green-mid);color:white;padding:12px 8px;">Mesatare</th>
         </tr>
       </thead>
@@ -1172,7 +1177,7 @@ function renderFemijaTabela() {
 
         html += `<td style="padding:0;border-left:2px solid var(--green-main);vertical-align:top;background:#f0faf5;">
           <div onclick="togglePeriudhePrind(${p})" style="cursor:pointer;text-align:center;padding:6px;border-bottom:1px solid var(--border);background:var(--green-pale);">
-            <span style="font-size:11px;font-weight:600;color:var(--green-main);">P${p}: ${mesStr} ▲</span>
+            <span style="font-size:11px;font-weight:600;color:var(--green-main);">${emriPeriudhes(p)}: ${mesStr} ▲</span>
           </div>
           <table style="width:100%;border-collapse:collapse;"><tr>${kolonatHTML}</tr></table>
         </td>`;
