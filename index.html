@@ -193,7 +193,11 @@
   <div class="content">
     <div class="panel" id="panel-ballina">
       <div class="stats-grid" id="stats-grid"></div>
-      <div class="card"><div class="card-title">Veprimet e fundit</div><div id="aktiviteti-list"><div class="empty-state"><p>Ende nuk ka shenime.</p></div></div></div>
+      <div class="card">
+        <div class="card-title">📢 Njoftimet</div>
+        <div id="njoftim-shkruaj"></div>
+        <div id="njoftimet-list"><div class="empty-state"><p>Ende nuk ka njoftime.</p></div></div>
+      </div>
     </div>
     <div class="panel" id="panel-nxenesit">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
@@ -227,6 +231,7 @@
     </div>
     <div class="panel" id="panel-femija">
       <div class="prind-header" id="prind-header"><h2 id="femija-emri">—</h2><p id="femija-klasa">—</p></div>
+      <div class="card"><div class="card-title">📢 Njoftime nga mesuesja</div><div id="femija-njoftimet"></div></div>
       <div class="card"><div class="card-title">Notat sipas lendes</div><div class="subject-grid" id="femija-notat"></div></div>
       <div class="card"><div class="card-title">Komentet e fundit</div><div id="femija-komentet"></div></div>
     </div>
@@ -1068,16 +1073,82 @@ async function loadBallina() {
     <div class="stat-card"><div class="stat-num">${nxCount||0}</div><div class="stat-label">Nxenes</div></div>
     <div class="stat-card"><div class="stat-num">${prCount||0}</div><div class="stat-label">Prinder</div></div>
     <div class="stat-card"><div class="stat-num">${noCount||0}</div><div class="stat-label">Nota te shenuara</div></div>`;
-  let fundQuery = db.from('notat').select('*, nxenesit(emri,mbiemri), lendet(emri)').order('data_shenimit', { ascending: false }).limit(5);
-  if (currentUser.roli !== 'admin') fundQuery = fundQuery.eq('mesuese_id', currentUser.id);
-  const { data: fund } = await fundQuery;
-  const el = document.getElementById('aktiviteti-list');
-  if (!fund || !fund.length) { el.innerHTML = '<div class="empty-state"><p>Ende nuk ka shenime.</p></div>'; return; }
-  el.innerHTML = fund.map(n => {
-    const d = new Date(n.data_shenimit);
-    const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-    const gc = ['','g1','g2','g3','g4','g5'][n.nota] || 'gx';
-    return `<div class="nota-item"><span class="grade-pill ${gc}">${n.nota}</span><div class="nota-lenda"><strong>${n.nxenesit ? n.nxenesit.emri+' '+n.nxenesit.mbiemri : '—'}</strong> — ${n.lendet ? n.lendet.emri : '—'}<div class="nota-date">📅 ${ds}</div></div></div>`;
+  renderNjoftimShkruaj();
+  await ngarkoNjoftimet();
+}
+
+// ===== Njoftimet (ana e mesueses) =====
+function renderNjoftimShkruaj() {
+  const el = document.getElementById('njoftim-shkruaj');
+  if (!el) return;
+  el.innerHTML = `
+    <div style="margin-bottom:18px;">
+      <textarea id="njoftim-teksti" placeholder="Shkruaj nje njoftim te ri per prinderit..." maxlength="500"
+        style="width:100%;min-height:70px;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--text-dark);outline:none;resize:vertical;"></textarea>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:10px;">
+        <button class="btn-green" onclick="publikoNjoftim()">Publiko njoftimin</button>
+        <span id="njoftim-status" style="font-size:13px;font-weight:600;"></span>
+      </div>
+    </div>`;
+}
+
+async function publikoNjoftim() {
+  const inp = document.getElementById('njoftim-teksti');
+  const statusEl = document.getElementById('njoftim-status');
+  if (!inp) return;
+  const teksti = inp.value.trim();
+  if (!teksti) { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = 'Shkruaj dicka me pare.'; } return; }
+  const { error } = await db.from('njoftimet').insert({ mesuese_id: currentUser.id, teksti: teksti });
+  if (error) { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = '✗ Gabim gjate publikimit.'; } return; }
+  inp.value = '';
+  if (statusEl) { statusEl.style.color = 'var(--green-main)'; statusEl.textContent = '✓ U publikua'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500); }
+  await ngarkoNjoftimet();
+}
+
+async function ngarkoNjoftimet() {
+  const el = document.getElementById('njoftimet-list');
+  if (!el) return;
+  const { data: njoftimet } = await db.from('njoftimet').select('*').eq('mesuese_id', currentUser.id).order('krijuar_me', { ascending: false });
+  if (!njoftimet || njoftimet.length === 0) {
+    el.innerHTML = '<div class="empty-state"><p>Ende nuk ka njoftime.</p></div>';
+    return;
+  }
+  el.innerHTML = njoftimet.map(n => {
+    const d = new Date(n.krijuar_me);
+    const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' }) + ' · ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+    return `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--green-ultra);">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div style="font-size:11px;color:var(--text-soft);font-weight:600;">📢 ${ds}</div>
+        <span onclick="fshijNjoftim('${n.id}')" title="Fshij" style="cursor:pointer;font-size:13px;flex-shrink:0;">🗑️</span>
+      </div>
+      <div style="font-size:14px;color:var(--text-dark);margin-top:6px;white-space:pre-wrap;">${n.teksti}</div>
+    </div>`;
+  }).join('');
+}
+
+async function fshijNjoftim(id) {
+  if (!confirm('Fshij kete njoftim?')) return;
+  await db.from('njoftimet').delete().eq('id', id);
+  await ngarkoNjoftimet();
+}
+
+// Njoftimet ne anen e prindit (vetem per lexim)
+async function ngarkoNjoftimetPrind(mesueseId) {
+  const el = document.getElementById('femija-njoftimet');
+  if (!el) return;
+  if (!mesueseId) { el.innerHTML = '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka njoftime.</div>'; return; }
+  const { data: njoftimet } = await db.from('njoftimet').select('*').eq('mesuese_id', mesueseId).order('krijuar_me', { ascending: false });
+  if (!njoftimet || njoftimet.length === 0) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-soft);">Ende nuk ka njoftime.</div>';
+    return;
+  }
+  el.innerHTML = njoftimet.map(n => {
+    const d = new Date(n.krijuar_me);
+    const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'long', year:'numeric' }) + ' · ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+    return `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;background:var(--green-ultra);">
+      <div style="font-size:11px;color:var(--text-soft);font-weight:600;">📢 ${ds}</div>
+      <div style="font-size:14px;color:var(--text-dark);margin-top:6px;white-space:pre-wrap;">${n.teksti}</div>
+    </div>`;
   }).join('');
 }
 
@@ -1158,6 +1229,7 @@ async function loadFemijaData() {
     const { data: mesuesja } = await db.from('mesueset').select('komentet_aktive, komentet_ora_fillim, komentet_ora_mbarim').eq('id', nx.mesuese_id).single();
     window._prindKomentCilesimet = mesuesja || null;
   }
+  ngarkoNjoftimetPrind(nx.mesuese_id);
 
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: true });
   const { data: lendet } = await db.from('lendet').select('*').order('emri');
