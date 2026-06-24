@@ -240,6 +240,54 @@
       <div class="card"><div class="card-title">Notat sipas lendes</div><div class="subject-grid" id="femija-notat"></div></div>
       <div class="card"><div class="card-title">Komentet e fundit</div><div id="femija-komentet"></div></div>
     </div>
+    <div class="panel" id="panel-pergatitje">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">📚 Pergatitje per test</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">Shto pyetje me pergjigje per nxenesit</div>
+        <div id="pergatitje-form"></div>
+      </div>
+      <div id="pergatitje-list"></div>
+    </div>
+    <div class="panel" id="panel-pergatitjeprind">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">📚 Pergatitje per test</h2>
+      </div>
+      <div id="pergatitjeprind-list"></div>
+    </div>
+    <div class="panel" id="panel-ushtrime">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">✏️ Ushtrime</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">Shto ushtrim per nxenesit</div>
+        <div id="ushtrime-form"></div>
+      </div>
+      <div id="ushtrime-list"></div>
+    </div>
+    <div class="panel" id="panel-ushtrimeprind">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">✏️ Ushtrime</h2>
+      </div>
+      <div id="ushtrimeprind-list"></div>
+    </div>
+    <div class="panel" id="panel-quiz">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">❓ Kuiz</h2>
+      </div>
+      <div class="card">
+        <div class="card-title">Krijo pyetje kuiz me opsione</div>
+        <div id="quiz-form"></div>
+      </div>
+      <div id="quiz-list"></div>
+    </div>
+    <div class="panel" id="panel-quizprind">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--green-dark);">❓ Kuiz</h2>
+      </div>
+      <div id="quizprind-list"></div>
+    </div>
   </div>
 </div>
 
@@ -394,7 +442,7 @@ async function showApp() {
 
 async function buildMesueseUI() {
   const isAdmin = currentUser.roli === 'admin';
-  const tabs = [{ id:'ballina', label:'Ballina' }, { id:'nxenesit', label:'Nxenesit' }, { id:'komentet', label:'💬 Komentet' }];
+  const tabs = [{ id:'ballina', label:'Ballina' }, { id:'nxenesit', label:'Nxenesit' }, { id:'komentet', label:'💬 Komentet' }, { id:'pergatitje', label:'📚 Pergatitje' }, { id:'ushtrime', label:'✏️ Ushtrime' }, { id:'quiz', label:'❓ Kuiz' }];
   if (isAdmin) tabs.push({ id:'mesueset', label:'Mesueset' });
   buildTabs(tabs, 'ballina');
   await loadLendet();
@@ -404,6 +452,12 @@ async function buildMesueseUI() {
   if (!isAdmin) document.getElementById('filter-klasa').style.display = 'none';
   renderCilesimetKomenteve();
   await loadKomentet();
+  renderPergatitjeForm();
+  await ngarkoPyetjetMesuese();
+  renderUshtrimeForm();
+  await ngarkoUshtrimeMesuese();
+  renderQuizForm();
+  await ngarkoQuizMesuese();
 }
 
 function buildTabs(tabs, active) {
@@ -1221,6 +1275,364 @@ async function ngarkoNjoftimetPrind(mesueseId) {
   }
 }
 
+// ===== Pergatitje per test (ana e mesueses) =====
+function renderPergatitjeForm() {
+  const el = document.getElementById('pergatitje-form');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="form-row"><label>Tema / Testi</label><input type="text" id="pp-tema" placeholder="p.sh. Test Matematike - Kapitulli 3"></div>
+    <div class="form-row"><label>Pyetja</label><textarea id="pp-pyetja" placeholder="Shkruaj pyetjen..." style="min-height:60px;"></textarea></div>
+    <div class="form-row"><label>Pergjigja</label><textarea id="pp-pergjigja" placeholder="Shkruaj pergjigjen..." style="min-height:60px;"></textarea></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn-green" onclick="publikoPyetje()">Shto pyetjen</button>
+      <span id="pp-status" style="font-size:13px;font-weight:600;"></span>
+    </div>`;
+}
+
+async function publikoPyetje() {
+  const temaEl = document.getElementById('pp-tema');
+  const pyetjaEl = document.getElementById('pp-pyetja');
+  const pergjigjaEl = document.getElementById('pp-pergjigja');
+  const statusEl = document.getElementById('pp-status');
+  const tema = temaEl ? temaEl.value.trim() : '';
+  const pyetja = pyetjaEl ? pyetjaEl.value.trim() : '';
+  const pergjigja = pergjigjaEl ? pergjigjaEl.value.trim() : '';
+  if (!pyetja) { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = 'Shkruaj pyetjen.'; } return; }
+  const { error } = await db.from('pyetjet_pergatitje').insert({ mesuese_id: currentUser.id, tema: tema || 'Pa teme', pyetja: pyetja, pergjigja: pergjigja || null });
+  if (error) { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = '✗ Gabim gjate ruajtjes.'; } return; }
+  if (pyetjaEl) pyetjaEl.value = '';
+  if (pergjigjaEl) pergjigjaEl.value = '';
+  // Tema mbetet qe te shtosh me shume pyetje per te njejtin test
+  if (statusEl) { statusEl.style.color = 'var(--green-main)'; statusEl.textContent = '✓ U shtua'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2000); }
+  await ngarkoPyetjetMesuese();
+}
+
+async function ngarkoPyetjetMesuese() {
+  const el = document.getElementById('pergatitje-list');
+  if (!el) return;
+  const { data: pyetjet } = await db.from('pyetjet_pergatitje').select('*').eq('mesuese_id', currentUser.id).order('krijuar_me', { ascending: false });
+  if (!pyetjet || pyetjet.length === 0) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka pyetje. Shto pyetjen e pare lart.</p></div></div>'; return; }
+  const grupe = {};
+  pyetjet.forEach(p => { const t = p.tema || 'Pa teme'; if (!grupe[t]) grupe[t] = []; grupe[t].push(p); });
+  let html = '';
+  Object.entries(grupe).forEach(([tema, lista]) => {
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--green-dark);">📝 ${tema}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:var(--green-pale);padding:2px 8px;border-radius:10px;">${lista.length} pyetje</span>
+      </div>`;
+    lista.forEach((p, i) => {
+      html += `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;">
+          <div style="font-weight:600;font-size:14px;color:var(--text-dark);">${i+1}. ${p.pyetja}</div>
+          <span onclick="fshijPyetje('${p.id}')" title="Fshij" style="cursor:pointer;font-size:13px;flex-shrink:0;">🗑️</span>
+        </div>
+        ${p.pergjigja ? `<div style="font-size:13px;color:var(--text-dark);margin-top:8px;background:var(--green-ultra);border-left:3px solid var(--green-main);border-radius:6px;padding:8px 10px;"><strong style="color:var(--green-main);">Pergjigja:</strong> ${p.pergjigja}</div>` : '<div style="font-size:12px;color:var(--text-soft);font-style:italic;margin-top:6px;">(pa pergjigje)</div>'}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
+async function fshijPyetje(id) {
+  if (!confirm('Fshij kete pyetje?')) return;
+  await db.from('pyetjet_pergatitje').delete().eq('id', id);
+  await ngarkoPyetjetMesuese();
+}
+
+// ===== Pergatitje per test (ana e prindit/nxenesit) =====
+async function ngarkoPyetjetPrind() {
+  const el = document.getElementById('pergatitjeprind-list');
+  if (!el) return;
+  const mesueseId = window._prindMesueseId;
+  if (!mesueseId) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka pyetje pergatitjeje.</p></div></div>'; return; }
+  const { data: pyetjet } = await db.from('pyetjet_pergatitje').select('*').eq('mesuese_id', mesueseId).order('krijuar_me', { ascending: false });
+  if (!pyetjet || pyetjet.length === 0) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Mesuesja ende nuk ka shtuar pyetje per pergatitje.</p></div></div>'; return; }
+  const grupe = {};
+  pyetjet.forEach(p => { const t = p.tema || 'Pa teme'; if (!grupe[t]) grupe[t] = []; grupe[t].push(p); });
+  let html = '';
+  Object.entries(grupe).forEach(([tema, lista]) => {
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--green-dark);">📝 ${tema}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:var(--green-pale);padding:2px 8px;border-radius:10px;">${lista.length} pyetje</span>
+      </div>`;
+    lista.forEach((p, i) => {
+      const pid = p.id.replace(/-/g,'');
+      html += `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;">
+        <div style="font-weight:600;font-size:14px;color:var(--text-dark);">${i+1}. ${p.pyetja}</div>
+        ${p.pergjigja ? `<button onclick="shfaqPergjigjen('${pid}')" id="btn_perg_${pid}" class="btn-outline" style="margin-top:10px;padding:6px 14px;font-size:13px;">Shfaq pergjigjen</button>
+        <div id="perg_${pid}" style="display:none;font-size:13px;color:var(--text-dark);margin-top:10px;background:var(--green-ultra);border-left:3px solid var(--green-main);border-radius:6px;padding:10px 12px;"><strong style="color:var(--green-main);">Pergjigja:</strong> ${p.pergjigja}</div>` : '<div style="font-size:12px;color:var(--text-soft);font-style:italic;margin-top:6px;">(pa pergjigje)</div>'}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
+function shfaqPergjigjen(pid) {
+  const perg = document.getElementById('perg_' + pid);
+  const btn = document.getElementById('btn_perg_' + pid);
+  if (!perg) return;
+  const hapur = perg.style.display !== 'none';
+  perg.style.display = hapur ? 'none' : 'block';
+  if (btn) btn.textContent = hapur ? 'Shfaq pergjigjen' : 'Fsheh pergjigjen';
+}
+
+// ===== Ushtrime (ana e mesueses) =====
+function renderUshtrimeForm() {
+  const el = document.getElementById('ushtrime-form');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="form-row"><label>Tema</label><input type="text" id="us-tema" placeholder="p.sh. Mbledhja dhe zbritja"></div>
+    <div class="form-row"><label>Ushtrimi</label><textarea id="us-ushtrimi" placeholder="Shkruaj ushtrimin..." style="min-height:60px;"></textarea></div>
+    <div class="form-row"><label>Zgjidhja (jo e detyrueshme)</label><textarea id="us-zgjidhja" placeholder="Shkruaj zgjidhjen..." style="min-height:60px;"></textarea></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn-green" onclick="publikoUshtrim()">Shto ushtrimin</button>
+      <span id="us-status" style="font-size:13px;font-weight:600;"></span>
+    </div>`;
+}
+
+async function publikoUshtrim() {
+  const temaEl = document.getElementById('us-tema');
+  const ushtrimiEl = document.getElementById('us-ushtrimi');
+  const zgjidhjaEl = document.getElementById('us-zgjidhja');
+  const statusEl = document.getElementById('us-status');
+  const tema = temaEl ? temaEl.value.trim() : '';
+  const ushtrimi = ushtrimiEl ? ushtrimiEl.value.trim() : '';
+  const zgjidhja = zgjidhjaEl ? zgjidhjaEl.value.trim() : '';
+  if (!ushtrimi) { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = 'Shkruaj ushtrimin.'; } return; }
+  const { error } = await db.from('ushtrimet').insert({ mesuese_id: currentUser.id, tema: tema || 'Pa teme', ushtrimi: ushtrimi, zgjidhja: zgjidhja || null });
+  if (error) { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = '✗ Gabim gjate ruajtjes.'; } return; }
+  if (ushtrimiEl) ushtrimiEl.value = '';
+  if (zgjidhjaEl) zgjidhjaEl.value = '';
+  if (statusEl) { statusEl.style.color = 'var(--green-main)'; statusEl.textContent = '✓ U shtua'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2000); }
+  await ngarkoUshtrimeMesuese();
+}
+
+async function ngarkoUshtrimeMesuese() {
+  const el = document.getElementById('ushtrime-list');
+  if (!el) return;
+  const { data: ushtrimet } = await db.from('ushtrimet').select('*').eq('mesuese_id', currentUser.id).order('krijuar_me', { ascending: false });
+  if (!ushtrimet || ushtrimet.length === 0) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka ushtrime. Shto te parin lart.</p></div></div>'; return; }
+  const grupe = {};
+  ushtrimet.forEach(u => { const t = u.tema || 'Pa teme'; if (!grupe[t]) grupe[t] = []; grupe[t].push(u); });
+  let html = '';
+  Object.entries(grupe).forEach(([tema, lista]) => {
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--green-dark);">✏️ ${tema}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:var(--green-pale);padding:2px 8px;border-radius:10px;">${lista.length} ushtrime</span>
+      </div>`;
+    lista.forEach((u, i) => {
+      html += `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;">
+          <div style="font-weight:600;font-size:14px;color:var(--text-dark);white-space:pre-wrap;">${i+1}. ${u.ushtrimi}</div>
+          <span onclick="fshijUshtrim('${u.id}')" title="Fshij" style="cursor:pointer;font-size:13px;flex-shrink:0;">🗑️</span>
+        </div>
+        ${u.zgjidhja ? `<div style="font-size:13px;color:var(--text-dark);margin-top:8px;background:var(--green-ultra);border-left:3px solid var(--green-main);border-radius:6px;padding:8px 10px;white-space:pre-wrap;"><strong style="color:var(--green-main);">Zgjidhja:</strong> ${u.zgjidhja}</div>` : '<div style="font-size:12px;color:var(--text-soft);font-style:italic;margin-top:6px;">(pa zgjidhje)</div>'}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
+async function fshijUshtrim(id) {
+  if (!confirm('Fshij kete ushtrim?')) return;
+  await db.from('ushtrimet').delete().eq('id', id);
+  await ngarkoUshtrimeMesuese();
+}
+
+// ===== Ushtrime (ana e prindit/nxenesit) =====
+async function ngarkoUshtrimePrind() {
+  const el = document.getElementById('ushtrimeprind-list');
+  if (!el) return;
+  const mesueseId = window._prindMesueseId;
+  if (!mesueseId) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka ushtrime.</p></div></div>'; return; }
+  const { data: ushtrimet } = await db.from('ushtrimet').select('*').eq('mesuese_id', mesueseId).order('krijuar_me', { ascending: false });
+  if (!ushtrimet || ushtrimet.length === 0) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Mesuesja ende nuk ka shtuar ushtrime.</p></div></div>'; return; }
+  const grupe = {};
+  ushtrimet.forEach(u => { const t = u.tema || 'Pa teme'; if (!grupe[t]) grupe[t] = []; grupe[t].push(u); });
+  let html = '';
+  Object.entries(grupe).forEach(([tema, lista]) => {
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--green-dark);">✏️ ${tema}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:var(--green-pale);padding:2px 8px;border-radius:10px;">${lista.length} ushtrime</span>
+      </div>`;
+    lista.forEach((u, i) => {
+      const uid = u.id.replace(/-/g,'');
+      html += `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;">
+        <div style="font-weight:600;font-size:14px;color:var(--text-dark);white-space:pre-wrap;">${i+1}. ${u.ushtrimi}</div>
+        ${u.zgjidhja ? `<button onclick="shfaqZgjidhjen('${uid}')" id="btn_zgj_${uid}" class="btn-outline" style="margin-top:10px;padding:6px 14px;font-size:13px;">Shfaq zgjidhjen</button>
+        <div id="zgj_${uid}" style="display:none;font-size:13px;color:var(--text-dark);margin-top:10px;background:var(--green-ultra);border-left:3px solid var(--green-main);border-radius:6px;padding:10px 12px;white-space:pre-wrap;"><strong style="color:var(--green-main);">Zgjidhja:</strong> ${u.zgjidhja}</div>` : '<div style="font-size:12px;color:var(--text-soft);font-style:italic;margin-top:6px;">(pa zgjidhje)</div>'}
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
+function shfaqZgjidhjen(uid) {
+  const zgj = document.getElementById('zgj_' + uid);
+  const btn = document.getElementById('btn_zgj_' + uid);
+  if (!zgj) return;
+  const hapur = zgj.style.display !== 'none';
+  zgj.style.display = hapur ? 'none' : 'block';
+  if (btn) btn.textContent = hapur ? 'Shfaq zgjidhjen' : 'Fsheh zgjidhjen';
+}
+
+// ===== Quiz (ana e mesueses) =====
+function renderQuizForm() {
+  const el = document.getElementById('quiz-form');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="form-row"><label>Tema / Kuiz</label><input type="text" id="qz-tema" placeholder="p.sh. Kuiz Shkenca - Java 5"></div>
+    <div class="form-row"><label>Pyetja</label><textarea id="qz-pyetja" placeholder="Shkruaj pyetjen..." style="min-height:50px;"></textarea></div>
+    <div class="form-grid">
+      <div class="form-row"><label>Opsioni A</label><input type="text" id="qz-a" placeholder="Opsioni A"></div>
+      <div class="form-row"><label>Opsioni B</label><input type="text" id="qz-b" placeholder="Opsioni B"></div>
+      <div class="form-row"><label>Opsioni C (jo i detyrueshem)</label><input type="text" id="qz-c" placeholder="Opsioni C"></div>
+      <div class="form-row"><label>Opsioni D (jo i detyrueshem)</label><input type="text" id="qz-d" placeholder="Opsioni D"></div>
+    </div>
+    <div class="form-row"><label>Pergjigja e sakte</label><select id="qz-sakte"><option value="1">A</option><option value="2">B</option><option value="3">C</option><option value="4">D</option></select></div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <button class="btn-green" onclick="publikoQuiz()">Shto pyetjen</button>
+      <span id="qz-status" style="font-size:13px;font-weight:600;"></span>
+    </div>`;
+}
+
+async function publikoQuiz() {
+  const g = id => { const e = document.getElementById(id); return e ? e.value.trim() : ''; };
+  const tema = g('qz-tema'); const pyetja = g('qz-pyetja');
+  const a = g('qz-a'); const b = g('qz-b'); const c = g('qz-c'); const d = g('qz-d');
+  const sakteEl = document.getElementById('qz-sakte');
+  const sakte = sakteEl ? parseInt(sakteEl.value, 10) : 1;
+  const statusEl = document.getElementById('qz-status');
+  const setErr = m => { if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = m; } };
+  if (!pyetja) return setErr('Shkruaj pyetjen.');
+  if (!a || !b) return setErr('Duhen te pakten opsionet A dhe B.');
+  if ((sakte === 3 && !c) || (sakte === 4 && !d)) return setErr('Opsioni i sakte eshte bosh.');
+  const { error } = await db.from('quizet').insert({ mesuese_id: currentUser.id, tema: tema || 'Pa teme', pyetja: pyetja, opsioni_a: a, opsioni_b: b, opsioni_c: c || null, opsioni_d: d || null, sakte: sakte });
+  if (error) return setErr('✗ Gabim gjate ruajtjes.');
+  ['qz-pyetja','qz-a','qz-b','qz-c','qz-d'].forEach(id => { const e = document.getElementById(id); if (e) e.value = ''; });
+  if (sakteEl) sakteEl.value = '1';
+  if (statusEl) { statusEl.style.color = 'var(--green-main)'; statusEl.textContent = '✓ U shtua'; setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2000); }
+  await ngarkoQuizMesuese();
+}
+
+async function ngarkoQuizMesuese() {
+  const el = document.getElementById('quiz-list');
+  if (!el) return;
+  const { data: quizet } = await db.from('quizet').select('*').eq('mesuese_id', currentUser.id).order('krijuar_me', { ascending: false });
+  if (!quizet || quizet.length === 0) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka pyetje kuiz. Shto te paren lart.</p></div></div>'; return; }
+  const grupe = {};
+  quizet.forEach(q => { const t = q.tema || 'Pa teme'; if (!grupe[t]) grupe[t] = []; grupe[t].push(q); });
+  let html = '';
+  Object.entries(grupe).forEach(([tema, lista]) => {
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--green-dark);">❓ ${tema}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:var(--green-pale);padding:2px 8px;border-radius:10px;">${lista.length} pyetje</span>
+      </div>`;
+    lista.forEach((q, i) => {
+      const opsionet = [[1,'A',q.opsioni_a],[2,'B',q.opsioni_b],[3,'C',q.opsioni_c],[4,'D',q.opsioni_d]].filter(o => o[2]);
+      let opsHtml = '';
+      opsionet.forEach(o => {
+        const eshteSakte = o[0] === q.sakte;
+        opsHtml += `<div style="font-size:13px;padding:5px 10px;margin-top:5px;border-radius:6px;${eshteSakte ? 'background:var(--green-pale);color:var(--green-main);font-weight:600;border:1px solid var(--green-main);' : 'background:var(--green-ultra);color:var(--text-mid);'}">${o[1]}. ${o[2]} ${eshteSakte ? '✓' : ''}</div>`;
+      });
+      html += `<div style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;gap:10px;">
+          <div style="font-weight:600;font-size:14px;color:var(--text-dark);">${i+1}. ${q.pyetja}</div>
+          <span onclick="fshijQuiz('${q.id}')" title="Fshij" style="cursor:pointer;font-size:13px;flex-shrink:0;">🗑️</span>
+        </div>
+        <div style="margin-top:8px;">${opsHtml}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  el.innerHTML = html;
+}
+
+async function fshijQuiz(id) {
+  if (!confirm('Fshij kete pyetje kuiz?')) return;
+  await db.from('quizet').delete().eq('id', id);
+  await ngarkoQuizMesuese();
+}
+
+// ===== Quiz (ana e prindit/nxenesit) - interaktiv =====
+async function ngarkoQuizPrind() {
+  const el = document.getElementById('quizprind-list');
+  if (!el) return;
+  const mesueseId = window._prindMesueseId;
+  if (!mesueseId) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Ende nuk ka kuiz.</p></div></div>'; return; }
+  const { data: quizet } = await db.from('quizet').select('*').eq('mesuese_id', mesueseId).order('krijuar_me', { ascending: false });
+  if (!quizet || quizet.length === 0) { el.innerHTML = '<div class="card"><div class="empty-state"><p>Mesuesja ende nuk ka shtuar kuiz.</p></div></div>'; return; }
+  const grupe = {};
+  quizet.forEach(q => { const t = q.tema || 'Pa teme'; if (!grupe[t]) grupe[t] = []; grupe[t].push(q); });
+  let html = '';
+  let gi = 0;
+  Object.entries(grupe).forEach(([tema, lista]) => {
+    const gid = gi++;
+    html += `<div class="card">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+        <span style="font-family:'DM Serif Display',serif;font-size:1.15rem;color:var(--green-dark);">❓ ${tema}</span>
+        <span style="font-size:11px;color:var(--text-soft);background:var(--green-pale);padding:2px 8px;border-radius:10px;">${lista.length} pyetje</span>
+      </div>
+      <div id="quiz_group_${gid}">`;
+    lista.forEach((q, i) => {
+      const pid = q.id.replace(/-/g,'');
+      const opsionet = [[1,'A',q.opsioni_a],[2,'B',q.opsioni_b],[3,'C',q.opsioni_c],[4,'D',q.opsioni_d]].filter(o => o[2]);
+      html += `<div class="quiz-pyetje" data-pid="${pid}" data-sakte="${q.sakte || 0}" style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;">
+        <div style="font-weight:600;font-size:14px;color:var(--text-dark);margin-bottom:8px;">${i+1}. ${q.pyetja}</div>`;
+      opsionet.forEach(o => {
+        html += `<label id="opt_${pid}_${o[0]}" style="display:block;border:1.5px solid var(--border);border-radius:8px;padding:9px 12px;margin-top:7px;cursor:pointer;font-size:13px;color:var(--text-dark);">
+          <input type="radio" name="quiz_${pid}" value="${o[0]}" style="margin-right:8px;vertical-align:middle;">${o[1]}. ${o[2]}</label>`;
+      });
+      html += `<div id="fb_${pid}" style="font-size:12px;font-weight:600;margin-top:8px;"></div></div>`;
+    });
+    html += `</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:6px;">
+        <button class="btn-green" onclick="kontrolloQuiz(${gid})">Kontrollo pergjigjet</button>
+        <span id="quiz_score_${gid}" style="font-weight:700;font-size:14px;"></span>
+      </div></div>`;
+  });
+  el.innerHTML = html;
+}
+
+function kontrolloQuiz(gid) {
+  const group = document.getElementById('quiz_group_' + gid);
+  if (!group) return;
+  const pyetjet = group.querySelectorAll('.quiz-pyetje');
+  let sakte = 0;
+  const total = pyetjet.length;
+  pyetjet.forEach(pq => {
+    const pid = pq.getAttribute('data-pid');
+    const correct = pq.getAttribute('data-sakte');
+    const sel = group.querySelector('input[name="quiz_' + pid + '"]:checked');
+    const fb = document.getElementById('fb_' + pid);
+    ['1','2','3','4'].forEach(v => {
+      const o = document.getElementById('opt_' + pid + '_' + v);
+      if (o) { o.style.borderColor = 'var(--border)'; o.style.background = 'white'; o.style.fontWeight = '400'; }
+    });
+    const correctOpt = document.getElementById('opt_' + pid + '_' + correct);
+    if (correctOpt) { correctOpt.style.borderColor = 'var(--green-main)'; correctOpt.style.background = 'var(--green-pale)'; correctOpt.style.fontWeight = '600'; }
+    if (sel) {
+      if (sel.value === correct) { sakte++; if (fb) { fb.textContent = '✓ Sakte'; fb.style.color = 'var(--green-main)'; } }
+      else {
+        const selOpt = document.getElementById('opt_' + pid + '_' + sel.value);
+        if (selOpt) { selOpt.style.borderColor = 'var(--danger)'; selOpt.style.background = 'var(--danger-light)'; }
+        if (fb) { fb.textContent = '✗ Gabim'; fb.style.color = 'var(--danger)'; }
+      }
+    } else { if (fb) { fb.textContent = '— Pa pergjigje'; fb.style.color = 'var(--text-soft)'; } }
+  });
+  const scoreEl = document.getElementById('quiz_score_' + gid);
+  if (scoreEl) { scoreEl.textContent = 'Rezultati: ' + sakte + '/' + total; scoreEl.style.color = (sakte === total) ? 'var(--green-main)' : 'var(--gold)'; }
+}
+
 async function shtoNxenes() {
   const emri = document.getElementById('sn-emri').value.trim();
   const mbiemri = document.getElementById('sn-mbiemri').value.trim();
@@ -1278,8 +1690,11 @@ async function shtoMesuese() {
 }
 
 async function buildPrindUI() {
-  buildTabs([{ id:'femija', label:'Femija im' }], 'femija');
+  buildTabs([{ id:'femija', label:'Femija im' }, { id:'pergatitjeprind', label:'📚 Pergatitje' }, { id:'ushtrimeprind', label:'✏️ Ushtrime' }, { id:'quizprind', label:'❓ Kuiz' }], 'femija');
   await loadFemijaData();
+  ngarkoPyetjetPrind();
+  ngarkoUshtrimePrind();
+  ngarkoQuizPrind();
 }
 
 let periudhatHapuraPrind = {};
@@ -1295,6 +1710,7 @@ async function loadFemijaData() {
 
   // Cilesimet e komenteve nga mesuesja e nxenesit
   window._prindKomentCilesimet = null;
+  window._prindMesueseId = nx.mesuese_id || null;
   if (nx.mesuese_id) {
     const { data: mesuesja } = await db.from('mesueset').select('komentet_aktive, komentet_ora_fillim, komentet_ora_mbarim').eq('id', nx.mesuese_id).single();
     window._prindKomentCilesimet = mesuesja || null;
