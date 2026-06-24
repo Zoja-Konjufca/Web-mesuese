@@ -149,6 +149,11 @@
   .new-col-input { width: 90px; padding: 5px 4px; border: 2px dashed var(--green-light); border-radius: 6px; font-size: 12px; text-align: center; font-family: 'DM Sans', sans-serif; outline: none; color: var(--text-mid); }
   .new-col-input:focus { border-color: var(--green-main); border-style: solid; }
   @media (max-width: 600px) { .content { padding: 14px; } .login-card { padding: 28px 22px; } .detail-content { padding: 14px; } }
+  .njoftim-chat-scroll { scrollbar-width: thin; scrollbar-color: var(--green-light) #e3ece6; overscroll-behavior: contain; }
+  .njoftim-chat-scroll::-webkit-scrollbar { width: 11px; }
+  .njoftim-chat-scroll::-webkit-scrollbar-track { background: #e3ece6; border-radius: 8px; margin: 4px; }
+  .njoftim-chat-scroll::-webkit-scrollbar-thumb { background: var(--green-light); border-radius: 8px; border: 2px solid #f7f9f5; }
+  .njoftim-chat-scroll::-webkit-scrollbar-thumb:hover { background: var(--green-mid); }
 </style>
 </head>
 <body>
@@ -1143,7 +1148,8 @@ async function ngarkoNjoftimetPrind(mesueseId) {
     return;
   }
 
-  let html = `<div id="njoftimet-chat" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;padding:12px;background:#f7f9f5;border-radius:var(--radius-sm);">`;
+  let html = `<div style="position:relative;">
+    <div id="njoftimet-chat" class="njoftim-chat-scroll" style="display:flex;flex-direction:column;gap:10px;max-height:500px;overflow-y:auto;padding:12px;background:#f7f9f5;border-radius:var(--radius-sm);">`;
   njoftimet.forEach(n => {
     const d = new Date(n.krijuar_me);
     const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'short', year:'numeric' }) + ' · ' + d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
@@ -1159,30 +1165,49 @@ async function ngarkoNjoftimetPrind(mesueseId) {
       </div>
     </div>`;
   });
-  html += `</div>`;
-  html += `<div id="njoftimet-hint" style="display:none;font-size:11px;color:var(--text-soft);text-align:center;margin-top:8px;">↓ Leviz poshte per te pare njoftimet e meparshme</div>`;
+  html += `</div>
+    <div id="njoftimet-fade" style="position:absolute;left:0;right:11px;bottom:0;height:30px;background:linear-gradient(rgba(247,249,245,0), #f7f9f5);pointer-events:none;border-radius:0 0 8px 8px;display:none;transition:opacity 0.2s;"></div>
+  </div>`;
+  html += `<div id="njoftimet-hint" style="display:none;font-size:12px;color:var(--green-main);font-weight:600;text-align:center;margin-top:8px;">↓ Leviz poshte brenda kutise per njoftimet me te vjetra</div>`;
   el.innerHTML = html;
 
   const teReja = njoftimet.filter(n => !njoftimetELexuara.has(n.id));
   const cont = document.getElementById('njoftimet-chat');
   const hint = document.getElementById('njoftimet-hint');
+  const fade = document.getElementById('njoftimet-fade');
 
-  // Trego vetem 3 njoftimet me te reja lart (ose te gjitha te rejat nese jane me shume se 3); te vjetrat me scroll poshte
-  if (cont) {
-    requestAnimationFrame(() => {
-      const items = cont.children;
-      const total = items.length;
-      let visibleCount = teReja.length > 3 ? teReja.length : 3;
-      visibleCount = Math.min(visibleCount, total);
-      if (total > visibleCount) {
-        const gap = 10, padV = 24, buffer = 2;
-        let h = 0;
-        for (let i = 0; i < visibleCount; i++) h += items[i].offsetHeight;
-        h += gap * (visibleCount - 1) + padV + buffer;
-        cont.style.maxHeight = Math.min(h, 500) + 'px';
-        if (hint) hint.style.display = 'block';
+  // Trego ~3 njoftimet me te reja lart (ose te gjitha te rejat nese jane me shume se 3); te vjetrat me scroll
+  function aplikoLartesine() {
+    if (!cont) return;
+    const items = cont.children;
+    const total = items.length;
+    let visibleCount = teReja.length > 3 ? teReja.length : 3;
+    visibleCount = Math.min(visibleCount, total);
+    if (total > visibleCount) {
+      const gap = 10, padV = 24, peek = 34;
+      let h = 0, anyZero = false;
+      for (let i = 0; i < visibleCount; i++) { const ih = items[i].offsetHeight; if (!ih) anyZero = true; h += ih; }
+      if (anyZero || h < 60) {
+        cont.style.maxHeight = '340px';
+      } else {
+        h += gap * (visibleCount - 1) + padV + peek;
+        cont.style.maxHeight = Math.min(h, 520) + 'px';
       }
-      cont.scrollTop = 0;
+      if (hint) hint.style.display = 'block';
+      if (fade) fade.style.display = 'block';
+    } else {
+      if (hint) hint.style.display = 'none';
+      if (fade) fade.style.display = 'none';
+    }
+    cont.scrollTop = 0;
+  }
+  requestAnimationFrame(() => requestAnimationFrame(aplikoLartesine));
+
+  // Fshih hijen kur prindi arrin fundin e listes
+  if (cont && fade) {
+    cont.addEventListener('scroll', () => {
+      const nefund = cont.scrollTop + cont.clientHeight >= cont.scrollHeight - 4;
+      fade.style.opacity = nefund ? '0' : '1';
     });
   }
 
