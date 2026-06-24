@@ -493,6 +493,29 @@ function getKolonatPerLende(lendaId, periudha) {
   return te_gjitha;
 }
 
+// HTML-i i butonit te komentit + paneli (perdoret ne render dhe pas ruajtjes se notes)
+function komentButtonHTML(notaId) {
+  return `<span onclick="togglePanelMesuese('panel_m_${notaId}','${notaId}')" style="cursor:pointer;font-size:11px;color:var(--green-main);">💬 Koment</span>
+    <div id="panel_m_${notaId}" style="display:none;margin-top:6px;text-align:left;">
+      <div id="komentet_m_${notaId}" style="margin-bottom:4px;"></div>
+      <div style="display:flex;gap:4px;">
+        <input id="inp_km_${notaId}" type="text" placeholder="Koment..." maxlength="200"
+          style="flex:1;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;"
+          onkeydown="if(event.key==='Enter')shtoKomentMesuese('${notaId}')">
+        <button onclick="shtoKomentMesuese('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;">→</button>
+      </div>
+    </div>`;
+}
+
+// Formaton daten dhe oren e notes per shfaqje ne qelize
+function dataOraHTML(dataISO) {
+  if (!dataISO) return '';
+  const d = new Date(dataISO);
+  const ds = d.toLocaleDateString('sq-AL', { day:'2-digit', month:'2-digit', year:'numeric' });
+  const os = d.toLocaleTimeString('sq-AL', { hour:'2-digit', minute:'2-digit' });
+  return `📅 ${ds}<br>🕐 ${os}`;
+}
+
 function renderDetailPage() {
   const nxenesi = window._detailNxenesi;
   const byLende = window._detailByLende;
@@ -552,6 +575,7 @@ function renderDetailPage() {
           const notaObj = arr.find(n => n.lloji === k);
           const nota = notaObj ? notaObj.nota : null;
           const notaId = notaObj ? notaObj.id : null;
+          const notaData = notaObj ? notaObj.data : null;
           const safeKey = k.replace(/[^a-zA-Z0-9]/g,'_');
           const inputId = `inp_${l.id}_${p}_${safeKey}`;
           const timerKey = `${l.id}_${p}_${k}`;
@@ -563,16 +587,8 @@ function renderDetailPage() {
                 onkeydown="if(event.key==='Enter'){clearTimeout(_debounceTimers['${timerKey}']); autoSaveNota('${l.id}',${p},'${k}','${inputId}','${timerKey}',true)}">
               <div class="save-status" id="status_${inputId}">${nota !== null ? '✓ e ruajtur' : ''}</div>
             </div>
-            ${nota !== null && notaId ? `<div style="margin-top:4px;"><span onclick="togglePanelMesuese('panel_m_${notaId}',' ${notaId}')" style="cursor:pointer;font-size:11px;color:var(--green-main);">💬 Koment</span></div>
-            <div id="panel_m_${notaId}" style="display:none;margin-top:6px;text-align:left;">
-              <div id="komentet_m_${notaId}" style="margin-bottom:4px;"></div>
-              <div style="display:flex;gap:4px;">
-                <input id="inp_km_${notaId}" type="text" placeholder="Koment..." maxlength="200"
-                  style="flex:1;padding:4px 6px;border:1.5px solid var(--border);border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;outline:none;"
-                  onkeydown="if(event.key==='Enter')shtoKomentMesuese('${notaId}')">
-                <button onclick="shtoKomentMesuese('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;">→</button>
-              </div>
-            </div>` : ''}
+            <div id="datetime_${inputId}" style="font-size:9px;color:var(--text-soft);margin-top:3px;line-height:1.4;">${nota !== null ? dataOraHTML(notaData) : ''}</div>
+            <div id="komentwrap_${inputId}" style="margin-top:4px;">${(nota !== null && notaId) ? komentButtonHTML(notaId) : ''}</div>
           </td>`;
         }).join('');
 
@@ -694,37 +710,60 @@ async function _ekzekutoRuajtjen(lendaId, periudha, kolona, nota, inputId, timer
   const statusEl = document.getElementById('status_' + inputId);
   const inp = document.getElementById(inputId);
   try {
+    const tani = new Date().toISOString();
+    let notaId;
+
     const { data: notatEkz } = await db.from('notat').select('id').eq('nxenesi_id', nxenesId).eq('lenda_id', lendaId).eq('periudha', periudha).eq('lloji', kolona);
-    if (notatEkz && notatEkz.length > 0) await db.from('notat').delete().eq('id', notatEkz[0].id);
 
-    const { error } = await db.from('notat').insert({
-      nxenesi_id: nxenesId, lenda_id: lendaId, mesuese_id: currentUser.id,
-      nota: nota, periudha: periudha, lloji: kolona, data_shenimit: new Date().toISOString()
-    });
-    if (error) throw error;
-
-    const { data: notatRe } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxenesId).order('data_shenimit', { ascending: true });
-    const byLendeRe = {};
-    if (notatRe) {
-      notatRe.forEach(n => {
-        if (!n.lendet) return;
-        if (!byLendeRe[n.lenda_id]) byLendeRe[n.lenda_id] = { emri: n.lendet.emri, periudhat: {} };
-        const p = n.periudha || 1;
-        if (!byLendeRe[n.lenda_id].periudhat[p]) byLendeRe[n.lenda_id].periudhat[p] = [];
-        byLendeRe[n.lenda_id].periudhat[p].push({ nota: n.nota, data: n.data_shenimit, lloji: n.lloji });
-      });
+    if (notatEkz && notatEkz.length > 0) {
+      // Perditeso noten ekzistuese — RUAN te njejten id, keshtu komentet nuk humbin
+      notaId = notatEkz[0].id;
+      const { error } = await db.from('notat').update({ nota: nota, mesuese_id: currentUser.id, data_shenimit: tani }).eq('id', notaId);
+      if (error) throw error;
+      // Hiq dyfishimet ne rast se ka pasur me shume se nje
+      for (let i = 1; i < notatEkz.length; i++) { await db.from('notat').delete().eq('id', notatEkz[i].id); }
+      // Note e perditesuar -> prindi ta shohe perseri si te re
+      await db.from('notat_te_lexuara').delete().eq('nota_id', notaId);
+    } else {
+      // Note e re
+      const { data: ins, error } = await db.from('notat').insert({
+        nxenesi_id: nxenesId, lenda_id: lendaId, mesuese_id: currentUser.id,
+        nota: nota, periudha: periudha, lloji: kolona, data_shenimit: tani
+      }).select().single();
+      if (error) throw error;
+      notaId = ins.id;
     }
-    window._detailByLende = byLendeRe;
+
+    // Perditeso te dhenat lokale ME id-ne dhe daten (qe butoni i komentit & data te dalin menjehere)
+    const byLende = window._detailByLende || {};
+    if (!byLende[lendaId]) {
+      const lObj = allLendet.find(l => l.id === lendaId);
+      byLende[lendaId] = { emri: lObj ? lObj.emri : '', periudhat: {} };
+    }
+    if (!byLende[lendaId].periudhat[periudha]) byLende[lendaId].periudhat[periudha] = [];
+    const ekz = byLende[lendaId].periudhat[periudha].find(n => n.lloji === kolona);
+    if (ekz) { ekz.nota = nota; ekz.id = notaId; ekz.data = tani; }
+    else { byLende[lendaId].periudhat[periudha].push({ nota: nota, id: notaId, data: tani, lloji: kolona }); }
+    window._detailByLende = byLende;
     periudhatHapura[lendaId + '_' + periudha] = true;
 
     if (inp) { inp.classList.remove('saving'); inp.classList.add('saved'); }
     if (statusEl) { statusEl.textContent = '✓ e ruajtur'; statusEl.className = 'save-status ok'; }
 
+    // Shfaq daten dhe oren menjehere
+    const dtEl = document.getElementById('datetime_' + inputId);
+    if (dtEl) dtEl.innerHTML = dataOraHTML(tani);
+
+    // Shfaq butonin e komentit menjehere (vetem nese nuk eshte aty tashme)
+    const wrap = document.getElementById('komentwrap_' + inputId);
+    if (wrap && !wrap.querySelector('span')) { wrap.innerHTML = komentButtonHTML(notaId); }
+
     // Dergo email njoftim te prinderi — perdor Edge Function
     dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona);
 
-    const arr = (byLendeRe[lendaId] && byLendeRe[lendaId].periudhat[periudha]) || [];
-    const notatP = arr.filter(n => n.nota !== null).map(n => n.nota);
+    // Perditeso mesataren e periudhes ne header
+    const arr = byLende[lendaId].periudhat[periudha] || [];
+    const notatP = arr.filter(n => n.nota !== null && n.nota !== undefined).map(n => n.nota);
     const mesP = notatP.length > 0 ? (notatP.reduce((a,b)=>a+b,0)/notatP.length).toFixed(1) : '—';
     const headerEl = document.getElementById(`header_${lendaId}_${periudha}`);
     if (headerEl) headerEl.textContent = `P${periudha}: ${mesP} ▲`;
@@ -1139,7 +1178,7 @@ function renderFemijaTabela() {
       } else {
         html += `<td style="text-align:center;border-left:2px solid var(--border);padding:12px 8px;cursor:pointer;${kaPatexuara ? 'background:#fff8e1;' : ''}" onclick="togglePeriudhePrind(${p})">
           <span class="grade-pill ${gc}">${mesStr}</span>
-          ${kaPatexuara ? '<div style="font-size:9px;color:#e65100;margin-top:3px;font-weight:600;">● Nota te reja</div>' : '<div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>'}
+          ${kaPatexuara ? '<div style="font-size:9px;color:#e65100;margin-top:3px;font-weight:600;">● Note e re</div>' : '<div style="font-size:9px;color:var(--text-soft);margin-top:3px;">▼ detaje</div>'}
         </td>`;
       }
     });
@@ -1239,6 +1278,7 @@ async function shtoKomentMesuese(notaId) {
     autori_id: currentUser.id,
     teksti: teksti
   });
+  // Mbyll dhe rihap panelin qe te shfaqet komenti i ri
   await togglePanelMesuese('panel_m_' + notaId, notaId);
   await togglePanelMesuese('panel_m_' + notaId, notaId);
 }
