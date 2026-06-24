@@ -825,6 +825,94 @@ async function dergoPrindErvetNjoftim(nxenesId, lendaId, nota, periudha, kolona)
   }
 }
 
+// ===== Cilesimet e komenteve (ana e mesueses) =====
+function renderCilesimetKomenteve() {
+  const el = document.getElementById('komentet-cilesimet');
+  if (!el || !currentUser) return;
+  const aktive = currentUser.komentet_aktive !== false;
+  const fillim = currentUser.komentet_ora_fillim || '';
+  const mbarim = currentUser.komentet_ora_mbarim || '';
+  el.innerHTML = `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">Cilesimet e komenteve nga prinderit</div>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:4px;">
+        <input type="checkbox" id="ck-komentet-aktive" ${aktive ? 'checked' : ''} onchange="toggleOrarKomenteve()" style="width:18px;height:18px;accent-color:var(--green-main);cursor:pointer;">
+        <span style="font-size:14px;font-weight:500;">Lejo prinderit te shkruajne komente</span>
+      </label>
+      <div style="font-size:12px;color:var(--text-soft);margin-left:28px;margin-bottom:14px;">Nese e c'aktivizon, prinderit i shohin komentet e vjetra por nuk mund te shkruajne te reja.</div>
+      <div id="orar-komenteve" style="display:${aktive ? 'block' : 'none'};padding-left:16px;border-left:2px solid var(--green-pale);margin-left:8px;">
+        <div style="font-size:13px;color:var(--text-mid);margin-bottom:8px;font-weight:500;">Orari i lejuar (opsional — lere bosh per gjate gjithe dites):</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:13px;color:var(--text-soft);">Nga</span>
+          <input type="time" id="komentet-fillim" value="${fillim}" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;color:var(--text-dark);">
+          <span style="font-size:13px;color:var(--text-soft);">deri</span>
+          <input type="time" id="komentet-mbarim" value="${mbarim}" style="padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;color:var(--text-dark);">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:16px;">
+        <button class="btn-green" onclick="ruajCilesimetKomenteve()">Ruaj cilesimet</button>
+        <span id="cilesimet-status" style="font-size:13px;font-weight:600;"></span>
+      </div>
+    </div>`;
+}
+
+function toggleOrarKomenteve() {
+  const ck = document.getElementById('ck-komentet-aktive');
+  const orar = document.getElementById('orar-komenteve');
+  if (ck && orar) orar.style.display = ck.checked ? 'block' : 'none';
+}
+
+async function ruajCilesimetKomenteve() {
+  const ck = document.getElementById('ck-komentet-aktive');
+  const fEl = document.getElementById('komentet-fillim');
+  const mEl = document.getElementById('komentet-mbarim');
+  const statusEl = document.getElementById('cilesimet-status');
+  const aktive = ck ? ck.checked : true;
+  const fillim = (aktive && fEl && fEl.value) ? fEl.value : null;
+  const mbarim = (aktive && mEl && mEl.value) ? mEl.value : null;
+  const { error } = await db.from('mesueset').update({
+    komentet_aktive: aktive,
+    komentet_ora_fillim: fillim,
+    komentet_ora_mbarim: mbarim
+  }).eq('id', currentUser.id);
+  if (error) {
+    if (statusEl) { statusEl.style.color = 'var(--danger)'; statusEl.textContent = '✗ Gabim gjate ruajtjes'; }
+    return;
+  }
+  currentUser.komentet_aktive = aktive;
+  currentUser.komentet_ora_fillim = fillim;
+  currentUser.komentet_ora_mbarim = mbarim;
+  if (statusEl) {
+    statusEl.style.color = 'var(--green-main)';
+    statusEl.textContent = '✓ U ruajten';
+    setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2500);
+  }
+}
+
+// A lejohen komentet e prindit tani, sipas cilesimeve te mesueses
+function komentetLejohen(cilesimet) {
+  if (!cilesimet || cilesimet.komentet_aktive === false) {
+    return { lejohet: false, mesazh: '🔒 Mesuesja i ka mbyllur komentet per momentin.' };
+  }
+  const fillim = cilesimet.komentet_ora_fillim;
+  const mbarim = cilesimet.komentet_ora_mbarim;
+  if (fillim && mbarim) {
+    const tani = new Date();
+    const minTani = tani.getHours() * 60 + tani.getMinutes();
+    const [fh, fm] = fillim.split(':').map(Number);
+    const [mh, mm] = mbarim.split(':').map(Number);
+    const minF = fh * 60 + fm;
+    const minM = mh * 60 + mm;
+    let brenda;
+    if (minF <= minM) brenda = minTani >= minF && minTani <= minM;
+    else brenda = minTani >= minF || minTani <= minM;
+    if (!brenda) {
+      return { lejohet: false, mesazh: `🕐 Komentet pranohen vetem nga ${fillim} deri ${mbarim}.` };
+    }
+  }
+  return { lejohet: true, mesazh: '' };
+}
+
 async function loadKomentet() {
   const el = document.getElementById('komentet-list');
   if (!el) return;
@@ -1064,6 +1152,13 @@ async function loadFemijaData() {
   document.getElementById('femija-emri').textContent = nx.emri + ' ' + nx.mbiemri;
   document.getElementById('femija-klasa').textContent = nx.klasat ? nx.klasat.emri : '';
 
+  // Cilesimet e komenteve nga mesuesja e nxenesit
+  window._prindKomentCilesimet = null;
+  if (nx.mesuese_id) {
+    const { data: mesuesja } = await db.from('mesueset').select('komentet_aktive, komentet_ora_fillim, komentet_ora_mbarim').eq('id', nx.mesuese_id).single();
+    window._prindKomentCilesimet = mesuesja || null;
+  }
+
   const { data: notat } = await db.from('notat').select('*, lendet(emri)').eq('nxenesi_id', nxId).order('data_shenimit', { ascending: true });
   const { data: lendet } = await db.from('lendet').select('*').order('emri');
   const { data: kolonatDB } = await db.from('kolonat_lendeve').select('*').order('renditja', { ascending: true });
@@ -1086,6 +1181,7 @@ function renderFemijaTabela() {
   const notat = window._prindNotat || [];
   const lendet = window._prindLendet || [];
   const kolonatDB = window._prindKolonat || [];
+  const lejimi = komentetLejohen(window._prindKomentCilesimet);
 
   const byLende = {};
   notat.forEach(n => {
@@ -1167,12 +1263,12 @@ function renderFemijaTabela() {
             <div id="${panelId}" style="display:none;margin-top:8px;text-align:left;background:white;border:1px solid var(--border);border-radius:8px;padding:10px;font-size:12px;">
               <div style="color:var(--text-soft);margin-bottom:6px;">📅 ${dataStr} &nbsp; 🕐 ${oraStr}</div>
               <div id="komentet_${notaId}" style="margin-bottom:8px;"></div>
-              <div style="display:flex;gap:6px;">
+              ${lejimi.lejohet ? `<div style="display:flex;gap:6px;">
                 <input id="inp_koment_${notaId}" type="text" placeholder="Shkruaj koment..." maxlength="200"
                   style="flex:1;padding:6px 8px;border:1.5px solid var(--border);border-radius:6px;font-size:12px;font-family:'DM Sans',sans-serif;outline:none;"
                   onkeydown="if(event.key==='Enter')shtoKomentPrind('${notaId}')">
                 <button onclick="shtoKomentPrind('${notaId}')" style="background:var(--green-main);color:white;border:none;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:12px;">→</button>
-              </div>
+              </div>` : `<div style="font-size:11px;color:#8a6d00;background:#fff8e1;border:1px solid #ffe0a3;border-radius:6px;padding:7px 9px;">${lejimi.mesazh}</div>`}
             </div>` : ''}
           </td>`;
         }).join('');
@@ -1364,6 +1460,8 @@ async function ngarkoKomentetPrind(notaId) {
 }
 
 async function shtoKomentPrind(notaId) {
+  const lejimi = komentetLejohen(window._prindKomentCilesimet);
+  if (!lejimi.lejohet) return;
   const inp = document.getElementById('inp_koment_' + notaId);
   if (!inp) return;
   const teksti = inp.value.trim();
